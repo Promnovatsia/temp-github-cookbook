@@ -8,8 +8,7 @@ module.exports = function(sequelize, DataTypes) {
             allowNull: false
         },
         amount: {
-            type: DataTypes.FLOAT,
-            allowNull: false
+            type: DataTypes.FLOAT
         },
         measure:{
             type: DataTypes.STRING

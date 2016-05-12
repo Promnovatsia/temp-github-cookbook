@@ -1,20 +1,22 @@
 <section ng-controller="RecipesController" ng-init="find()">
-  <div class="page-header">
-    <h1>Recipes</h1>
-  </div>
-  <div class="list-group">
-    <a ng-repeat="recipe in recipes" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
-      <small class="list-group-item-text">
-        Posted on
-        <span ng-bind="recipe.created | date:'mediumDate'"></span>
-        by
-        <span ng-bind="recipe.user.username"></span>
-      </small>
-      <h4 class="list-group-item-heading" ng-bind="recipe.title"></h4>
-      <p class="list-group-item-text" ng-bind="recipe.content"></p>
-    </a>
-  </div>
-  <div class="alert alert-warning text-center" ng-if="!recipes.length">
-    No recipes yet, why don't you <a ui-sref="recipes.create">create one</a>?
-  </div>
+    <div class="page-header">
+        <h1>
+            Recipes
+        </h1>
+    </div>
+    <div class="list-group">
+        <a ng-repeat="recipe in recipes" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
+            <small class="list-group-item-text">
+                Posted on
+                <span ng-bind="recipe.created | date:'mediumDate'"></span>
+                by
+                <span ng-bind="recipe.user.username"></span>
+            </small>
+            <h4 class="list-group-item-heading" ng-bind="recipe.title"></h4>
+            <p class="list-group-item-text" ng-bind="recipe.content"></p>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" ng-if="!recipes.length">
+        No recipes yet, why don't you <a ui-sref="recipes.create">create one</a>?
+    </div>
 </section>

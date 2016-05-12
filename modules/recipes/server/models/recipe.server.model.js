@@ -19,6 +19,8 @@ module.exports = function(sequelize, DataTypes) {
     },{
         associate: function(models) {
             Recipe.belongsTo(models.user);
+            Recipe.hasMany(models.ingridient, { onDelete: 'cascade' });
+            Recipe.hasMany(models.step, { onDelete: 'cascade' });
         }
     });
 

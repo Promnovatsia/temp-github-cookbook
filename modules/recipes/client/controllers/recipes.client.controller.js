@@ -5,6 +5,9 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
   function($scope, $stateParams, $location, Authentication, Recipes) {
     $scope.authentication = Authentication;
 
+      
+      $scope.isCollapsed = true;
+      
     // Create new Recipe
     $scope.create = function(isValid) {
       $scope.error = null;
@@ -16,10 +19,14 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
       }
 
       // Create new Recipe object
-      var recipe = new Recipes({
-        title: this.title,
-        content: this.content
-      });
+        
+        var recipe = new Recipes({
+            title: this.title,
+            content: this.content,
+            action: this.action,
+            device: this.device,
+            duration: this.duration
+        });
 
       // Redirect after save
       recipe.$save(function(response) {
