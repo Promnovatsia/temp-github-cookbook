@@ -4,9 +4,6 @@
 angular.module('recipes').controller('RecipesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes',
   function($scope, $stateParams, $location, Authentication, Recipes) {
     $scope.authentication = Authentication;
-
-      
-      $scope.isCollapsed = true;
       
     // Create new Recipe
     $scope.create = function(isValid) {

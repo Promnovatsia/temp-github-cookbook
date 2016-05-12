@@ -10,12 +10,26 @@ Thumbs.db
 .nodemonignore
 .sass-cache/
 node_modules/
-public/lib/
 app/tests/coverage/
 .bower-*/
 .idea/
 coverage/
 npm-debug.log
+
+# Angular and related
+public/lib/angular
+public/lib/angular-animate
+public/lib/angular-bootstrap
+public/lib/angular-file-upload
+public/lib/angular-messages
+public/lib/angular-mocks
+public/lib/angular-resource
+public/lib/angular-ui-router
+public/lib/angular-ui-utils
+public/lib/bootstrap
+public/lib/es5-shim
+public/lib/jquery
+public/lib/owasp-password-strength-test
 
 # SEAN.JS app and assets
 # ======================
