@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 var path = require('path'),
+    async = require('async'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   db = require(path.resolve('./config/lib/sequelize')).models,
   Recipe = db.recipe,
@@ -21,23 +22,27 @@ exports.create = function(req, res) {
                 errors: 'Could not create the recipe'
             });
         } else {
-            Step.create({ 
-                action: req.body.action,
-                device: req.body.device,
-                duration: req.body.duration
-            })
-            .then(function(step){
-                if (!step) {
-                    return res.send('users/signup', {
-                        errors: 'Could not create the step of recipe'
-                    });    
-                } else {
-                    step.setRecipe(recipe)
-                    .then(function(step){
-                        return res.jsonp(step);
-                    });
-                }
-            });
+            async.forEach(req.body.steps, function (item,callback){
+                Step.create({
+                    'index': item.index,
+                    action: item.action,
+                    device: item.device,
+                    duration: item.duration
+                })
+                .then(function(step){
+                    if (!step) {
+                        return res.send('users/signup', {
+                            errors: 'Could not create the step of recipe'
+                        });    
+                    } else {
+                        step.setRecipe(recipe)
+                        .then(function(step){
+                            //res.jsonp(step);
+                        });
+                    }
+                });
+                callback();
+            });      
             res.jsonp(recipe);
         }
     })
@@ -62,7 +67,8 @@ exports.update = function(req, res) {
     var recipe = req.recipe;
     recipe.updateAttributes({
         title: req.body.title,
-        content: req.body.content 
+        content: req.body.content,
+        steps: req.body.steps
     })
     .then(function(recipe) {
         return res.json(recipe);

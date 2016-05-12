@@ -4,6 +4,24 @@
 angular.module('recipes').controller('RecipesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes',
   function($scope, $stateParams, $location, Authentication, Recipes) {
     $scope.authentication = Authentication;
+    
+     
+    //tree test
+        $scope.removeStep = function (node) {          
+            $scope.data.splice(node.step.index,1);
+            $scope.data.forEach(function(item, i, arr) {
+                item.index = i;
+            });
+        };
+        
+        $scope.newStep = function () {
+            $scope.data.push({
+                'index': $scope.data.length,
+                action: 'action ' + ($scope.data.length + 1),
+                device: 'device',
+                duration: 'duration'
+            });
+        };  
       
     // Create new Recipe
     $scope.create = function(isValid) {
@@ -20,10 +38,10 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
         var recipe = new Recipes({
             title: this.title,
             content: this.content,
-            action: this.action,
-            device: this.device,
-            duration: this.duration
+            steps: this.data
         });
+        
+        console.log(recipe.steps);
 
       // Redirect after save
       recipe.$save(function(response) {
@@ -32,11 +50,13 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
         // Clear form fields
         $scope.title = '';
         $scope.content = '';
+          $scope.data = [];
       }, function(errorResponse) {
         $scope.error = errorResponse.data.message;
       });
     };
-
+      
+      
     // Remove existing Recipe
     $scope.remove = function(recipe) {
       if (recipe) {
@@ -60,6 +80,7 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
       }
 
       var recipe = $scope.recipe;
+        recipe.steps = $scope.data;
 
       recipe.$update(function() {
         $location.path('recipes/' + recipe.id);
@@ -78,6 +99,7 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
       $scope.recipe = Recipes.get({
         recipeId: $stateParams.recipeId
       });
+        $scope.data = $scope.recipe.steps;
     };
   }
 ]);

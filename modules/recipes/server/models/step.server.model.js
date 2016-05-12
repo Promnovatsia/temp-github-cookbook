@@ -3,6 +3,10 @@
 module.exports = function(sequelize, DataTypes) {
 
     var Step = sequelize.define('step',{
+        'index' : {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         action: {
             type: DataTypes.STRING,
             allowNull: false
