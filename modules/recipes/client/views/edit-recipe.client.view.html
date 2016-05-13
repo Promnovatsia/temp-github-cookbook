@@ -33,34 +33,34 @@
                                     <th>Sort</th>
                                     <th width="80%">Name</th>
                                     <th>
-                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newStep()" style="margin-right: 8px;">
+                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newExistingStep()" style="margin-right: 8px;">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody ui-tree-nodes ng-model="data">
-                                <tr ng-repeat="step in data" ui-tree-node>
+                            <tbody ui-tree-nodes ng-model="recipe.steps">
+                                <tr ng-repeat="step in recipe.steps" ui-tree-node>
                                     <td>
                                         <i class="glyphicon glyphicon-resize-vertical" ui-tree-handle></i> 
                                     </td>
                                     <td>
                                         <strong>{{step.index+1}}</strong>
-                                        <div class="form-group">
+                                        <div class="form-group" data-nodrag>
                                             <label for="action">Action</label>
                                             <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" placeholder="Action"></textarea>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group" data-nodrag>
                                             <label for="device">Device</label>
                                             <textarea name="device" ng-model="step.device" id="device" class="form-control" cols="30" rows="3" placeholder="Device"></textarea>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group" data-nodrag>
                                             <label for="duration">Duration</label>
                                             <textarea name="duration" ng-model="step.duration" id="duration" class="form-control" cols="30" rows="3" placeholder="Duration"></textarea>
                                         </div>
                                     </td>
                                     <td>
-                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep(this)">
+                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeExistingStep(this)">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     </td>
