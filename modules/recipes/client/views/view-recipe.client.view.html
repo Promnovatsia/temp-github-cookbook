@@ -19,4 +19,13 @@
     </em>
   </small>
   <p class="lead" ng-bind="recipe.content"></p>
+    <ol>
+        <li ng-repeat="step in recipe.steps">
+            <span ng-bind="step.action"></span>
+            <hr>
+            <small>
+                {{step.device}} at {{step.duration}}
+            </small>
+        </li>
+    </ol>
 </section>

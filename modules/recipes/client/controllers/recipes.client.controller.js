@@ -57,8 +57,6 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
             content: this.content,
             steps: this.data
         });
-        
-        console.log(recipe.steps);
 
       // Redirect after save
       recipe.$save(function(response) {
