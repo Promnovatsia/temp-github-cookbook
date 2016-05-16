@@ -40,6 +40,22 @@ angular.module('recipes').controller('RecipesController', ['$scope', '$statePara
             });
         };
       
+      $scope.treeOptionsCreate = {
+        dropped : function (e) {
+            $scope.data.forEach(function(item, i, arr) {
+                item.index = i;
+            });
+        }
+      };
+      
+      $scope.treeOptionsUpdate = {
+        dropped : function (e) {
+            $scope.recipe.steps.forEach(function(item, i, arr) {
+                item.index = i;
+            });
+        }
+      };
+      
     // Create new Recipe
     $scope.create = function(isValid) {
       $scope.error = null;
