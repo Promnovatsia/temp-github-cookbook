@@ -18,11 +18,47 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <table ui-tree="treeOptionsCreate" id="tree-root" class="table table-responsive">
+                        <table ui-tree="treeIgridientsCreate" id="tree-root-ingridient" class="table table-responsive">
                             <thead>
                                 <tr>
                                     <th>Sort</th>
-                                    <th width="80%">Name</th>
+                                    <th width="80%">Ingridient</th>
+                                    <th>
+                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newIngridient()" style="margin-right: 8px;">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody ui-tree-nodes ng-model="ingridientData">
+                                <tr ng-repeat="ingridient in ingridientData" ui-tree-node>
+                                    <td>
+                                        <strong>{{ingridient.index+1}}</strong>
+                                        <i class="glyphicon glyphicon-resize-vertical" ui-tree-handle></i>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <textarea name="caption" ng-model="ingridient.caption" id="caption" class="form-control" cols="20" rows="1" placeholder="Ingridient"></textarea>
+                                        </div>
+                                        <h-number value="ingridient.amount" min="1" max="10" step="1"></h-number>
+                                    </td>
+                                    <td>
+                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeIngridient(this)">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <table ui-tree="treeStepsCreate" id="tree-root-step" class="table table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Sort</th>
+                                    <th width="80%">Step</th>
                                     <th>
                                         <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newStep()" style="margin-right: 8px;">
                                             <span class="glyphicon glyphicon-plus"></span>
@@ -30,25 +66,25 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody ui-tree-nodes ng-model="data">
-                                <tr ng-repeat="step in data" ui-tree-node>
-                                    <td>
-                                        <i class="glyphicon glyphicon-resize-vertical" ui-tree-handle></i> 
-                                    </td>
+                            <tbody ui-tree-nodes ng-model="stepData">
+                                <tr ng-repeat="step in stepData" ui-tree-node>
                                     <td>
                                         <strong>{{step.index+1}}</strong>
+                                        <span class="glyphicon glyphicon-resize-vertical" ui-tree-handle></span>
+                                    </td>
+                                    <td>
                                         <div class="form-group">
                                             <label for="action">Action</label>
                                             <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" placeholder="Action"></textarea>
                                         </div>
-                                        <div class="form-group">
+                                        <!--<div class="form-group">
                                             <label for="device">Device</label>
                                             <textarea name="device" ng-model="step.device" id="device" class="form-control" cols="30" rows="3" placeholder="Device"></textarea>
                                         </div>
                                         <div class="form-group">
                                             <label for="duration">Duration</label>
                                             <textarea name="duration" ng-model="step.duration" id="duration" class="form-control" cols="30" rows="3" placeholder="Duration"></textarea>
-                                        </div>
+                                        </div>-->
                                     </td>
                                     <td>
                                         <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep(this)">

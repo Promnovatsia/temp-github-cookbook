@@ -5,10 +5,12 @@
  */
 var path = require('path'),
     async = require('async'),
-  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
-  db = require(path.resolve('./config/lib/sequelize')).models,
-  Recipe = db.recipe,
-  Step = db.step;
+    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+    db = require(path.resolve('./config/lib/sequelize')).models,
+        Recipe = db.recipe,
+        Step = db.step,
+        Ingridient = db.ingridient
+    ;
 
 /**
  * Create a recipe
@@ -36,12 +38,32 @@ exports.create = function(req, res) {
                         });    
                     } else {
                         step.setRecipe(recipe)
-                        .then(function(step){
+                        .then(function(){
                             callback();
                         });
                     }
                 });
-            });      
+            });
+            async.forEach(req.body.ingridients, function (item,callback){
+                Ingridient.create({
+                    'index': item.index,
+                    caption: item.caption,
+                    amount: item.amount,
+                    measure: item.measure
+                })
+                .then(function(ingridient){
+                    if (!ingridient) {
+                        return res.send('users/signup', {
+                            errors: 'Could not create the ingridient of recipe'
+                        });    
+                    } else {
+                        ingridient.setRecipe(recipe)
+                        .then(function(){
+                            callback();
+                        });
+                    }
+                });
+            });
             return res.jsonp(recipe);
         }
     })
@@ -144,7 +166,10 @@ exports.recipeByID = function(req, res, next, id) {
           {model: db.step},
           {model: db.ingridient}
       ],
-      order: [[{model: db.step}, 'index']]
+      order: [
+          [{model: db.step}, 'index'],
+          [{model: db.ingridient}, 'index']
+      ]
   }).then(function(recipe) {
     if (!recipe) {
       return res.status(404).send({

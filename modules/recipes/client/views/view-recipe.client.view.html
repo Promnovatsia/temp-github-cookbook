@@ -20,12 +20,21 @@
   </small>
   <p class="lead" ng-bind="recipe.content"></p>
     <ol>
+        <li ng-repeat="ingridient in recipe.ingridients">
+            <span ng-bind="ingridient.caption"></span>
+            <hr>
+            <!--            <small>
+                {{step.device}} at {{step.duration}}
+            </small>-->
+        </li>
+    </ol>
+    <ol>
         <li ng-repeat="step in recipe.steps">
             <span ng-bind="step.action"></span>
             <hr>
-            <small>
+            <!--            <small>
                 {{step.device}} at {{step.duration}}
-            </small>
+            </small>-->
         </li>
     </ol>
 </section>

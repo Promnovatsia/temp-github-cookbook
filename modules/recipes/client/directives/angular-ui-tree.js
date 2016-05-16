@@ -157,16 +157,17 @@
         function countSubTreeDepth(scope) {
           var thisLevelDepth = 0,
               childNodes = scope.childNodes(),
-              childNode,
-              childDepth,
+              //childNode,
+              //childDepth,
               i;
           if (!childNodes || childNodes.length === 0) {
             return 0;
           }
           for (i = childNodes.length - 1; i >= 0 ; i--) {
-            childNode = childNodes[i],
-            childDepth = 1 + countSubTreeDepth(childNode);
-            thisLevelDepth = Math.max(thisLevelDepth, childDepth);
+                thisLevelDepth = Math.max(thisLevelDepth, 1 + countSubTreeDepth(childNodes[i]));
+              //childNode = childNodes[i],
+            //childDepth = 1 + countSubTreeDepth(childNode);
+            //thisLevelDepth = Math.max(thisLevelDepth, childDepth);
           }
           return thisLevelDepth;
         }
@@ -243,7 +244,8 @@
           var index = $scope.$modelValue.indexOf(node.$modelValue);
           if (index > -1) {
             $scope.safeApply(function () {
-              $scope.$modelValue.splice(index, 1)[0];
+             // $scope.$modelValue.splice(index, 1)[0];
+                $scope.$modelValue.splice(index, 1);
             });
             return $scope.$treeScope.$callbacks.removed(node);
           }
