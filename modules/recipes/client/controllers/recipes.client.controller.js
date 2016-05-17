@@ -26,7 +26,8 @@ angular.module('recipes').controller('RecipesController',
                 'index': $scope.ingridientData.length,
                 caption: 'ingridient ' + ($scope.ingridientData.length + 1),
                 amount: 1,
-                measure: 'item'
+                measure: 'item',
+                isPopover: false
             });
         };
         
@@ -52,15 +53,39 @@ angular.module('recipes').controller('RecipesController',
                 'index': $scope.recipe.ingridients.length,
                 caption: 'ingridient ' + ($scope.recipe.ingridients.length + 1),
                 amount: 1,
-                measure: 'item'
+                isPopover: false
             });
         };
         
         $scope.removeExistingIngridient = function (node) {          
             $scope.recipe.ingridients.splice(node.ingridient.index,1);
-            $scope.recipe.ingridient.forEach(function(item, i, arr) {
+            $scope.recipe.ingridients.forEach(function(item, i, arr) {
                 item.index = i;
             });
+        };
+    
+    //UI func
+        
+        $scope.globalPopoverEnable = false;
+        
+        $scope.amountMinus = function(item) {
+            item.amount--;
+            if(item.amount<1){
+                item.amount=1;
+            }
+            item.isPopover=false;
+        };
+        
+        $scope.amountPlus = function(item) {
+            item.amount++;
+            item.isPopover=false;
+        };
+        
+        $scope.applyAmount = function(item) {
+            if(item.amount<1){
+                item.amount=1;
+            }
+            item.isPopover=false;
         };
         
 //Steps

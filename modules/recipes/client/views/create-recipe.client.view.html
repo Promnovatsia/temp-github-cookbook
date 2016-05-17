@@ -12,13 +12,10 @@
                         <p class="help-block error-text" ng-message="required">Recipe title is required.</p>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="content">Content</label>
-                    <textarea name="content" ng-model="content" id="content" class="form-control" cols="30" rows="10" placeholder="Content"></textarea>
-                </div>
                 <div class="row">
-                    <div class="col-sm-6">
-                        <table ui-tree="treeIgridientsCreate" id="tree-root-ingridient" class="table table-responsive">
+                    <div class="col-md-12">
+                        <label for="tree-root-ingridient">Ingridients</label>
+                        <table ui-tree="treeIngridientsCreate" id="tree-root-ingridient" class="table table-responsive">
                             <thead>
                                 <tr>
                                     <th>Sort</th>
@@ -38,9 +35,44 @@
                                     </td>
                                     <td>
                                         <div class="form-group">
-                                            <textarea name="caption" ng-model="ingridient.caption" id="caption" class="form-control" cols="20" rows="1" placeholder="Ingridient"></textarea>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <textarea name="caption" ng-model="ingridient.caption" id="caption" class="form-control" cols="30" rows="1" placeholder="Ingridient"></textarea>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <table class="table table-responsive borderless">
+                                                        <th width="15%">
+                                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="amountMinus(ingridient)" id="amountMinus">
+                                                                <span class="glyphicon glyphicon-minus"></span>
+                                                            </a>
+                                                        </th>
+                                                        <th width="60%">
+                                                            <a class="btn btn-secondary btn-block" data-nodrag popover-template="'app/template/my-popover-template.html'" popover-placement="top" popover-is-open="ingridient.isPopover">
+                                                                {{ingridient.amount}}
+                                                            </a>
+                                                            <script type="text/ng-template" id="app/template/my-popover-template.html">
+                                                                <div>
+                                                                    <div class="form-group">
+                                                                        <input type="number" ng-model="ingridient.amount" class="form-control">
+                                                                        <button type="button" class="btn btn-primary btn-block" ng-click="applyAmount(ingridient)">
+                                                                            OK
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </script>
+                                                        </th>
+                                                        <th width="15%">
+                                                            <a class="btn btn-primary btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </a>
+                                                        </th>
+                                                    </table>  
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input name="measure" type="text" ng.model="ingridient.measure" id="measure" class="form-control">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <h-number value="ingridient.amount" min="1" max="10" step="1"></h-number>
                                     </td>
                                     <td>
                                         <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeIngridient(this)">
@@ -53,7 +85,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-md-12">
+                        <label for="tree-root-step">Steps</label>
                         <table ui-tree="treeStepsCreate" id="tree-root-step" class="table table-responsive">
                             <thead>
                                 <tr>
@@ -95,6 +128,10 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea name="content" ng-model="content" id="content" class="form-control" cols="30" rows="10" placeholder="Content"></textarea>
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-default">

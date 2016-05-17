@@ -48,8 +48,7 @@ exports.create = function(req, res) {
                 Ingridient.create({
                     'index': item.index,
                     caption: item.caption,
-                    amount: item.amount,
-                    measure: item.measure
+                    amount: item.amount
                 })
                 .then(function(ingridient){
                     if (!ingridient) {

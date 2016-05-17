@@ -2,7 +2,7 @@
 
 module.exports = function(sequelize, DataTypes) {
 
-    var Ingridient = sequelize.define('ingridient', {
+    var Measure = sequelize.define('measure', {
         'index' : {
             type: DataTypes.INTEGER,
             allowNull: false
@@ -11,15 +11,15 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
-        amount: {
-            type: DataTypes.INTEGER
+        measureStep: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     },{
         associate: function(models) {
-            Ingridient.belongsTo(models.recipe);
-            Ingridient.belongsTo(models.measure);
+            Measure.hasMany(models.ingridient);
         }
     });
     
-return Ingridient;
+return Measure;
 };
