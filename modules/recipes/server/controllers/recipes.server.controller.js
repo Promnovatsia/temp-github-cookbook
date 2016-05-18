@@ -18,13 +18,17 @@ var path = require('path'),
 exports.create = function(req, res) {
 
     req.body.userId = req.user.id;
+    console.log(req.body);
     Recipe.create(req.body).then(function(recipe) {
         if (!recipe) {
             return res.send('users/signup', {
                 errors: 'Could not create the recipe'
             });
         } else {
-            async.forEach(req.body.steps, function (item,callback){
+            //async.forEach(req.body.ingridients, function (item,callback){
+            //    recipe.addIngridient()
+            //}
+            /*async.forEach(req.body.steps, function (item,callback){
                 Step.create({
                     'index': item.index,
                     action: item.action,
@@ -43,8 +47,8 @@ exports.create = function(req, res) {
                         });
                     }
                 });
-            });
-            async.forEach(req.body.ingridients, function (item,callback){
+            });*/
+            /*async.forEach(req.body.ingridients, function (item,callback){
                 Ingridient.create({
                     'index': item.index,
                     caption: item.caption,
@@ -62,7 +66,7 @@ exports.create = function(req, res) {
                         });
                     }
                 });
-            });
+            });*/
             return res.jsonp(recipe);
         }
     })
@@ -78,6 +82,10 @@ exports.create = function(req, res) {
  */
 exports.read = function(req, res) {
   res.json(req.recipe);
+};
+
+exports.ingridientRead = function(req, res) {
+  res.json(req.ingridient);
 };
 
 /**
@@ -131,18 +139,71 @@ exports.delete = function(req, res) {
 exports.list = function(req, res) {
   Recipe.findAll({
       //model: ,
-    include: [db.user, db.step, db.ingridient]
+    include: [db.user, db.ingridient]
   }).then(function(recipes) {
     if (!recipes) {
       return res.status(404).send({
         message: 'No recipes found'
       });
     } else {
+        console.log(recipes);
       return res.json(recipes);
     }
   }).catch(function(err) {
     res.jsonp(err);
   });
+};
+
+exports.ingridientList = function(req, res) {
+    Ingridient.findAll({
+        raw: true//include: [db.user, db.ingridient]
+    })
+    .then(function(ingridients) {
+        if (!ingridients) {
+            return res.status(404).send({
+            message: 'No ingridients found'
+        });
+        } else {
+            console.log(ingridients);
+            return res.json(ingridients);
+        }
+    })
+    .catch(function(err) {
+        res.jsonp(err);
+    });
+};
+
+/**
+ * ingridient middleware
+ */
+exports.ingridientByID = function(req, res, next, id) {
+
+    if ((id % 1 === 0) === false) { //check if it's integer
+        return res.status(404).send({
+            message: 'Ingridient is invalid'
+        });
+    }
+  
+    Ingridient.findOne({
+        where: {
+            id: id
+        }
+    })
+    .then(function(ingridient) {
+        if (!ingridient) {
+            return res.status(404).send({
+                message: 'No ingridient with that identifier has been found'
+            });
+        } else {
+            console.log(ingridient);
+            req.ingridient = ingridient;
+            next();
+            return null;
+        }
+    })
+    .catch(function(err) {
+        return next(err);
+    });
 };
 
 /**
@@ -162,19 +223,20 @@ exports.recipeByID = function(req, res, next, id) {
     },
       include: [
           {model: db.user},
-          {model: db.step},
-          {model: db.ingridient}
-      ],
-      order: [
-          [{model: db.step}, 'index'],
-          [{model: db.ingridient}, 'index']
-      ]
+          //{model: db.step},
+          //{model: db.ingridient}
+      ]//,
+      //order: [
+          //[{model: db.step}, 'index'],
+    //      [{model: db.ingridient}, 'index']
+     // ]
   }).then(function(recipe) {
     if (!recipe) {
       return res.status(404).send({
         message: 'No recipe with that identifier has been found'
       });
     } else {
+        console.log(recipe);
       req.recipe = recipe;
       next();
     return null;

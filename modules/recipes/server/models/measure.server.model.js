@@ -7,18 +7,51 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        caption: {
+        captionSingular: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        measureStep: {
-            type: DataTypes.INTEGER,
+        captionSemiplural: {
+            type: DataTypes.STRING,
             allowNull: false
+        },
+        captionPlural: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        step: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        min: {
+            type: DataTypes.FLOAT,
+            allowNull: false
+        },
+        type: {
+            type: DataTypes.STRING
+        },
+        converter: {
+            type: DataTypes.JSONB
+            /*{
+                measureB: {
+                    type: DataTypes.INTEGER,
+                    references:
+                        {
+                            model: models.measure,
+                            key: "id"
+                        }
+                },
+                rate: {
+                    type: DateTypes.FLOAT,
+                    allowNull: false
+                }
+            }*/
         }
     },{
         associate: function(models) {
-            Measure.hasMany(models.ingridient);
-        }
+            Measure.hasMany(models.ingridientAmount);
+        },
+        timestamps: false
     });
     
 return Measure;

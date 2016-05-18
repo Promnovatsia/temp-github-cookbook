@@ -7,20 +7,47 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-        len: {
-          args: [1, 250],
-          msg: "Recipe title must be between 1 and 250 characters in length"
+                len: {
+                    args: [1, 250],
+                    msg: "Recipe title must be between 1 and 250 characters in length"
+                },
+            }
         },
-      }
+        steps: {
+            type: DataTypes.ARRAY(DataTypes.JSONB)
+                /*'index' : {
+                    type: DataTypes.INTEGER,
+                    allowNull: false
+                },
+                action: {
+                    type: DataTypes.STRING,
+                    allowNull: false
+                },
+                device: {
+                    type: DataTypes.STRING
+                },
+                duration: {
+                    type: DataTypes.STRING
+                }*/
         },
         content: {
             type: DataTypes.TEXT
+        },
+        portions: {
+            type: DataTypes.INTEGER,
+            defaultValue: 2
+        },
+        mainIngridient: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
         }
     },{
         associate: function(models) {
             Recipe.belongsTo(models.user);
-            Recipe.hasMany(models.ingridient, { onDelete: 'cascade' });
-            Recipe.hasMany(models.step, { onDelete: 'cascade' });
+            Recipe.belongsToMany(models.ingridient,{
+                through: models.ingridientAmount
+            });
         }
     });
 

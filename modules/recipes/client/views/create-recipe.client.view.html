@@ -37,7 +37,17 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <textarea name="caption" ng-model="ingridient.caption" id="caption" class="form-control" cols="30" rows="1" placeholder="Ingridient"></textarea>
+                                                    <!--<textarea name="caption" ng-model="ingridient.caption" id="caption" class="form-control" cols="30" rows="1" placeholder="Ingridient"></textarea>-->
+                                                    <input type="text" ng-model="ingridient.caption"
+                                                        placeholder="Locations loaded via $http"
+                                                        uib-typeahead="caption for caption in getIngridientList() | filter:$viewValue | limitTo:8"
+                                                        typeahead-loading="loadingLocations"
+                                                        typeahead-no-results="noResults"
+                                                        class="form-control">
+                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                    <div ng-show="noResults">
+                                                        <i class="glyphicon glyphicon-remove"></i> No Results Found
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <table class="table table-responsive borderless">

@@ -2,14 +2,15 @@
 
 // Recipes controller
 angular.module('recipes').controller('RecipesController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes',
-    function($scope, $stateParams, $location, Authentication, Recipes) {
+                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients',
+    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients) {
         
         $scope.authentication = Authentication;      
 
 //Igridients
         
     $scope.ingridientData = [];
+    $scope.ingridientList = [];
         
     //create view
         
@@ -24,7 +25,7 @@ angular.module('recipes').controller('RecipesController',
         $scope.newIngridient = function () {
             $scope.ingridientData.push({
                 'index': $scope.ingridientData.length,
-                caption: 'ingridient ' + ($scope.ingridientData.length + 1),
+                //caption: 'ingridient' + ($scope.ingridientData.length + 1),
                 amount: 1,
                 measure: 'item',
                 isPopover: false
@@ -87,6 +88,15 @@ angular.module('recipes').controller('RecipesController',
             }
             item.isPopover=false;
         };
+        
+        $scope.getIngridientList = function() {
+            $scope.ingridientList = Ingridients.query();
+            console.log($scope.ingridientList);
+            return $scope.ingridientList;
+        }.then(function(response){
+            console.log(response);
+            return response;
+        });
         
 //Steps
         

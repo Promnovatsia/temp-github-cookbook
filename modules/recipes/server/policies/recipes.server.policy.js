@@ -35,7 +35,16 @@ exports.invokeRolesPolicies = function() {
     }, {
       resources: '/api/recipes/:recipeId',
       permissions: '*'
-    }]
+    },
+        {
+            resources: '/api/ingridients',
+            permissions: '*'
+        },
+        {
+            resources: '/api/ingridients/:ingridientId',
+            permissions: '*'
+        }
+    ]
   }, {
     roles: ['user'],
     allows: [{

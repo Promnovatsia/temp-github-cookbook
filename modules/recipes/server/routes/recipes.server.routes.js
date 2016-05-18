@@ -22,8 +22,17 @@ module.exports = function(app) {
     .get(recipes.read)
     .put(recipes.update)
     .delete(recipes.delete);
+    
+    app.route('/api/ingridients')
+        .all(recipesPolicy.isAllowed)
+        .get(recipes.ingridientList);
+    
+    app.route('/api/ingridients/:ingridientId')
+        .all(recipesPolicy.isAllowed)
+        .get(recipes.ingridientRead);
 
   // Finish by binding the recipe middleware
   app.param('recipeId', recipes.recipeByID);
+    app.param('ingridientId', recipes.ingridientByID);
 
 };

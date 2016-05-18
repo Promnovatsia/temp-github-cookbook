@@ -3,22 +3,34 @@
 module.exports = function(sequelize, DataTypes) {
 
     var Ingridient = sequelize.define('ingridient', {
-        'index' : {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
         caption: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        amount: {
-            type: DataTypes.INTEGER
+        infoCard: {
+            type: DataTypes.TEXT
+        },
+        image: {
+            type: DataTypes.STRING
+            //TODO validate as URL
+        },
+        measureDefault: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: "measures",
+                key: "id"
+            }
+        },
+        measureType: {
+            type: DataTypes.STRING
         }
     },{
         associate: function(models) {
-            Ingridient.belongsTo(models.recipe);
-            Ingridient.belongsTo(models.measure);
-        }
+            Ingridient.belongsToMany(models.recipe, {
+                through: models.ingridientAmount
+            });
+        },
+        timestamps: false
     });
     
 return Ingridient;
