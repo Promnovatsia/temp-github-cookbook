@@ -8,9 +8,16 @@ angular.module('recipes').controller('RecipesController',
         $scope.authentication = Authentication;      
 
 //Igridients
-        
+      
+        $scope.searchIngridient = false;
     $scope.ingridientData = [];
-    $scope.ingridientList = [];
+        
+        $scope.getIngridientList = function() {
+            return Ingridients.query().$promise;
+        };
+        
+        //$scope.ingridientList = $scope.getIngridientList();
+        
         
     //create view
         
@@ -23,13 +30,24 @@ angular.module('recipes').controller('RecipesController',
         };
         
         $scope.newIngridient = function () {
-            $scope.ingridientData.push({
-                'index': $scope.ingridientData.length,
-                //caption: 'ingridient' + ($scope.ingridientData.length + 1),
-                amount: 1,
-                measure: 'item',
-                isPopover: false
+            $scope.searchIngridient = false;
+        };
+        
+        $scope.newIngridientPush = function(index) {
+            Ingridients.get({
+                ingridientId: index
+            }).$promise.then(function(res){
+                console.log(res);
+                $scope.ingridientData.push({
+                    'index': $scope.ingridientData.length,
+                    caption: res.caption,
+                    infoCard: res.infoCard,
+                    amount: 1,
+                    measure: 'item',
+                    isPopover: false
             });
+                return res;
+            });            
         };
         
         $scope.removeIngridient = function (node) {          
@@ -88,15 +106,6 @@ angular.module('recipes').controller('RecipesController',
             }
             item.isPopover=false;
         };
-        
-        $scope.getIngridientList = function() {
-            $scope.ingridientList = Ingridients.query();
-            console.log($scope.ingridientList);
-            return $scope.ingridientList;
-        }.then(function(response){
-            console.log(response);
-            return response;
-        });
         
 //Steps
         

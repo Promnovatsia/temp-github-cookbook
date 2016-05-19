@@ -164,7 +164,6 @@ exports.ingridientList = function(req, res) {
             message: 'No ingridients found'
         });
         } else {
-            console.log(ingridients);
             return res.json(ingridients);
         }
     })
@@ -187,7 +186,8 @@ exports.ingridientByID = function(req, res, next, id) {
     Ingridient.findOne({
         where: {
             id: id
-        }
+        },
+        raw: true
     })
     .then(function(ingridient) {
         if (!ingridient) {

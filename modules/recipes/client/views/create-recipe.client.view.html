@@ -19,9 +19,17 @@
                             <thead>
                                 <tr>
                                     <th>Sort</th>
-                                    <th width="80%">Ingridient</th>
+                                    <th width="60%">{{selectedIngridient}}</th>
                                     <th>
-                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newIngridient()" style="margin-right: 8px;">
+                                        <input type="text" class="form-control"
+                                            ng-model="selectedIngridient"
+                                            data-animation="am-flip-x"
+                                            bs-options="obj.id as obj.caption for obj in getIngridientList()"
+                                            placeholder="Enter address"
+                                        bs-typeahead>
+                                    </th>
+                                    <th>
+                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newIngridientPush(selectedIngridient)" style="margin-right: 8px;">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     </th>
@@ -37,17 +45,7 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <!--<textarea name="caption" ng-model="ingridient.caption" id="caption" class="form-control" cols="30" rows="1" placeholder="Ingridient"></textarea>-->
-                                                    <input type="text" ng-model="ingridient.caption"
-                                                        placeholder="Locations loaded via $http"
-                                                        uib-typeahead="caption for caption in getIngridientList() | filter:$viewValue | limitTo:8"
-                                                        typeahead-loading="loadingLocations"
-                                                        typeahead-no-results="noResults"
-                                                        class="form-control">
-                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
-                                                    <div ng-show="noResults">
-                                                        <i class="glyphicon glyphicon-remove"></i> No Results Found
-                                                    </div>
+                                                        {{ingridient.caption}}
                                                 </div>
                                                 <div class="col-md-3">
                                                     <table class="table table-responsive borderless">
@@ -57,10 +55,10 @@
                                                             </a>
                                                         </th>
                                                         <th width="60%">
-                                                            <a class="btn btn-secondary btn-block" data-nodrag popover-template="'app/template/my-popover-template.html'" popover-placement="top" popover-is-open="ingridient.isPopover">
+                                                            <a class="btn btn-secondary btn-block" data-nodrag popover-template="'app/template/popover/amount.html'" popover-placement="top" popover-is-open="ingridient.isPopover">
                                                                 {{ingridient.amount}}
                                                             </a>
-                                                            <script type="text/ng-template" id="app/template/my-popover-template.html">
+                                                            <script type="text/ng-template" id="app/template/popover/amount.html">
                                                                 <div>
                                                                     <div class="form-group">
                                                                         <input type="number" ng-model="ingridient.amount" class="form-control">
