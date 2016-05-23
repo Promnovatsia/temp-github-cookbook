@@ -1,0 +1,26 @@
+<section ng-controller="IngridientsController">
+    <div class="page-header">
+        <h1>New Ingridient</h1>
+    </div>
+    <div class="col-md-12">
+        <form name="ingridientForm" class="form-horizontal" ng-submit="create(ingridientForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group" show-errors>
+                    <label for="caption">Caption</label>
+                    <input name="caption" type="text" ng-model="caption" id="caption" class="form-control" placeholder="Caption" required>
+                    <div ng-messages="ingridientForm.caption.$error" role="alert">
+                        <p class="help-block error-text" ng-message="required">Ingridient caption is required.</p>
+                    </div>
+                    <label for="infoCard">InfoCard</label>
+                    <textarea name="infoCard" ng-model="infoCard" id="infoCard" class="form-control" cols="30" rows="5" placeholder="infoCard"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default">
+                </div>
+                <div ng-show="error" class="text-center alert alert-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>

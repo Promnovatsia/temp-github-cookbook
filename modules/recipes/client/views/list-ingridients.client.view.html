@@ -1,0 +1,16 @@
+<section ng-controller="IngridientsController" ng-init="find()">
+    <div class="page-header">
+        <h1>
+            Ingridients
+        </h1>
+    </div>
+    <div class="list-group">
+        <a ng-repeat="ingridient in ingridients" ui-sref="ingridients.edit({ingridientId: ingridient.id})" class="list-group-item">
+            <h4 class="list-group-item-heading" ng-bind="ingridient.caption"></h4>
+            <p class="list-group-item-text" ng-bind="ingridient.infoCard"></p>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" ng-if="!ingridients.length">
+        No ingridients yet, why don't you <a ui-sref="ingridients.create">create one</a>?
+    </div>
+</section>

@@ -13,25 +13,28 @@
                     </div>
                 </div>
                 <div class="row">
+                    <label for="selectedIngridient">Add ingridient</label>
                     <div class="col-md-12">
-                        <label for="tree-root-ingridient">Ingridients</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control"
+                                ng-model="selectedIngridient"
+                                data-animation="am-flip-x"
+                                bs-options="obj.id as obj.caption for obj in getIngridientList()"
+                                placeholder="Enter address"
+                                bs-typeahead
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <a class="pull-left btn btn-primary btn-xs" data-nodrag ng-click="newIngridientPush(selectedIngridient)" style="margin-right: 8px;">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </a>
+                        </div>
                         <table ui-tree="treeIngridientsCreate" id="tree-root-ingridient" class="table table-responsive">
                             <thead>
                                 <tr>
                                     <th>Sort</th>
-                                    <th width="60%">{{selectedIngridient}}</th>
-                                    <th>
-                                        <input type="text" class="form-control"
-                                            ng-model="selectedIngridient"
-                                            data-animation="am-flip-x"
-                                            bs-options="obj.id as obj.caption for obj in getIngridientList()"
-                                            placeholder="Enter address"
-                                        bs-typeahead>
-                                    </th>
-                                    <th>
-                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newIngridientPush(selectedIngridient)" style="margin-right: 8px;">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </a>
+                                    <th width="60%">
+                                        <label for="tree-root-ingridient">Ingridients</label>
                                     </th>
                                 </tr>
                             </thead>
@@ -55,10 +58,10 @@
                                                             </a>
                                                         </th>
                                                         <th width="60%">
-                                                            <a class="btn btn-secondary btn-block" data-nodrag popover-template="'app/template/popover/amount.html'" popover-placement="top" popover-is-open="ingridient.isPopover">
+                                                            <a class="btn btn-secondary btn-block" data-nodrag popover-template="'app/template/popover-amount.html'" popover-placement="top" popover-is-open="ingridient.isPopover">
                                                                 {{ingridient.amount}}
                                                             </a>
-                                                            <script type="text/ng-template" id="app/template/popover/amount.html">
+                                                            <script type="text/ng-template" id="app/template/popover-amount.html">
                                                                 <div>
                                                                     <div class="form-group">
                                                                         <input type="number" ng-model="ingridient.amount" class="form-control">

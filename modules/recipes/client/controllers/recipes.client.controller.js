@@ -11,7 +11,6 @@ angular.module('recipes').controller('RecipesController',
       
         $scope.searchIngridient = false;
     $scope.ingridientData = [];
-        
         $scope.getIngridientList = function() {
             return Ingridients.query().$promise;
         };
@@ -44,7 +43,7 @@ angular.module('recipes').controller('RecipesController',
                     infoCard: res.infoCard,
                     amount: 1,
                     measure: 'item',
-                    isPopover: false
+                    isPopover: true
             });
                 return res;
             });            
@@ -68,6 +67,7 @@ angular.module('recipes').controller('RecipesController',
         };
         
         $scope.newExistingIngridient = function () {
+            console.log($scope.recipe);
             $scope.recipe.ingridients.push({
                 'index': $scope.recipe.ingridients.length,
                 caption: 'ingridient ' + ($scope.recipe.ingridients.length + 1),

@@ -19,10 +19,10 @@ exports.create = function(req, res) {
 
     req.body.userId = req.user.id;
     console.log(req.body);
-    Recipe.create(req.body).then(function(recipe) {
-        if (!recipe) {
+    Ingridient.create(req.body).then(function(ingridient) {
+        if (!ingridient) {
             return res.send('users/signup', {
-                errors: 'Could not create the recipe'
+                errors: 'Could not create the ingridient'
             });
         } else {
             //async.forEach(req.body.ingridients, function (item,callback){
@@ -67,7 +67,7 @@ exports.create = function(req, res) {
                     }
                 });
             });*/
-            return res.jsonp(recipe);
+            return res.jsonp(ingridient);
         }
     })
     .catch(function(err) {
@@ -78,18 +78,18 @@ exports.create = function(req, res) {
 };
 
 /**
- * Show the current recipe
+ * Show the current ingridient
  */
 exports.read = function(req, res) {
-  res.json(req.recipe);
+  res.json(req.ingridient);
 };
 
 /**
- * Update a recipe
+ * Update a ingridient
  */
 exports.update = function(req, res) {
-    Recipe.destroy(
-        { where : {id:req.recipe.id}}
+    Ingridient.destroy(
+        { where : {id:req.ingridient.id}}
     )
     .then(exports.create(req,res))
     .catch(function(err) {
@@ -100,17 +100,17 @@ exports.update = function(req, res) {
 };    
 
 /**
- * Delete an recipe
+ * Delete an ingridient
  */
 exports.delete = function(req, res) {
-  var recipe = req.recipe;
+  var ingridient = req.ingridient;
 
   // Find the recipe
-  Recipe.findById(recipe.id).then(function(recipe) {
+  Ingridient.findById(ingridient.id).then(function(recipe) {
     if (recipe) {
-      // Delete the recipe
-      recipe.destroy().then(function() {
-        return res.json(recipe);
+      // Delete the ingridient
+      ingridient.destroy().then(function() {
+        return res.json(ingridient);
       }).catch(function(err) {
         return res.status(400).send({
           message: errorHandler.getErrorMessage(err)
@@ -118,7 +118,7 @@ exports.delete = function(req, res) {
       });
     } else {
       return res.status(400).send({
-        message: 'Unable to find the recipe'
+        message: 'Unable to find the ingridient'
       });
     }
   }).catch(function(err) {
@@ -130,56 +130,51 @@ exports.delete = function(req, res) {
 };
 
 /**
- * List of recipes
+ * List of ingridients
  */
 exports.list = function(req, res) {
-  Recipe.findAll({
-    include: [db.user, db.ingridient]
-  }).then(function(recipes) {
-    if (!recipes) {
+  Ingridient.findAll({
+  }).then(function(ingridients) {
+    if (!ingridients) {
       return res.status(404).send({
         message: 'No recipes found'
       });
     } else {
-        console.log(recipes);
-      return res.json(recipes);
+        console.log(ingridients);
+      return res.json(ingridients);
     }
   }).catch(function(err) {
     res.jsonp(err);
   });
 };
 
-/**
- * recipe middleware
- */
-exports.recipeByID = function(req, res, next, id) {
+exports.ingridientByID = function(req, res, next, id) {
 
-  if ((id % 1 === 0) === false) { //check if it's integer
-    return res.status(404).send({
-      message: 'Recipe is invalid'
-    });
-  }
-
-  Recipe.findOne({
-    where: {
-      id: id
-    },
-      include: [
-          {model: db.user}
-      ]
-  }).then(function(recipe) {
-    if (!recipe) {
-      return res.status(404).send({
-        message: 'No recipe with that identifier has been found'
-      });
-    } else {
-        console.log(recipe);
-      req.recipe = recipe;
-      next();
-    return null;
+    if ((id % 1 === 0) === false) { //check if it's integer
+        return res.status(404).send({
+            message: 'Ingridient is invalid'
+        });
     }
-  }).catch(function(err) {
-    return next(err);
-  });
-
+  
+    Ingridient.findOne({
+        where: {
+            id: id
+        },
+        raw: true
+    })
+    .then(function(ingridient) {
+        if (!ingridient) {
+            return res.status(404).send({
+                message: 'No ingridient with that identifier has been found'
+            });
+        } else {
+            console.log(ingridient);
+            req.ingridient = ingridient;
+            next();
+            return null;
+        }
+    })
+    .catch(function(err) {
+        return next(err);
+    });
 };

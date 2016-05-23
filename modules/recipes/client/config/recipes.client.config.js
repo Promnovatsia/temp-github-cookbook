@@ -23,5 +23,23 @@ angular.module('recipes').run(['Menus',
       state: 'recipes.create',
       roles: ['user']
     });
+    
+      Menus.addMenuItem('topbar', {
+          title: 'Ingridients',
+          state: 'ingridients',
+          type: 'dropdown',
+          roles: ['user']
+      });
+          // Add the dropdown create item
+          Menus.addSubMenuItem('topbar', 'ingridients', {
+              title: 'List Ingridients',
+              state: 'ingridients.list',
+              roles: ['user']
+          });
+          Menus.addSubMenuItem('topbar', 'ingridients', {
+              title: 'Create Ingridient',
+              state: 'ingridients.create',
+              roles: ['user']
+          }); 
   }
 ]);
