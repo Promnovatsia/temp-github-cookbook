@@ -2,8 +2,8 @@
 
 // Recipes controller
 angular.module('recipes').controller('IngridientsController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients',
-    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients) {
+                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients','FileUploader',
+    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, FileUploader) {
         
         $scope.authentication = Authentication;
         
@@ -30,7 +30,7 @@ angular.module('recipes').controller('IngridientsController',
 
             var ingridient = new Ingridients({
                 caption: this.caption,
-                infoCard: this.infoCard,
+                infoCard: this.infoCard
             });
 
             // Redirect after save
@@ -60,5 +60,19 @@ angular.module('recipes').controller('IngridientsController',
                 $scope.error = errorResponse.data.message;
             });
         };
+        
+        var uploader = $scope.uploader = new FileUploader({
+            url: '/api/pictures/ingridients'
+        });
+
+        // FILTERS
+
+        uploader.filters.push({
+            name: 'imageFilter',
+            fn: function(item /*{File|FileLikeObject}*/, options) {
+                var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+                return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+            }
+        });
 }                                  
 ]);

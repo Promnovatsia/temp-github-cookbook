@@ -4,8 +4,20 @@
             Ingridients
         </h1>
     </div>
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-search"></i>
+                </div>
+                <input type="text" class="form-control" placeholder="Search ingridients" ng-model="filterIngridients">
+            </div>
+        </div>
+    </form>
     <div class="list-group">
-        <a ng-repeat="ingridient in ingridients" ui-sref="ingridients.edit({ingridientId: ingridient.id})" class="list-group-item">
+        <a ng-repeat="ingridient in ingridients | filter:filterIngridients"
+           ui-sref="ingridients.edit({ingridientId: ingridient.id})" 
+           class="list-group-item">
             <h4 class="list-group-item-heading" ng-bind="ingridient.caption"></h4>
             <p class="list-group-item-text" ng-bind="ingridient.infoCard"></p>
         </a>

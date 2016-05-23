@@ -5,6 +5,7 @@
  */
 var path = require('path'),
     async = require('async'),
+    fs = require('fs'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
         Recipe = db.recipe,
@@ -150,6 +151,7 @@ exports.list = function(req, res) {
 
 exports.ingridientByID = function(req, res, next, id) {
 
+    console.log(req);
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
             message: 'Ingridient is invalid'
@@ -177,4 +179,64 @@ exports.ingridientByID = function(req, res, next, id) {
     .catch(function(err) {
         return next(err);
     });
+};
+
+exports.addPicture = function(req, res) {
+    var image = req.file;
+    fs.createWriteStream('./public/uploads/ingridients/pictures/' + image);
+    return res.json(req.file);
+}
+
+exports.changePicture = function(req, res) {
+  Ingridient.findOne({
+    where: {
+      id: req.ingridient.id
+    }
+  }).then(function(ingridient) {
+      
+    if (ingridient) {
+      if (!req.file) {
+        return res.status(400).send({
+          message: 'Error occurred while uploading ingridient picture'
+        });
+      } else {
+
+        var oldImage = ingridient.image;
+
+        ingridient.image = req.file.filename;
+        fs.createWriteStream('./public/uploads/ingridients/pictures/' + ingridient.image);
+        ingridient.save().then(function(saved) {
+          if (!saved) {
+            return res.status(400).send({
+              message: errorHandler.getErrorMessage(saved)
+            });
+          } else {
+            if (oldImage) {
+              try {
+                var stats = fs.lstatSync('./public/uploads/ingridients/pictures/' + oldImage);
+                if (stats.isFile()) {
+                  fs.unlinkSync('./public/uploads/ingridients/pictures/' + oldImage);
+                }
+              } catch (e) {
+                console.log('Unable to delete the old image', e);
+              }
+            }
+
+            req.ingridient.image = ingridient.image;
+            res.json(ingridient);
+          }
+        }).catch(function(err) {
+          return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+          });
+        });
+      }
+
+    }
+  }).catch(function(err) {
+    return res.status(400).send({
+      message: errorHandler.getErrorMessage(err)
+    });
+  });
+
 };

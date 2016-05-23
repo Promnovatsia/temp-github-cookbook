@@ -43,6 +43,10 @@ exports.invokeRolesPolicies = function() {
         {
             resources: '/api/ingridients/:ingridientId',
             permissions: '*'
+        },
+        {
+            resources: '/api/ingridients/pictures',
+            permissions: '*'
         }
     ]
   }, {
@@ -53,6 +57,10 @@ exports.invokeRolesPolicies = function() {
     }, {
       resources: '/api/recipes/:recipeId',
       permissions: ['get']
+    },
+    {
+      resources: '/api/ingridients/pictures',
+      permissions: ['get', 'post']
     }]
   }, {
     roles: ['guest'],
