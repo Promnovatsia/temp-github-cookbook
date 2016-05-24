@@ -13,22 +13,22 @@ angular.module('recipes').config(['$stateProvider',
         })
             .state('recipes.list', {
                 url: '',
-                templateUrl: 'modules/recipes/client/views/list-recipes.client.view.html'
+                templateUrl: 'modules/recipes/client/views/recipes-list.client.view.html'
             })
             .state('recipes.create', {
                 url: '/create',
-                templateUrl: 'modules/recipes/client/views/create-recipe.client.view.html',
+                templateUrl: 'modules/recipes/client/views/recipe-create.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('recipes.view', {
                 url: '/:recipeId',
-                templateUrl: 'modules/recipes/client/views/view-recipe.client.view.html'
+                templateUrl: 'modules/recipes/client/views/recipe-read.client.view.html'
             })
             .state('recipes.edit', {
                 url: '/:recipeId/edit',
-                templateUrl: 'modules/recipes/client/views/edit-recipe.client.view.html',
+                templateUrl: 'modules/recipes/client/views/recipe-edit.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
@@ -40,28 +40,28 @@ angular.module('recipes').config(['$stateProvider',
         })
             .state('ingridients.list', {
                 url: '',
-                templateUrl: 'modules/recipes/client/views/list-ingridients.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridients-list.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('ingridients.create', {
                 url: '/create',
-                templateUrl: 'modules/recipes/client/views/create-ingridient.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridient-create.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('ingridients.view', {
                 url: '/:ingridientId',
-                templateUrl: 'modules/recipes/client/views/view-ingridient.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridient-read.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('ingridients.edit', {
                 url: '/:ingridientId/edit',
-                templateUrl: 'modules/recipes/client/views/edit-ingridient.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridient-edit.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
