@@ -2,11 +2,10 @@
 
 // Recipes controller
 angular.module('recipes').controller('IngridientsController', 
-                                     ['$scope', '$stateParams', '$location', '$window', '$timeout' ,'Authentication', 'Recipes','Ingridients','FileUploader',
-    function($scope, $stateParams, $location, $window, $timeout, Authentication, Recipes, Ingridients, FileUploader) {
+                                     ['$scope', '$stateParams', '$location', '$window', '$timeout' ,'Authentication', 'Recipes','Ingridients','Measures', 'FileUploader',
+    function($scope, $stateParams, $location, $window, $timeout, Authentication, Recipes, Ingridients, Measures, FileUploader) {
         
         $scope.authentication = Authentication;
-        
         
         $scope.find = function() {
             $scope.ingridients = Ingridients.query();

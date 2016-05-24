@@ -6,7 +6,9 @@
 var path = require('path'),
   recipesPolicy = require('../policies/recipes.server.policy'),
   recipes = require(path.resolve('./modules/recipes/server/controllers/recipes.server.controller')),
-    ingridients = require(path.resolve('./modules/recipes/server/controllers/ingridients.server.controller'));
+    ingridients = require(path.resolve('./modules/recipes/server/controllers/ingridients.server.controller')),
+    measures = require(path.resolve('./modules/recipes/server/controllers/measures.server.controller'))
+    ;
 
 
 module.exports = function(app) {
@@ -36,10 +38,18 @@ module.exports = function(app) {
         .put(ingridients.update)
         .delete(ingridients.delete)
     ;
+    
+    app.route('/api/measures/:measureId')
+        .all(recipesPolicy.isAllowed)
+        .get(measures.read)
+        //.put(ingridients.update)
+        //.delete(ingridients.delete)
+    ;
     //app.route('/api/pictures/ingridients').post(ingridients.addPicture);
 
   // Finish by binding the recipe middleware
   app.param('recipeId', recipes.recipeByID);
     app.param('ingridientId', ingridients.ingridientByID);
+    app.param('measureId', measures.measureByID);
 
 };

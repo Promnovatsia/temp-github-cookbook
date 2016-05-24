@@ -178,18 +178,19 @@ exports.delete = function(req, res) {
  * List of ingridients
  */
 exports.list = function(req, res) {
-  Ingridient.findAll({
-  }).then(function(ingridients) {
-    if (!ingridients) {
-      return res.status(404).send({
-        message: 'No recipes found'
-      });
-    } else {
-      return res.json(ingridients);
-    }
-  }).catch(function(err) {
-    res.jsonp(err);
-  });
+    Ingridient.findAll({
+    })
+    .then(function(ingridients) {
+        if (!ingridients) {
+            return res.status(404).send({
+                message: 'No ingridients found'
+            });
+        } else {
+            return res.json(ingridients);
+        }
+    }).catch(function(err) {
+        res.jsonp(err);
+    });
 };
 
 exports.ingridientByID = function(req, res, next, id) {

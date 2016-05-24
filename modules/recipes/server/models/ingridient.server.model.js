@@ -20,9 +20,6 @@ module.exports = function(sequelize, DataTypes) {
                 model: "measures",
                 key: "id"
             }
-        },
-        measureType: {
-            type: DataTypes.STRING
         }
     },{
         associate: function(models) {

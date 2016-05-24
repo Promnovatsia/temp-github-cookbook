@@ -27,19 +27,19 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.FLOAT,
             allowNull: false
         },
-        type: {
-            type: DataTypes.STRING
-        },
         converter: {
             type: DataTypes.JSONB
             /*{
-                measureB: {
+                measureId: {
                     type: DataTypes.INTEGER,
                     references:
                         {
                             model: models.measure,
                             key: "id"
                         }
+                },
+                measureName: {
+                    type: DataTypes.STRING
                 },
                 rate: {
                     type: DateTypes.FLOAT,

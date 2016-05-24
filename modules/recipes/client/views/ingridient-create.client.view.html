@@ -23,6 +23,11 @@
                             <hr>
                             <label for="infoCard">InfoCard</label>
                             <textarea name="infoCard" ng-model="infoCard" id="infoCard" class="form-control" cols="30" rows="5" placeholder="infoCard"></textarea>
+                            <hr>
+                            <label>Measure type:&nbsp;</label>
+                            <button type="button" class="btn btn-default" ng-model="selectedMeasure" data-html="1" data-toggle="true"
+                                    bs-options="obj.captionSingular as obj.captionSingular for obj in getMeasureList()" bs-select>
+                            </button>
                         </div>
                     </div> 
                 </div>
