@@ -13,13 +13,29 @@ var path = require('path'),
         Ingridient = db.ingridient
     ;
 
+function decodeBase64Image(dataString) {
+    var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/) , response = {};
+        if (matches.length !== 3) {
+            console.log('Error in decoding file');
+            return new Error('Invalid input string');
+        }
+    response.type = matches[1];
+    response.data = new Buffer(matches[2], 'base64');
+    console.log('no error in decoding');
+    return response;
+}
 /**
  * Create a recipe
  */
 exports.create = function(req, res) {
 
     req.body.userId = req.user.id;
-    console.log(req.body);
+    
+    var imageBuffer = decodeBase64Image(req.body.image);
+    var fileName = req.body.caption + '.jpg';
+    fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {});
+    req.body.image = fileName;
+    
     Ingridient.create(req.body).then(function(ingridient) {
         if (!ingridient) {
             return res.send('users/signup', {
@@ -68,7 +84,7 @@ exports.create = function(req, res) {
                     }
                 });
             });*/
-            return res.jsonp(ingridient);
+            return res.json(ingridient);
         }
     })
     .catch(function(err) {
@@ -89,11 +105,39 @@ exports.read = function(req, res) {
  * Update a ingridient
  */
 exports.update = function(req, res) {
-    Ingridient.destroy(
-        { where : {id:req.ingridient.id}}
-    )
-    .then(exports.create(req,res))
-    .catch(function(err) {
+    
+     console.log(req.body);
+    // Find the recipe
+    Ingridient.findById(req.body.id).then(function(ingridient) {
+        if (ingridient) {
+            var imageBuffer = decodeBase64Image(req.body.image);
+            var fileName = req.body.caption + '.jpg';
+            fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {
+                if (err){
+                    console.log('Error in write file');
+                    return res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
+                });
+                }    
+            });
+            
+            ingridient.update({
+                caption: req.body.caption,
+                infoCard: req.body.infoCard,
+                image: fileName
+            }).then(function() {
+                return res.json(ingridient);
+            }).catch(function(err) {
+                return res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
+                });
+            });
+        } else {
+            return res.status(400).send({
+                message: 'Unable to find the ingridient'
+            });
+        }
+    }).catch(function(err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
@@ -141,7 +185,6 @@ exports.list = function(req, res) {
         message: 'No recipes found'
       });
     } else {
-        console.log(ingridients);
       return res.json(ingridients);
     }
   }).catch(function(err) {
@@ -151,7 +194,6 @@ exports.list = function(req, res) {
 
 exports.ingridientByID = function(req, res, next, id) {
 
-    console.log(req);
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
             message: 'Ingridient is invalid'
@@ -170,7 +212,7 @@ exports.ingridientByID = function(req, res, next, id) {
                 message: 'No ingridient with that identifier has been found'
             });
         } else {
-            console.log(ingridient);
+            //console.log(ingridient);
             req.ingridient = ingridient;
             next();
             return null;
@@ -179,64 +221,4 @@ exports.ingridientByID = function(req, res, next, id) {
     .catch(function(err) {
         return next(err);
     });
-};
-
-exports.addPicture = function(req, res) {
-    var image = req.file;
-    fs.createWriteStream('./public/uploads/ingridients/pictures/' + image);
-    return res.json(req.file);
-}
-
-exports.changePicture = function(req, res) {
-  Ingridient.findOne({
-    where: {
-      id: req.ingridient.id
-    }
-  }).then(function(ingridient) {
-      
-    if (ingridient) {
-      if (!req.file) {
-        return res.status(400).send({
-          message: 'Error occurred while uploading ingridient picture'
-        });
-      } else {
-
-        var oldImage = ingridient.image;
-
-        ingridient.image = req.file.filename;
-        fs.createWriteStream('./public/uploads/ingridients/pictures/' + ingridient.image);
-        ingridient.save().then(function(saved) {
-          if (!saved) {
-            return res.status(400).send({
-              message: errorHandler.getErrorMessage(saved)
-            });
-          } else {
-            if (oldImage) {
-              try {
-                var stats = fs.lstatSync('./public/uploads/ingridients/pictures/' + oldImage);
-                if (stats.isFile()) {
-                  fs.unlinkSync('./public/uploads/ingridients/pictures/' + oldImage);
-                }
-              } catch (e) {
-                console.log('Unable to delete the old image', e);
-              }
-            }
-
-            req.ingridient.image = ingridient.image;
-            res.json(ingridient);
-          }
-        }).catch(function(err) {
-          return res.status(400).send({
-            message: errorHandler.getErrorMessage(err)
-          });
-        });
-      }
-
-    }
-  }).catch(function(err) {
-    return res.status(400).send({
-      message: errorHandler.getErrorMessage(err)
-    });
-  });
-
 };

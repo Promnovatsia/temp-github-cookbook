@@ -52,8 +52,15 @@ angular.module('recipes').config(['$stateProvider',
                     roles: ['user', 'admin']
                 }
             })
-            .state('ingridients.edit', {
+            .state('ingridients.view', {
                 url: '/:ingridientId',
+                templateUrl: 'modules/recipes/client/views/view-ingridient.client.view.html',
+                data: {
+                    roles: ['user', 'admin']
+                }
+            })
+            .state('ingridients.edit', {
+                url: '/:ingridientId/edit',
                 templateUrl: 'modules/recipes/client/views/edit-ingridient.client.view.html',
                 data: {
                     roles: ['user', 'admin']

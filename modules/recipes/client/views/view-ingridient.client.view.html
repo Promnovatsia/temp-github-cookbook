@@ -1,0 +1,23 @@
+<section ng-controller="IngridientsController" ng-init="findOne()">
+    <div class="page-header">
+        <h1 ng-bind="ingridient.caption"></h1>
+    </div>
+    <div class="pull-right" ng-show="authentication.user.roles.indexOf('admin') !== -1">
+        <a class="btn btn-primary" ui-sref="ingridients.edit({ingridientId: ingridient.id})">
+            <i class="glyphicon glyphicon-edit"></i>
+        </a>
+        <a class="btn btn-primary" ng-click="remove(ingridient);">
+            <i class="glyphicon glyphicon-trash"></i>
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <span ng-if="ingridient.image">
+                <img ng-src="./uploads/ingridients/pictures/{{ingridient.image}}" class="img-thumbnail user-profile-picture">
+            </span>
+        </div>
+        <div class="col-md-6">
+            <p class="lead" ng-bind="ingridient.infoCard"></p>
+        </div>
+    </div>
+</section>

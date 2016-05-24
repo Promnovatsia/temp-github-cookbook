@@ -2,8 +2,8 @@
 
 // Recipes controller
 angular.module('recipes').controller('IngridientsController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients','FileUploader',
-    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, FileUploader) {
+                                     ['$scope', '$stateParams', '$location', '$window', '$timeout' ,'Authentication', 'Recipes','Ingridients','FileUploader',
+    function($scope, $stateParams, $location, $window, $timeout, Authentication, Recipes, Ingridients, FileUploader) {
         
         $scope.authentication = Authentication;
         
@@ -30,7 +30,8 @@ angular.module('recipes').controller('IngridientsController',
 
             var ingridient = new Ingridients({
                 caption: this.caption,
-                infoCard: this.infoCard
+                infoCard: this.infoCard,
+                image: $scope.imageURL
             });
 
             // Redirect after save
@@ -47,18 +48,29 @@ angular.module('recipes').controller('IngridientsController',
         
         $scope.update = function(isValid) {
             $scope.error = null;
-
             if (!isValid) {
                 $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
                 return false;
             }
 
             var ingridient = $scope.ingridient;
+            ingridient.image = $scope.imageURL;
             ingridient.$update(function() {
                 $location.path('ingridients/' + ingridient.id);
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
             });
+        };
+        
+        $scope.remove = function(ingridient) {
+            if (ingridient) {
+                ingridient.$remove();
+                $location.path('ingridients');
+            } else {
+                $scope.ingridient.$remove(function() {
+                    $location.path('ingridient');
+                });
+            }
         };
         
         var uploader = $scope.uploader = new FileUploader({
@@ -74,5 +86,20 @@ angular.module('recipes').controller('IngridientsController',
                 return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
             }
         });
-}                                  
+        
+            // Called after the user selected a new picture file
+        $scope.uploader.onAfterAddingFile = function(fileItem) {
+            if ($window.FileReader) {
+                var fileReader = new FileReader();
+                fileReader.readAsDataURL(fileItem._file);
+                
+                fileReader.onload = function(fileReaderEvent) {
+                    $timeout(function() {
+                        $scope.imageURL = fileReaderEvent.target.result;
+                    }, 0);
+                };
+            }
+            console.log($scope.imageURL);
+        };
+    }                                  
 ]);

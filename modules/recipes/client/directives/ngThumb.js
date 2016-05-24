@@ -1,3 +1,5 @@
+/* jshint ignore:start */
+
 'use strict';
 
 
@@ -60,3 +62,4 @@ angular
             }
         };
     }]);
+/* jshint ignore:end */

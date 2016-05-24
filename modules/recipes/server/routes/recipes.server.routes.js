@@ -36,7 +36,7 @@ module.exports = function(app) {
         .put(ingridients.update)
         .delete(ingridients.delete)
     ;
-    app.route('/api/pictures/ingridients').post(ingridients.addPicture);
+    //app.route('/api/pictures/ingridients').post(ingridients.addPicture);
 
   // Finish by binding the recipe middleware
   app.param('recipeId', recipes.recipeByID);
