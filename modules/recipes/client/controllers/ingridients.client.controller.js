@@ -17,6 +17,10 @@ angular.module('recipes').controller('IngridientsController',
             });
         };
         
+        $scope.getMeasuresList = function() {
+            return Measures.query().$promise;
+        };
+        
         $scope.create = function(isValid) {
             $scope.error = null;
 
@@ -30,7 +34,8 @@ angular.module('recipes').controller('IngridientsController',
             var ingridient = new Ingridients({
                 caption: this.caption,
                 infoCard: this.infoCard,
-                image: $scope.imageURL
+                image: $scope.imageURL,
+                measureDefault: $scope.measureDefault
             });
 
             // Redirect after save

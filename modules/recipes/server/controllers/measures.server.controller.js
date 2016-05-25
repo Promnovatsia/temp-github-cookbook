@@ -13,8 +13,7 @@ var path = require('path'),
 
 exports.list = function(req, res) {
     Measure.findAll({    
-    })
-    .then(function(measures) {
+    }).then(function(measures) {
         if (!measures) {
             return res.status(404).send({
                 message: 'No measures found'
@@ -28,7 +27,7 @@ exports.list = function(req, res) {
 };
 
 exports.read = function(req, res) {
-  res.json(req.measure);
+    res.json(req.measure);
 };
 
 exports.measureByID = function(req, res, next, id) {
@@ -44,8 +43,7 @@ exports.measureByID = function(req, res, next, id) {
             id: id
         },
         raw: true
-    })
-    .then(function(measure) {
+    }).then(function(measure) {
         if (!measure) {
             return res.status(404).send({
                 message: 'No measure with that identifier has been found'
@@ -55,8 +53,7 @@ exports.measureByID = function(req, res, next, id) {
             next();
             return null;
         }
-    })
-    .catch(function(err) {
+    }).catch(function(err) {
         return next(err);
     });
 };

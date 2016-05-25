@@ -31,6 +31,14 @@
                             <hr>
                             <label for="infoCard">InfoCard</label>
                             <textarea name="infoCard" ng-model="ingridient.infoCard" id="infoCard" class="form-control" cols="30" rows="5" placeholder="infoCard"></textarea>
+                            <label>Measure default:&nbsp;</label>
+                            <input type="text" class="form-control"
+                                ng-model="ingridient.measureDefault"
+                                data-animation="am-flip-x"
+                                bs-options="obj.id as obj.captionSingular for obj in getMeasuresList()"
+                                placeholder="Measure"
+                                bs-typeahead
+                            >
                         </div>
                     </div>
                 </div>

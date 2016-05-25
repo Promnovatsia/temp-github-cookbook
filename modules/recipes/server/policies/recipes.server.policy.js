@@ -27,51 +27,54 @@ acl = new acl(new acl.redisBackend(redisInstance, 'acl'));
  * Invoke recipes Permissions
  */
 exports.invokeRolesPolicies = function() {
-  acl.allow([{
-    roles: ['admin'],
-    allows: [{
-      resources: '/api/recipes',
-      permissions: '*'
-    }, {
-      resources: '/api/recipes/:recipeId',
-      permissions: '*'
-    },
+    acl.allow([
         {
-            resources: '/api/ingridients',
-            permissions: '*'
-        },
-        {
-            resources: '/api/ingridients/:ingridientId',
-            permissions: '*'
-        },
-        {
-            resources: '/api/ingridients/pictures',
-            permissions: '*'
+            roles: ['admin'],
+            allows: [
+                {
+                    resources: '/api/recipes',
+                    permissions: '*'
+                }, {
+                    resources: '/api/recipes/:recipeId',
+                    permissions: '*'
+                }, {
+                    resources: '/api/ingridients',
+                    permissions: '*'
+                }, {
+                    resources: '/api/ingridients/:ingridientId',
+                    permissions: '*'
+                }, {
+                    resources: '/api/measures',
+                    permissions: '*'
+                }, {
+                    resources: '/api/measures/:measureId',
+                    permissions: '*'
+                }
+            ]
+        }, {
+            roles: ['user'],
+            allows: [
+                {
+                    resources: '/api/recipes',
+                    permissions: ['get', 'post']
+                }, {
+                    resources: '/api/recipes/:recipeId',
+                    permissions: ['get']
+                }
+            ]
+        }, {
+            roles: ['guest'],
+            allows: [
+                {
+                    resources: '/api/recipes',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/recipes/:recipeId',
+                    permissions: ['get']
+                }
+            ]
         }
-    ]
-  }, {
-    roles: ['user'],
-    allows: [{
-      resources: '/api/recipes',
-      permissions: ['get', 'post']
-    }, {
-      resources: '/api/recipes/:recipeId',
-      permissions: ['get']
-    },
-    {
-      resources: '/api/ingridients/pictures',
-      permissions: ['get', 'post']
-    }]
-  }, {
-    roles: ['guest'],
-    allows: [{
-      resources: '/api/recipes',
-      permissions: ['get']
-    }, {
-      resources: '/api/recipes/:recipeId',
-      permissions: ['get']
-    }]
-  }]);
+    ]);
 };
 
 /**

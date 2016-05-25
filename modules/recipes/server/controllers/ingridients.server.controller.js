@@ -21,7 +21,6 @@ function decodeBase64Image(dataString) {
         }
     response.type = matches[1];
     response.data = new Buffer(matches[2], 'base64');
-    console.log('no error in decoding');
     return response;
 }
 /**
@@ -31,10 +30,12 @@ exports.create = function(req, res) {
 
     req.body.userId = req.user.id;
     
-    var imageBuffer = decodeBase64Image(req.body.image);
-    var fileName = req.body.caption + '.jpg';
-    fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {});
-    req.body.image = fileName;
+    if (req.body.image) {
+        var imageBuffer = decodeBase64Image(req.body.image);
+        var fileName = req.body.caption + '.jpg';
+        fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {});
+        req.body.image = fileName;
+    }
     
     Ingridient.create(req.body).then(function(ingridient) {
         if (!ingridient) {
@@ -86,8 +87,7 @@ exports.create = function(req, res) {
             });*/
             return res.json(ingridient);
         }
-    })
-    .catch(function(err) {
+    }).catch(function(err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
@@ -98,7 +98,7 @@ exports.create = function(req, res) {
  * Show the current ingridient
  */
 exports.read = function(req, res) {
-  res.json(req.ingridient);
+    res.json(req.ingridient);
 };
 
 /**
@@ -106,25 +106,29 @@ exports.read = function(req, res) {
  */
 exports.update = function(req, res) {
     
-     console.log(req.body);
     // Find the recipe
     Ingridient.findById(req.body.id).then(function(ingridient) {
         if (ingridient) {
-            var imageBuffer = decodeBase64Image(req.body.image);
-            var fileName = req.body.caption + '.jpg';
-            fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {
-                if (err){
-                    console.log('Error in write file');
-                    return res.status(400).send({
-                    message: errorHandler.getErrorMessage(err)
+            
+            var fileName;
+            if (req.body.image) {
+                var imageBuffer = decodeBase64Image(req.body.image);
+                fileName = req.body.caption + '.jpg';
+                fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {
+                    if (err){
+                        console.log('Error in write file');
+                        return res.status(400).send({
+                            message: errorHandler.getErrorMessage(err)
+                        });
+                    }    
                 });
-                }    
-            });
+            }
             
             ingridient.update({
                 caption: req.body.caption,
                 infoCard: req.body.infoCard,
-                image: fileName
+                image: fileName,
+                measureDefault: req.body.measureDefault
             }).then(function() {
                 return res.json(ingridient);
             }).catch(function(err) {
@@ -148,30 +152,29 @@ exports.update = function(req, res) {
  * Delete an ingridient
  */
 exports.delete = function(req, res) {
-  var ingridient = req.ingridient;
-
-  // Find the recipe
-  Ingridient.findById(ingridient.id).then(function(recipe) {
-    if (recipe) {
-      // Delete the ingridient
+    
+    var ingridient = req.ingridient;
+    // Find the ingridient
+    Ingridient.findById(ingridient.id).then(function(recipe) {
+        if (recipe) {
+            // Delete the ingridient
       ingridient.destroy().then(function() {
-        return res.json(ingridient);
+          return res.json(ingridient);
       }).catch(function(err) {
+          return res.status(400).send({
+              message: errorHandler.getErrorMessage(err)
+          });
+      });
+        } else {
+            return res.status(400).send({
+                message: 'Unable to find the ingridient'
+            });
+        }
+    }).catch(function(err) {
         return res.status(400).send({
-          message: errorHandler.getErrorMessage(err)
+            message: errorHandler.getErrorMessage(err)
         });
-      });
-    } else {
-      return res.status(400).send({
-        message: 'Unable to find the ingridient'
-      });
-    }
-  }).catch(function(err) {
-    return res.status(400).send({
-      message: errorHandler.getErrorMessage(err)
     });
-  });
-
 };
 
 /**
@@ -179,8 +182,7 @@ exports.delete = function(req, res) {
  */
 exports.list = function(req, res) {
     Ingridient.findAll({
-    })
-    .then(function(ingridients) {
+    }).then(function(ingridients) {
         if (!ingridients) {
             return res.status(404).send({
                 message: 'No ingridients found'
@@ -206,8 +208,7 @@ exports.ingridientByID = function(req, res, next, id) {
             id: id
         },
         raw: true
-    })
-    .then(function(ingridient) {
+    }).then(function(ingridient) {
         if (!ingridient) {
             return res.status(404).send({
                 message: 'No ingridient with that identifier has been found'
@@ -218,8 +219,7 @@ exports.ingridientByID = function(req, res, next, id) {
             next();
             return null;
         }
-    })
-    .catch(function(err) {
+    }).catch(function(err) {
         return next(err);
     });
 };
