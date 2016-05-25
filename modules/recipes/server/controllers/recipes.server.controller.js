@@ -140,9 +140,7 @@ exports.recipeByID = function(req, res, next, id) {
         where: {
             id: id
         },
-        include: [
-            {model: db.user}
-        ]
+        include: [db.ingridient]
     }).then(function(recipe) {
         if (!recipe) {
             return res.status(404).send({

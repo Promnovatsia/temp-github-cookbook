@@ -1,40 +1,50 @@
 <section ng-controller="RecipesController">
     <div class="page-header">
-        <h1>New Recipe</h1>
+        <h1>
+            New Recipe
+        </h1>
     </div>
     <div class="col-md-12">
         <form name="recipeForm" class="form-horizontal" ng-submit="create(recipeForm.$valid)" novalidate>
             <fieldset>
                 <div class="form-group" show-errors>
-                    <label for="title">Title</label>
+                    <label for="title">
+                        Title
+                    </label>
                     <input name="title" type="text" ng-model="title" id="title" class="form-control" placeholder="Title" required>
                     <div ng-messages="recipeForm.title.$error" role="alert">
-                        <p class="help-block error-text" ng-message="required">Recipe title is required.</p>
+                        <p class="help-block error-text" ng-message="required">
+                            Recipe title is required.
+                        </p>
                     </div>
                 </div>
                 <div class="row">
-                    <label for="selectedIngridient">Add ingridient</label>
+                    <label for="selectedIngridient">
+                        Add ingridient
+                    </label>
                     <div class="col-md-12">
                         <div class="col-md-6">
                             <input type="text" class="form-control"
                                 ng-model="selectedIngridient"
                                 data-animation="am-flip-x"
                                 bs-options="obj.id as obj.caption for obj in getIngridientList()"
-                                placeholder="Enter address"
+                                placeholder="Enter ingridient"
                                 bs-typeahead
                             >
                         </div>
                         <div class="col-md-6">
-                            <a class="pull-left btn btn-primary btn-xs" data-nodrag ng-click="newIngridientPush(selectedIngridient)" style="margin-right: 8px;">
+                            <a class="pull-left btn btn-primary btn-xs" data-nodrag ng-click="newIngridient(selectedIngridient)" style="margin-right: 8px;">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </div>
-                        <table ui-tree="treeIngridientsCreate" id="tree-root-ingridient" class="table table-responsive">
+                        <table ui-tree="treeIngridients" id="tree-root-ingridient" class="table table-responsive">
                             <thead>
                                 <tr>
                                     <th>Sort</th>
                                     <th width="60%">
-                                        <label for="tree-root-ingridient">Ingridients</label>
+                                        <label for="tree-root-ingridient">
+                                            Ingridients
+                                        </label>
                                     </th>
                                 </tr>
                             </thead>
@@ -47,40 +57,33 @@
                                     <td>
                                         <div class="form-group">
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-7">
                                                         {{ingridient.caption}}
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <table class="table table-responsive borderless">
-                                                        <th width="15%">
-                                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="amountMinus(ingridient)" id="amountMinus">
-                                                                <span class="glyphicon glyphicon-minus"></span>
-                                                            </a>
-                                                        </th>
-                                                        <th width="60%">
-                                                            <a class="btn btn-secondary btn-block" data-nodrag popover-template="'app/template/popover-amount.html'" popover-placement="top" popover-is-open="ingridient.isPopover">
-                                                                {{ingridient.amount}}
-                                                            </a>
-                                                            <script type="text/ng-template" id="app/template/popover-amount.html">
-                                                                <div>
-                                                                    <div class="form-group">
-                                                                        <input type="number" ng-model="ingridient.amount" class="form-control">
-                                                                        <button type="button" class="btn btn-primary btn-block" ng-click="applyAmount(ingridient)">
-                                                                            OK
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </script>
-                                                        </th>
-                                                        <th width="15%">
-                                                            <a class="btn btn-primary btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
-                                                                <span class="glyphicon glyphicon-plus"></span>
-                                                            </a>
-                                                        </th>
-                                                    </table>  
+                                                <div class="col-md-1">
+                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="amountMinus(ingridient)" id="amountMinus">
+                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                    </a>    
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <input name="measure" type="text" ng.model="ingridient.measure" id="measure" class="form-control">
+                                                    <a class="btn btn-secondary btn-block" data-nodrag popover-template="'app/template/popover-amount.html'" popover-placement="top" popover-is-open="ingridient.isPopover">
+                                                        {{ingridient.amount}} {{ingridient.measure.caption}}
+                                                    </a>
+                                                    <script type="text/ng-template" id="app/template/popover-amount.html">
+                                                        <div>
+                                                            <div class="form-group">
+                                                                <input type="number" ng-model="ingridient.amount" class="form-control">
+                                                                <button type="button" class="btn btn-primary btn-block" ng-click="applyAmount(ingridient)">
+                                                                    OK
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </script>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <a class="btn btn-primary btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
+                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                    </a>    
                                                 </div>
                                             </div>
                                         </div>
@@ -97,7 +100,9 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <label for="tree-root-step">Steps</label>
+                        <label for="tree-root-step">
+                            Steps
+                        </label>
                         <table ui-tree="treeStepsCreate" id="tree-root-step" class="table table-responsive">
                             <thead>
                                 <tr>
@@ -118,17 +123,11 @@
                                     </td>
                                     <td>
                                         <div class="form-group">
-                                            <label for="action">Action</label>
+                                            <label for="action">
+                                                Action
+                                            </label>
                                             <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" placeholder="Action"></textarea>
                                         </div>
-                                        <!--<div class="form-group">
-                                            <label for="device">Device</label>
-                                            <textarea name="device" ng-model="step.device" id="device" class="form-control" cols="30" rows="3" placeholder="Device"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="duration">Duration</label>
-                                            <textarea name="duration" ng-model="step.duration" id="duration" class="form-control" cols="30" rows="3" placeholder="Duration"></textarea>
-                                        </div>-->
                                     </td>
                                     <td>
                                         <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep(this)">

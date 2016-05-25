@@ -7,15 +7,7 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        captionSingular: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        captionSemiplural: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        captionPlural: {
+        caption: {
             type: DataTypes.STRING,
             allowNull: false
         },

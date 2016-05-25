@@ -206,15 +206,14 @@ exports.ingridientByID = function(req, res, next, id) {
     Ingridient.findOne({
         where: {
             id: id
-        },
-        raw: true
+        }
     }).then(function(ingridient) {
         if (!ingridient) {
             return res.status(404).send({
                 message: 'No ingridient with that identifier has been found'
             });
         } else {
-            //console.log(ingridient);
+            console.log(ingridient);
             req.ingridient = ingridient;
             next();
             return null;

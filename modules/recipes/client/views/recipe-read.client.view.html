@@ -2,7 +2,7 @@
   <div class="page-header">
     <h1 ng-bind="recipe.title"></h1>
   </div>
-  <div class="pull-right" ng-show="authentication.user.id == recipe.user.id || (authentication.user.roles.indexOf('admin') && authentication.user.roles.indexOf('admin') != -1) ">
+  <div class="pull-right" ng-show="authentication.user.id == recipe.user.id || authentication.user.roles.indexOf('admin') != -1">
     <a class="btn btn-primary" ui-sref="recipes.edit({recipeId: recipe.id})">
       <i class="glyphicon glyphicon-edit"></i>
     </a>

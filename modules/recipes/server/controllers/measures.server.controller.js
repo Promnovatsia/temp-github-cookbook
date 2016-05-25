@@ -41,8 +41,7 @@ exports.measureByID = function(req, res, next, id) {
     Measure.findOne({
         where: {
             id: id
-        },
-        raw: true
+        }
     }).then(function(measure) {
         if (!measure) {
             return res.status(404).send({

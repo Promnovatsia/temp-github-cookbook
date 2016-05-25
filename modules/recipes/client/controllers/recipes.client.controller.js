@@ -2,101 +2,140 @@
 
 // Recipes controller
 angular.module('recipes').controller('RecipesController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients',
-    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients) {
+                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients', 'Measures',
+    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
         
         $scope.authentication = Authentication;      
 
-//Igridients
+        // Find a list of Recipes
+        $scope.find = function() {
+            $scope.recipes = Recipes.query();
+        };
+        
+        // Find existing Recipe
+        $scope.findOne = function() {
+            $scope.recipe = Recipes.get({
+                recipeId: $stateParams.recipeId
+            });
+        };
+        
+        /*.$promise.then(function(recipe) {
+                if(recipe.ingridients.length>0){
+                    recipe.ingridients.forEach(function(item, i, arr) {
+                        Measures.get(
+                            {measureId: i.ingridientAmount.measureId}
+                        ).$promise.then(function(measure) {
+                            item.measure = measure;
+                        });
+                    });   
+                }
+                console.log(recipe);
+                return recipe;
+            });*/
+        
+        //Igridients
       
         $scope.searchIngridient = false;
-    $scope.ingridientData = [];
+        $scope.ingridientData = [];
+        $scope.measuresList = [];
         $scope.getIngridientList = function() {
             return Ingridients.query().$promise;
         };
         
-        //$scope.ingridientList = $scope.getIngridientList();
+        $scope.getMeasures = function() {
+            return Measures.query().$promise;
+        };
         
-        
+        $scope.getMeasuresList = function() {
+           $scope.getMeasures().then(function(measuresList){
+               $scope.measuresList=measuresList;
+               return measuresList;
+           }); 
+        };
+
     //create view
         
-        $scope.treeIngridientsCreate = {
+        $scope.treeIngridients = {
             dropped : function (e) {
-                $scope.ingridientData.forEach(function(item, i, arr) {
-                    item.index = i;
-                });
+                if($scope.recipe){
+                    $scope.recipe.ingridients.forEach(function(item, i, arr) {
+                        item.index = i;
+                    });
+                } else {
+                    $scope.ingridientData.forEach(function(item, i, arr) {
+                        item.index = i;
+                    }); 
+                }
             }
-        };
+        };     
         
-        $scope.newIngridient = function () {
-            $scope.searchIngridient = false;
-        };
-        
-        $scope.newIngridientPush = function(index) {
-            Ingridients.get({
-                ingridientId: index
-            }).$promise.then(function(res){
-                console.log(res);
-                $scope.ingridientData.push({
-                    'index': $scope.ingridientData.length,
-                    caption: res.caption,
-                    infoCard: res.infoCard,
-                    amount: 1,
-                    measure: 'item',
-                    isPopover: true
+        $scope.newIngridient = function (index) {
+            $scope.selectedIngridient = '';
+            Ingridients.get(
+                {ingridientId: index}
+            ).$promise.then(function(newIngridient){
+                console.log(newIngridient);
+                if($scope.recipe){
+                    console.log('existing one');
+                    Measures.get(
+                        {measureId: newIngridient.ingridientAmount.measureId}
+                    ).$promise.then(function(measure) {
+                        $scope.recipe.ingridients.push({
+                            'index': $scope.recipe.ingridients.length,
+                            caption: newIngridient.caption,
+                            amount: newIngridient.ingridientAmount.amount,
+                            measure: measure,
+                            isPopover: false
+                        });
+                    });
+                } else {
+                    console.log('new one');
+                    console.log(newIngridient.measureDefault);
+                    Measures.get(
+                        {measureId: newIngridient.measureDefault}
+                    ).$promise.then(function(measure) {
+                        console.log(measure);
+                        $scope.ingridientData.push({
+                            'index': $scope.ingridientData.length,
+                            caption: newIngridient.caption,
+                            infoCard: newIngridient.infoCard,
+                            amount: measure.min,
+                            measure: measure,
+                            isPopover: false
+                        });
+                    });
+                }
             });
-                return res;
-            });            
         };
         
-        $scope.removeIngridient = function (node) {          
-            $scope.ingridientData.splice(node.ingridient.index,1);
-            $scope.ingridientData.forEach(function(item, i, arr) {
-                item.index = i;
-            });
-        };
-        
-    //update view
-        
-        $scope.treeIngridientsUpdate = {
-            dropped : function (e) {
+        $scope.removeIngridient = function (node) {
+            if($scope.recipe){
+                $scope.recipe.ingridients.splice(node.ingridient.index,1);
                 $scope.recipe.ingridients.forEach(function(item, i, arr) {
                     item.index = i;
                 });
-            }
+            } else {
+                $scope.ingridientData.splice(node.ingridient.index,1);
+                $scope.ingridientData.forEach(function(item, i, arr) {
+                    item.index = i;
+                });
+            } 
         };
         
-        $scope.newExistingIngridient = function () {
-            console.log($scope.recipe);
-            $scope.recipe.ingridients.push({
-                'index': $scope.recipe.ingridients.length,
-                caption: 'ingridient ' + ($scope.recipe.ingridients.length + 1),
-                amount: 1,
-                isPopover: false
-            });
-        };
-        
-        $scope.removeExistingIngridient = function (node) {          
-            $scope.recipe.ingridients.splice(node.ingridient.index,1);
-            $scope.recipe.ingridients.forEach(function(item, i, arr) {
-                item.index = i;
-            });
-        };
-    
     //UI func
         
         $scope.globalPopoverEnable = false;
         
         $scope.amountMinus = function(item) {
-            item.amount--;
-            if(item.amount<1){
-                item.amount=1;
+            item.amount=Number((item.amount-item.measure.step).toFixed(2));
+            if(item.amount<item.measure.min){
+                item.amount=item.measure.min;
             }
             item.isPopover=false;
         };
         
         $scope.amountPlus = function(item) {
-            item.amount++;
+            item.amount=Number((item.amount+item.measure.step).toFixed(2));
             item.isPopover=false;
         };
         
@@ -224,16 +263,7 @@ angular.module('recipes').controller('RecipesController',
             });
         };
 
-    // Find a list of Recipes
-        $scope.find = function() {
-            $scope.recipes = Recipes.query();
-        };
-
-    // Find existing Recipe
-        $scope.findOne = function() {
-            $scope.recipe = Recipes.get({
-                recipeId: $stateParams.recipeId
-            });
-        };
+    
     }
+    
 ]);
