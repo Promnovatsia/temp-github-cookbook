@@ -17,35 +17,24 @@ var path = require('path'),
  */
 exports.create = function(req, res) {
     req.body.userId = req.user.id;
-    console.log(req.body);
     Recipe.create(req.body).then(function(recipe) {
         if (!recipe) {
             return res.send('users/signup', {
                 errors: 'Could not create the recipe'
             });
-        } else {
-            //async.forEach(req.body.ingridients, function (item,callback){
-            //    recipe.addIngridient()
-            //}
-            /*async.forEach(req.body.ingridients, function (item,callback){
-                Ingridient.create({
-                    'index': item.index,
-                    caption: item.caption,
-                    amount: item.amount
-                })
-                .then(function(ingridient){
-                    if (!ingridient) {
-                        return res.send('users/signup', {
-                            errors: 'Could not create the ingridient of recipe'
-                        });    
-                    } else {
-                        ingridient.setRecipe(recipe)
-                        .then(function(){
-                            callback();
-                        });
-                    }
+        } else { 
+            async.forEach(req.body.ingridients, function (item,callback){
+                Ingridient.findById(item.id).then(function(ingridient) {
+                    recipe.addIngridient(ingridient, {
+                        index:item.index,
+                        measureId: item.measure.id,
+                        amount: item.amount,
+                        measureCaption: item.measure.caption
+                    });
+                    console.log('added ' + ingridient);
+                    callback();
                 });
-            });*/
+            });
             return res.jsonp(recipe);
         }
     })
@@ -67,14 +56,38 @@ exports.read = function(req, res) {
  * Update a recipe
  */
 exports.update = function(req, res) {
-    Recipe.destroy(
-        { where : {id:req.recipe.id}}
-    )
-    .then(exports.create(req,res))
-    .catch(function(err) {
-        return res.status(400).send({
-            message: errorHandler.getErrorMessage(err)
-        });
+    Recipe.findById(req.body.id).then(function(recipe) {
+        if (recipe) {
+            recipe.update(req.body).then(function() {
+                recipe.setIngridients([]).then(function (tasks){
+                    async.forEach(req.body.ingridients, function (item,callback){
+                        Ingridient.findById(item.id).then(function(ingridient) {
+                            recipe.addIngridient(ingridient, {
+                                index:item.index,
+                                measureId: item.measure.id,
+                                amount: item.amount,
+                                measureCaption: item.measure.caption
+                            });
+                            callback();
+                        });
+                    });
+                    return res.json(recipe);
+                }).catch(function(err) {
+                    return res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
+                    });
+                });
+            })
+            .catch(function(err) {
+                return res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
+                });
+            });    
+        } else {
+            return res.status(400).send({
+                message: 'Unable to find the recipe'
+            });    
+        }
     });
 };    
 
@@ -99,6 +112,7 @@ exports.delete = function(req, res) {
                 message: 'Unable to find the recipe'
             });
         }
+        return null;
     }).catch(function(err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
@@ -110,15 +124,16 @@ exports.delete = function(req, res) {
  * List of recipes
  */
 exports.list = function(req, res) {
-    Recipe.findAll({
-        include: [db.user, db.ingridient]
-    }).then(function(recipes) {
+    Recipe.findAll(
+        {
+            include: [db.user, db.ingridient]
+        }
+    ).then(function(recipes) {
         if (!recipes) {
             return res.status(404).send({
                 message: 'No recipes found'
             });
         } else {
-            console.log(recipes);
             return res.json(recipes);
         }
     }).catch(function(err) {
@@ -136,18 +151,19 @@ exports.recipeByID = function(req, res, next, id) {
             message: 'Recipe is invalid'
         });
     }
-    Recipe.findOne({
-        where: {
-            id: id
-        },
-        include: [db.ingridient]
-    }).then(function(recipe) {
+    Recipe.findOne(
+        {
+            where: {
+                id: id
+            },
+            include: [db.ingridient]
+        }
+    ).then(function(recipe) {
         if (!recipe) {
             return res.status(404).send({
                 message: 'No recipe with that identifier has been found'
             });
         } else {
-            console.log(recipe);
             req.recipe = recipe;
             next();
             return null;

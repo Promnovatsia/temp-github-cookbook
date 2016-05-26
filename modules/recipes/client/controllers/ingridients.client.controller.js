@@ -12,9 +12,11 @@ angular.module('recipes').controller('IngridientsController',
         };
         
         $scope.findOne = function() {
-            $scope.ingridient = Ingridients.get({
-                ingridientId: $stateParams.ingridientId
-            });
+            $scope.ingridient = Ingridients.get(
+                {
+                    ingridientId: $stateParams.ingridientId
+                }
+            );
         };
         
         $scope.getMeasuresList = function() {
@@ -31,12 +33,14 @@ angular.module('recipes').controller('IngridientsController',
 
             // Create new Recipe object
 
-            var ingridient = new Ingridients({
-                caption: this.caption,
-                infoCard: this.infoCard,
-                image: $scope.imageURL,
-                measureDefault: $scope.measureDefault
-            });
+            var ingridient = new Ingridients(
+                {
+                    caption: this.caption,
+                    infoCard: this.infoCard,
+                    image: $scope.imageURL,
+                    measureDefault: $scope.measureDefault
+                }
+            );
 
             // Redirect after save
             ingridient.$save(function(response) {

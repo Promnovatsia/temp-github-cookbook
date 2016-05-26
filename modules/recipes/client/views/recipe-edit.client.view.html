@@ -11,7 +11,6 @@
                     <label for="title">
                         Title
                     </label>
-                    {{recipe}}
                     <input name="title" type="text" ng-model="recipe.title" id="title" class="form-control" placeholder="Title" required>
                     <div ng-messages="recipeForm.title.$error" role="alert">
                         <p class="help-block error-text" ng-message="required">
@@ -30,6 +29,8 @@
                                 data-animation="am-flip-x"
                                 bs-options="obj.id as obj.caption for obj in getIngridientList()"
                                 placeholder="Enter ingridient"
+                                select-mode="true"
+                                data-onSelect="newIngridient(selectedIngridient)"   
                                 bs-typeahead
                             >
                         </div>
@@ -61,20 +62,33 @@
                                                 <div class="col-md-7">
                                                     {{ingridient.caption}}
                                                 </div>
+<!--                
                                                 <div class="col-md-1">
-                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="amountMinus(ingridient)" id="amountMinus">
-                                                        <span class="glyphicon glyphicon-minus"></span>
-                                                    </a>      
-                                                </div>
-                                                <div class="col-md-3">
-                                                     <a class="btn btn-secondary btn-block"
+                                                          
+                                                </div>-->
+                                                <div class="col-md-4">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">
+                                                            <a class="btn btn-link btn-xs" data-nodrag ng-click="amountMinus(ingridient)" id="amountMinus">
+                                                                <span class="glyphicon glyphicon-minus"></span>
+                                                            </a>
+                                                        </span>
+                                                        <a class="btn btn-secondary btn-block"
                                                         data-nodrag popover-template="'app/template/my-popover-template.html'"
                                                         popover-placement="top"
                                                         popover-is-open="ingridient.isPopover"
                                                         popover-enable="globalPopoverEnable"
                                                         ng-click = "globalPopoverEnable=true; ingridient.isPopover=true">
-                                                            {{ingridient.amount}} {{ingridient.measure.caption}}
+                                                            {{ingridient.amount}} 
                                                     </a>
+                                                        <span class="input-group-addon">
+                                                            <a class="btn btn-link btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </a>
+                                                        </span>
+                                                        <span class="input-group-addon">{{ingridient.measure.caption}}</span>
+                                                    </div>
+                                                     <!--
                                                     <script type="text/ng-template" id="app/template/my-popover-template.html">
                                                         <div>
                                                             <div class="form-group">
@@ -84,13 +98,12 @@
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                    </script>
+                                                    </script>-->
                                                 </div>
-                                                <div class="col-md-1">
-                                                    <a class="btn btn-primary btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
-                                                        <span class="glyphicon glyphicon-plus"></span>
-                                                    </a>      
-                                                </div>
+                                                <!--<div class="col-md-1">
+                                                          
+                                                </div>-->
+                                            
                                             </div>
                                         </div>
                                     </td>
@@ -106,13 +119,13 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <table ui-tree="treeStepsUpdate" id="tree-root" class="table table-responsive">
+                        <table ui-tree="treeSteps" id="tree-root" class="table table-responsive">
                             <thead>
                                 <tr>
                                     <th>Sort</th>
                                     <th width="80%">Name</th>
                                     <th>
-                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newExistingStep()" style="margin-right: 8px;">
+                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newStep()" style="margin-right: 8px;">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     </th>
@@ -121,19 +134,16 @@
                             <tbody ui-tree-nodes ng-model="recipe.steps">
                                 <tr ng-repeat="step in recipe.steps" ui-tree-node>
                                     <td>
+                                        <strong>{{step.index+1}}</strong>
                                         <i class="glyphicon glyphicon-resize-vertical" ui-tree-handle></i> 
                                     </td>
                                     <td>
-                                        <strong>{{step.index+1}}</strong>
                                         <div class="form-group" data-nodrag>
-                                            <label for="action">
-                                                Action
-                                            </label>
                                             <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" placeholder="Action"></textarea>
                                         </div>
                                     </td>
                                     <td>
-                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeExistingStep(this)">
+                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep(this)">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     </td>

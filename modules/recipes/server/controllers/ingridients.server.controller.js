@@ -24,7 +24,7 @@ function decodeBase64Image(dataString) {
     return response;
 }
 /**
- * Create a recipe
+ * Create an ingridient
  */
 exports.create = function(req, res) {
 
@@ -43,48 +43,6 @@ exports.create = function(req, res) {
                 errors: 'Could not create the ingridient'
             });
         } else {
-            //async.forEach(req.body.ingridients, function (item,callback){
-            //    recipe.addIngridient()
-            //}
-            /*async.forEach(req.body.steps, function (item,callback){
-                Step.create({
-                    'index': item.index,
-                    action: item.action,
-                    device: item.device,
-                    duration: item.duration
-                })
-                .then(function(step){
-                    if (!step) {
-                        return res.send('users/signup', {
-                            errors: 'Could not create the step of recipe'
-                        });    
-                    } else {
-                        step.setRecipe(recipe)
-                        .then(function(){
-                            callback();
-                        });
-                    }
-                });
-            });*/
-            /*async.forEach(req.body.ingridients, function (item,callback){
-                Ingridient.create({
-                    'index': item.index,
-                    caption: item.caption,
-                    amount: item.amount
-                })
-                .then(function(ingridient){
-                    if (!ingridient) {
-                        return res.send('users/signup', {
-                            errors: 'Could not create the ingridient of recipe'
-                        });    
-                    } else {
-                        ingridient.setRecipe(recipe)
-                        .then(function(){
-                            callback();
-                        });
-                    }
-                });
-            });*/
             return res.json(ingridient);
         }
     }).catch(function(err) {
@@ -124,12 +82,14 @@ exports.update = function(req, res) {
                 });
             }
             
-            ingridient.update({
-                caption: req.body.caption,
-                infoCard: req.body.infoCard,
-                image: fileName,
-                measureDefault: req.body.measureDefault
-            }).then(function() {
+            ingridient.update(
+                {
+                    caption: req.body.caption,
+                    infoCard: req.body.infoCard,
+                    image: fileName,
+                    measureDefault: req.body.measureDefault
+                }
+            ).then(function() {
                 return res.json(ingridient);
             }).catch(function(err) {
                 return res.status(400).send({
@@ -181,8 +141,9 @@ exports.delete = function(req, res) {
  * List of ingridients
  */
 exports.list = function(req, res) {
-    Ingridient.findAll({
-    }).then(function(ingridients) {
+    Ingridient.findAll(
+        {}
+    ).then(function(ingridients) {
         if (!ingridients) {
             return res.status(404).send({
                 message: 'No ingridients found'
@@ -203,11 +164,13 @@ exports.ingridientByID = function(req, res, next, id) {
         });
     }
   
-    Ingridient.findOne({
-        where: {
-            id: id
+    Ingridient.findOne(
+        {
+            where: {
+                id: id
+            }
         }
-    }).then(function(ingridient) {
+    ).then(function(ingridient) {
         if (!ingridient) {
             return res.status(404).send({
                 message: 'No ingridient with that identifier has been found'

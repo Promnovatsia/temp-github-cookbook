@@ -9,6 +9,9 @@ module.exports = function(sequelize, DataTypes) {
         },
         amount: {
             type: DataTypes.FLOAT
+        },
+        measureCaption: {
+            type: DataTypes.STRING    
         }
     },{
         associate: function(models) {

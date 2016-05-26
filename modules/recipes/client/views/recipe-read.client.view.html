@@ -1,40 +1,59 @@
 <section ng-controller="RecipesController" ng-init="findOne()">
-  <div class="page-header">
-    <h1 ng-bind="recipe.title"></h1>
-  </div>
-  <div class="pull-right" ng-show="authentication.user.id == recipe.user.id || authentication.user.roles.indexOf('admin') != -1">
-    <a class="btn btn-primary" ui-sref="recipes.edit({recipeId: recipe.id})">
-      <i class="glyphicon glyphicon-edit"></i>
-    </a>
-    <a class="btn btn-primary" ng-click="remove(recipe);">
-      <i class="glyphicon glyphicon-trash"></i>
-    </a>
-  </div>
-  <small>
-    <em class="text-muted">
-      Posted on
-      <span ng-bind="recipe.created | date:'mediumDate'"></span>
-      by
-      <span ng-bind="recipe.user.username"></span>
-    </em>
-  </small>
-  <p class="lead" ng-bind="recipe.content"></p>
+    <div class="page-header">
+        <h1 ng-bind="recipe.title"></h1>
+    </div>
+    <div class="pull-right" ng-show="authentication.user.id == recipe.user.id || authentication.user.roles.indexOf('admin') != -1">
+        <a class="btn btn-primary" ui-sref="recipes.edit({recipeId: recipe.id})">
+            <i class="glyphicon glyphicon-edit"></i>
+        </a>
+        <a class="btn btn-primary" ng-click="remove(recipe);">
+            <i class="glyphicon glyphicon-trash"></i>
+        </a>
+    </div>
+    <small>
+        <em class="text-muted">
+            Добавлен
+            <span ng-bind="recipe.createdAt | date:'mediumDate'"></span>
+            автором
+            <span ng-bind="recipe.user.username"></span>
+        </em>
+    </small>
+    <hr>
+    <small>
+        Количество порций: 
+        <span ng-bind="recipe.portions"></span>
+    </small>
+    <hr>
+    <label for="ingridients">
+        Ингридиенты
+    </label>
     <ol>
-        <li ng-repeat="ingridient in recipe.ingridients">
-            <span ng-bind="ingridient.caption"></span>
-            <hr>
-            <!--            <small>
-                {{step.device}} at {{step.duration}}
-            </small>-->
+        <li ng-repeat="ingridient in recipe.ingridients | orderBy : ingridient.ingridientAmount.index">
+            <div class="row">
+                <div class="col-md-4">
+                    <span ng-bind="ingridient.caption"></span>    
+                </div>
+                <div class="col-md-1">
+                    <span ng-bind="ingridient.ingridientAmount.amount"></span>
+                </div>
+                <div class="col-md-1">
+                    <span ng-bind="ingridient.ingridientAmount.measureCaption"></span>
+                </div>
+            </div>
         </li>
     </ol>
+    <hr>
+    <label for="steps">
+        Инструкции
+    </label>
     <ol>
         <li ng-repeat="step in recipe.steps">
             <span ng-bind="step.action"></span>
             <hr>
-            <!--            <small>
-                {{step.device}} at {{step.duration}}
-            </small>-->
         </li>
     </ol>
+    <label for="content">
+        Применчания
+    </label>
+    <span ng-bind="ingridient.ingridientAmount.amount"></span>
 </section>
