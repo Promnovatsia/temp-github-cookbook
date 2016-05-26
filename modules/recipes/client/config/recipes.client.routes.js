@@ -66,6 +66,13 @@ angular.module('recipes').config(['$stateProvider',
                     roles: ['user', 'admin']
                 }
             })
+            .state('measures', {
+                url: '/measures',
+                templateUrl: 'modules/recipes/client/views/measures-manage.client.view.html',
+                data: {
+                    roles: ['admin']
+                } 
+            })
         ;
     }
 ]);

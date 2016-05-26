@@ -156,7 +156,8 @@ angular.module('recipes').controller('RecipesController',
             item.isPopover=false;
         };
         
-        $scope.applyAmount = function(item) {
+        $scope.amountApply = function(item) {
+            item.amount=Number((item.amount - item.amount % item.measure.step).toFixed(2));
             if(item.amount<item.measure.min){
                 item.amount=item.measure.min;
             }

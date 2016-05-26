@@ -43,6 +43,7 @@ module.exports = function(app) {
     app.route('/api/measures')
         .all(recipesPolicy.isAllowed)
         .get(measures.list)
+        .put(measures.update)
     ;
     
     app.route('/api/measures/:measureId')

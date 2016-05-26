@@ -35,7 +35,7 @@ exports.create = function(req, res) {
                     callback();
                 });
             });
-            return res.jsonp(recipe);
+            return res.json(recipe);
         }
     })
     .catch(function(err) {

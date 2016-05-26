@@ -40,6 +40,11 @@ angular.module('recipes').run(['Menus',
               title: 'Create Ingridient',
               state: 'ingridients.create',
               roles: ['user']
-          }); 
+          });
+        Menus.addSubMenuItem('topbar', 'ingridients', {
+              title: 'Manage Measures',
+              state: 'measures',
+              roles: ['user']
+          });
   }
 ]);

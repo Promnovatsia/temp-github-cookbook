@@ -4,8 +4,18 @@
             Recipes
         </h1>
     </div>
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="glyphicon glyphicon-search"></i>
+                </div>
+                <input type="text" class="form-control" placeholder="Search recipes" ng-model="filterRecipes">
+            </div>
+        </div>
+    </form>
     <div class="list-group">
-        <a ng-repeat="recipe in recipes" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
+        <a ng-repeat="recipe in recipes | filter:filterRecipes" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
             <small class="list-group-item-text">
                 Posted on
                 <span ng-bind="recipe.created | date:'mediumDate'"></span>

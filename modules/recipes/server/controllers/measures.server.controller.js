@@ -30,6 +30,27 @@ exports.read = function(req, res) {
     res.json(req.measure);
 };
 
+exports.update = function(req, res) {
+    console.log(req.body.measures);
+    async.forEach(req.body.measures, function (item,callback){
+        Measure.findById(item.id).then(function(measure) {
+            measure.update(item).then(callback());
+        });
+    });
+    Measure.findAll({    
+    }).then(function(measures) {
+        if (!measures) {
+            return res.status(404).send({
+                message: 'No measures found'
+            });
+        } else {
+            return res.json(measures);
+        }
+    }).catch(function(err) {
+        res.json(err);
+    });
+};
+
 exports.measureByID = function(req, res, next, id) {
 
     if ((id % 1 === 0) === false) { //check if it's integer
