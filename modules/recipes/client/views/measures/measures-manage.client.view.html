@@ -1,0 +1,52 @@
+<section ng-controller="MeasuresController" ng-init="find()">
+    <div class="page-header">
+        <h1>
+            Measures
+        </h1>
+    </div>
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="glyphicon glyphicon-search"></i>
+                </div>
+                <input type="text" class="form-control" placeholder="Search measures" ng-model="filterMeasures">
+            </div>
+        </div>
+    </form>
+    <div class="list-group">
+        <div class="row">
+                <div class="col-md-2"> 
+                </div>
+                <div class="col-md-4">
+                    <h4 class="list-group-item-heading"> Caption </h4>    
+                </div>
+                <div class="col-md-3">
+                    <h4 class="list-group-item-heading"> Min </h4>    
+                </div>
+                <div class="col-md-3">
+                    <h4 class="list-group-item-heading"> Step </h4>    
+                </div>
+            </div>
+        <a ng-repeat="measure in measures | filter:filterMeasures" 
+           ui-sref="measures.edit({measureId: measure.id})"
+           class="list-group-item">
+            <div class="row">
+                <div class="col-md-2"> 
+                </div>
+                <div class="col-md-4">
+                    <h4 class="list-group-item-text" ng-bind="measure.caption"></h4>    
+                </div>
+                <div class="col-md-3">
+                    <h4 class="list-group-item-text" ng-bind="measure.min"></h4>    
+                </div>
+                <div class="col-md-3">
+                    <h4 class="list-group-item-text" ng-bind="measure.step"></h4>    
+                </div>
+            </div>           
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" ng-if="!measures.length">
+        No measures yet, why don't you <a ui-sref="measures.create">create one</a>?
+    </div>
+</section>

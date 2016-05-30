@@ -11,6 +11,14 @@ angular.module('recipes').controller('MeasuresController',
             $scope.measures = Measures.query();
         };
         
+        $scope.findOne = function() {
+            $scope.measure = Measures.get(
+                {
+                    measureId: $stateParams.measureId
+                }
+            );
+        };
+        
         $scope.update = function(isValid) {
             
             $scope.error = null;

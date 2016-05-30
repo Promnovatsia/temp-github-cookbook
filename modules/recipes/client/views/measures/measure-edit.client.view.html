@@ -1,0 +1,43 @@
+<section ng-controller="MeasuresController" ng-init="findOne()">
+    <div class="page-header">
+        <h1>
+            Measure edit
+        </h1>
+    </div>
+    <form name="measureForm" class="form-horizontal" ng-submit="update(measureForm.$valid)" novalidate>
+        <div class="form-group">
+            <input class="input-md" type="text" ng-model="measure.caption" placeholder="Name" />
+            <hr>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <a class="btn btn-link btn-xs" data-nodrag ng-click="amountMinus(measure)" id="amountMinus">
+                        <span class="glyphicon glyphicon-minus"></span>
+                    </a>
+                </span>
+                <input class="input-md" type="number" ng-model="measure.min" placeholder="Min" />
+                <span class="input-group-addon">
+                    <a class="btn btn-link btn-xs" data-nodrag ng-click="amountPlus(measure)" id="amountPlus">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
+                </span>
+            </div>
+            <hr>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <a class="btn btn-link btn-xs" data-nodrag ng-click="stepMinus(measure)" id="amountMinus">
+                        <span class="glyphicon glyphicon-minus"></span>
+                    </a>
+                </span>
+                <input class="input-md" type="number" ng-model="measure.step" placeholder="Step" />
+                <span class="input-group-addon">
+                    <a class="btn btn-link btn-xs" data-nodrag ng-click="stepPlus(measure)" id="amountPlus">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Update" class="btn btn-default">
+        </div>
+    </form>
+</section>

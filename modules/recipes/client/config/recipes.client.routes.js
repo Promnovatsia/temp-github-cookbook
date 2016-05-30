@@ -13,22 +13,22 @@ angular.module('recipes').config(['$stateProvider',
         })
             .state('recipes.list', {
                 url: '',
-                templateUrl: 'modules/recipes/client/views/recipes-list.client.view.html'
+                templateUrl: 'modules/recipes/client/views/recipes/recipes-list.client.view.html'
             })
             .state('recipes.create', {
                 url: '/create',
-                templateUrl: 'modules/recipes/client/views/recipe-create.client.view.html',
+                templateUrl: 'modules/recipes/client/views/recipes/recipe-create.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('recipes.view', {
                 url: '/:recipeId',
-                templateUrl: 'modules/recipes/client/views/recipe-read.client.view.html'
+                templateUrl: 'modules/recipes/client/views/recipes/recipe-read.client.view.html'
             })
             .state('recipes.edit', {
                 url: '/:recipeId/edit',
-                templateUrl: 'modules/recipes/client/views/recipe-edit.client.view.html',
+                templateUrl: 'modules/recipes/client/views/recipes/recipe-edit.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
@@ -40,35 +40,42 @@ angular.module('recipes').config(['$stateProvider',
         })
             .state('ingridients.list', {
                 url: '',
-                templateUrl: 'modules/recipes/client/views/ingridients-list.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridients/ingridients-list.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('ingridients.create', {
                 url: '/create',
-                templateUrl: 'modules/recipes/client/views/ingridient-create.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridients/ingridient-create.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('ingridients.view', {
                 url: '/:ingridientId',
-                templateUrl: 'modules/recipes/client/views/ingridient-read.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridients/ingridient-read.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
             .state('ingridients.edit', {
                 url: '/:ingridientId/edit',
-                templateUrl: 'modules/recipes/client/views/ingridient-edit.client.view.html',
+                templateUrl: 'modules/recipes/client/views/ingridients/ingridient-edit.client.view.html',
                 data: {
                     roles: ['user', 'admin']
                 }
             })
-            .state('measures', {
-                url: '/measures',
-                templateUrl: 'modules/recipes/client/views/measures-manage.client.view.html',
+        .state('measures', {
+            url: '/measures',
+            templateUrl: 'modules/recipes/client/views/measures/measures-manage.client.view.html',
+            data: {
+                roles: ['admin']
+            } 
+        })
+            .state('measures.edit',{
+                url: '/measures/:measuresId',
+                templateUrl: 'modules/recipes/client/views/measures/measure-edit.client.view.html',
                 data: {
                     roles: ['admin']
                 } 
