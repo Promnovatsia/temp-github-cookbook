@@ -10,7 +10,9 @@
                 <div class="form-group" show-errors>
                     <div class="row">
                         <div class="col-md-2">
-                            <label for="image">Image</label>
+                            <label for="image">
+                                Image
+                            </label>
                             <input type="file" nv-file-select="" uploader="uploader" />
                             <span ng-if="ingridient.image">
                                 <img ng-src="./uploads/ingridients/pictures/{{ingridient.image}}" class="img-thumbnail user-profile-picture">
@@ -21,7 +23,9 @@
                         </div>
                         <div class="col-md-6">
                             <br /><br />
-                            <label for="caption">Caption</label>
+                            <label for="caption">
+                                Caption
+                            </label>
                             <input name="caption" type="text" ng-model="ingridient.caption" id="caption" class="form-control" placeholder="Caption" required>
                             <div ng-messages="ingridientForm.caption.$error" role="alert">
                                 <p class="help-block error-text" ng-message="required">
@@ -29,9 +33,13 @@
                                 </p>
                             </div>
                             <hr>
-                            <label for="infoCard">InfoCard</label>
+                            <label for="infoCard">
+                                InfoCard
+                            </label>
                             <textarea name="infoCard" ng-model="ingridient.infoCard" id="infoCard" class="form-control" cols="30" rows="5" placeholder="infoCard"></textarea>
-                            <label>Measure default:&nbsp;</label>
+                            <label>
+                                Measure default:&nbsp;
+                            </label>
                             <input type="text" class="form-control"
                                 ng-model="ingridient.measureDefault"
                                 data-animation="am-flip-x"

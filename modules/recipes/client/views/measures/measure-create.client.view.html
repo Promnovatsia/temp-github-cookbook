@@ -1,17 +1,17 @@
-<section ng-controller="MeasuresController" ng-init="findOne()">
+<section ng-controller="MeasuresController">
     <div class="page-header">
         <h1>
-            Measure edit
+            Measure create
         </h1>
     </div>
-    <form name="measureForm" class="form-horizontal" ng-submit="update(measureForm.$valid)" novalidate>
+    <form name="measureForm" class="form-horizontal" ng-submit="create(measureForm.$valid)" novalidate>
         <fieldset>
             <div class="form-group"> 
                 <div class="col-md-3">
                     <label for="caption">
                         Measure caption
                     </label>
-                    <input class="form-control" type="text" ng-model="measure.caption" placeholder="Name" />
+                    <input class="form-control" type="text" ng-model="caption" placeholder="Name" />
                 </div>
                 <div class="col-md-3">
                     <label for="min">
@@ -19,13 +19,13 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" data-nodrag ng-click="minMinus(measure)" id="minMinus">
+                            <a class="btn btn-link btn-xs" data-nodrag ng-click="minMinus()" id="minMinus">
                                 <span class="glyphicon glyphicon-minus"></span>
                             </a>
                         </span>
-                        <input class="form-control" type="number" ng-model="measure.min" placeholder="Min" />
+                        <input class="form-control" type="number" ng-model="min" placeholder="Min" />
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs pull-left" data-nodrag ng-click="minPlus(measure)" id="minPlus">
+                            <a class="btn btn-link btn-xs pull-left" data-nodrag ng-click="minPlus()" id="minPlus">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </span>
@@ -37,13 +37,13 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" data-nodrag ng-click="stepMinus(measure)" id="amountMinus">
+                            <a class="btn btn-link btn-xs" data-nodrag ng-click="stepMinus()" id="amountMinus">
                                 <span class="glyphicon glyphicon-minus"></span>
                             </a>
                         </span>
-                        <input class="form-control" type="number" ng-model="measure.step" placeholder="Step" />
+                        <input class="form-control" type="number" ng-model="step" placeholder="Step" />
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" data-nodrag ng-click="stepPlus(measure)" id="amountPlus">
+                            <a class="btn btn-link btn-xs" data-nodrag ng-click="stepPlus()" id="amountPlus">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </span>
@@ -53,7 +53,7 @@
             </div>
             <div class="form-group">
                 <div class="col-md-3">
-                    <input type="submit" value="Update" class="btn btn-default">
+                    <input type="submit" class="btn btn-default">
                 </div>
             </div>
         </fieldset>

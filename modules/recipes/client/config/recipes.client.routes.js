@@ -67,14 +67,26 @@ angular.module('recipes').config(['$stateProvider',
                 }
             })
         .state('measures', {
+            abstract: true,
             url: '/measures',
-            templateUrl: 'modules/recipes/client/views/measures/measures-manage.client.view.html',
-            data: {
-                roles: ['admin']
-            } 
+            template: '<ui-view/>'
         })
+            .state('measures.list', {
+                url: '',
+                templateUrl: 'modules/recipes/client/views/measures/measures-list.client.view.html',
+                data: {
+                    roles: ['admin']
+                } 
+        })
+            .state('measures.create',{
+                url: '/create',
+                templateUrl: 'modules/recipes/client/views/measures/measure-create.client.view.html',
+                data: {
+                    roles: ['admin']
+                } 
+            })
             .state('measures.edit',{
-                url: '/measures/:measuresId',
+                url: '/:measureId',
                 templateUrl: 'modules/recipes/client/views/measures/measure-edit.client.view.html',
                 data: {
                     roles: ['admin']

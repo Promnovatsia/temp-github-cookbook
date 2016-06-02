@@ -254,18 +254,6 @@ angular.module('recipes').controller('RecipesController',
             });
         };
 
-    // Remove existing Recipe
-        $scope.remove = function(recipe) {
-            if (recipe) {
-                recipe.$remove();
-                $location.path('recipes');
-            } else {
-                $scope.recipe.$remove(function() {
-                    $location.path('recipes');
-                });
-            }
-        };
-
     // Update existing Recipe
         $scope.update = function(isValid) {
             $scope.error = null;
@@ -283,6 +271,18 @@ angular.module('recipes').controller('RecipesController',
                 $scope.error = errorResponse.data.message;
             });
         };
-    
+        
+        // Remove existing Recipe
+        $scope.remove = function(recipe) {
+            if (recipe) {
+                recipe.$remove();
+                $location.path('recipes');
+            } else {
+                $scope.recipe.$remove(function() {
+                    $location.path('recipes');
+                });
+            }
+        };
+
     }    
 ]);

@@ -43,7 +43,7 @@ angular.module('recipes').run(['Menus',
           });
         Menus.addSubMenuItem('topbar', 'ingridients', {
               title: 'Manage Measures',
-              state: 'measures',
+              state: 'measures.list',
               roles: ['user']
           });
   }

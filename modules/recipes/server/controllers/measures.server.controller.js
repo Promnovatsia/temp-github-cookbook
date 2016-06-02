@@ -11,6 +11,47 @@ var path = require('path'),
         Measure = db.measure
     ;
 
+exports.create = function(req, res) {
+    Measure.create(req.body).then(function(measure) {
+        if (!measure) {
+            return res.send('users/signup', {
+                errors: 'Could not create the measure'
+            });
+        } else {
+            return res.json(measure);
+        }
+    }).catch(function(err) {
+        return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+        });
+    });       
+};
+
+exports.read = function(req, res) {
+    res.json(req.measure);
+};
+
+exports.update = function(req, res) {
+    Measure.findById(req.body.id).then(function(measure) {
+        measure.update(req.body).then(function(measure) {
+            if (!measure) {
+                return res.status(404).send({
+                    message: 'No measure found'
+                });
+            } else {
+                return res.json(measure);
+            }
+        }).catch(function(err) {
+            res.json(err);
+        });
+        return null;
+    }).catch(function(err) {
+        return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+        });
+    });
+};
+
 exports.list = function(req, res) {
     Measure.findAll({    
     }).then(function(measures) {
@@ -23,31 +64,6 @@ exports.list = function(req, res) {
         }
     }).catch(function(err) {
         res.jsonp(err);
-    });
-};
-
-exports.read = function(req, res) {
-    res.json(req.measure);
-};
-
-exports.update = function(req, res) {
-    console.log(req.body.measures);
-    async.forEach(req.body.measures, function (item,callback){
-        Measure.findById(item.id).then(function(measure) {
-            measure.update(item).then(callback());
-        });
-    });
-    Measure.findAll({    
-    }).then(function(measures) {
-        if (!measures) {
-            return res.status(404).send({
-                message: 'No measures found'
-            });
-        } else {
-            return res.json(measures);
-        }
-    }).catch(function(err) {
-        res.json(err);
     });
 };
 

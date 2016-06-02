@@ -41,7 +41,9 @@
                         <table ui-tree="treeIngridients" id="tree-root-ingridient" class="table table-responsive">
                             <thead>
                                 <tr>
-                                    <th>Sort</th>
+                                    <th>
+                                        Sort
+                                    </th>
                                     <th width="60%">
                                         <label for="tree-root-ingridient">
                                             Ingridients
@@ -63,29 +65,29 @@
                                                 </div>
                                                 <div class="col-md-5">
                                                     <div class="input-group">
-                                                        <span class="input-group-addon">
+                                                        <span class="input-group-addon" ng-hide="ingridient.isPopover">
                                                             <a class="btn btn-link btn-xs" data-nodrag ng-click="amountMinus(ingridient)" id="amountMinus">
                                                                 <span class="glyphicon glyphicon-minus"></span>
                                                             </a>
                                                         </span>
-                                                        <span ng-hide="ingridient.isPopover">
-                                                            <a class="btn btn-secondary btn-block" ng-click="ingridient.isPopover = true">
+                                                        <a class="btn btn-secondary btn-block" 
+                                                           ng-click="ingridient.isPopover = true" 
+                                                           ng-hide="ingridient.isPopover">
                                                                 {{ingridient.amount}}
-                                                            </a>   
+                                                        </a>
+                                                        <span class="input-group-addon" ng-hide="ingridient.isPopover">
+                                                                {{ingridient.measure.caption}}
                                                         </span>
                                                         <span ng-show="ingridient.isPopover">
-                                                            <input class="input-md" type="number" ng-model="ingridient.amount" placeholder="Name" />
+                                                            <input class="input-sm" type="number" ng-model="ingridient.measure" placeholder="Name" />
                                                             <a class="btn btn-default btn-block" ng-click="amountApply(ingridient)">
                                                                 Save
                                                             </a> 
                                                         </span>
-                                                        <span class="input-group-addon">
+                                                        <span class="input-group-addon" ng-hide="ingridient.isPopover">
                                                             <a class="btn btn-link btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
                                                                 <span class="glyphicon glyphicon-plus"></span>
                                                             </a>
-                                                        </span>
-                                                        <span class="input-group-addon">
-                                                            {{ingridient.measure.caption}}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -110,8 +112,12 @@
                         <table ui-tree="treeSteps" id="tree-root-step" class="table table-responsive">
                             <thead>
                                 <tr>
-                                    <th>Sort</th>
-                                    <th width="80%">Step</th>
+                                    <th>
+                                        Sort
+                                    </th>
+                                    <th width="80%">
+                                        Step
+                                    </th>
                                     <th>
                                         <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newStep()" style="margin-right: 8px;">
                                             <span class="glyphicon glyphicon-plus"></span>
@@ -144,7 +150,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="content">Content</label>
+                    <label for="content">
+                        Content
+                    </label>
                     <textarea name="content" ng-model="content" id="content" class="form-control" cols="30" rows="10" placeholder="Content"></textarea>
                 </div>
                 <div class="form-group">

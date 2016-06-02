@@ -43,12 +43,13 @@ module.exports = function(app) {
     app.route('/api/measures')
         .all(recipesPolicy.isAllowed)
         .get(measures.list)
-        .put(measures.update)
+        .post(measures.create)
     ;
     
     app.route('/api/measures/:measureId')
         .all(recipesPolicy.isAllowed)
         .get(measures.read)
+        .put(measures.update)
     ;
 
     // Finish by binding the recipe middleware
