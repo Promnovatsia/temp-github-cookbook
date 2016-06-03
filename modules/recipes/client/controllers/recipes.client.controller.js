@@ -38,7 +38,6 @@ angular.module('recipes').controller('RecipesController',
                     });   
                 }
                 recipe.ingridients.sort($scope.sort);
-                console.log(recipe.ingridients);
                 $scope.recipe = recipe;
             });
         };
@@ -51,15 +50,8 @@ angular.module('recipes').controller('RecipesController',
             return Ingridients.query().$promise;
         };
         
-        $scope.getMeasures = function() {
-            return Measures.query().$promise;
-        };
-        
         $scope.getMeasuresList = function() {
-           $scope.getMeasures().then(function(measuresList){
-               $scope.measuresList=measuresList;
-               return measuresList;
-           }); 
+            return Measures.query().$promise;
         };
 
     //create view
@@ -79,7 +71,10 @@ angular.module('recipes').controller('RecipesController',
         };     
         
         $scope.newIngridient = function (id) {
-            $scope.selectedIngridient='';
+            if(!id || id % 1 !== 0) {
+                $scope.selectedIngridient='';
+                return;
+            }
             Ingridients.get(
                 {
                     ingridientId: id
@@ -101,7 +96,8 @@ angular.module('recipes').controller('RecipesController',
                                 amount: measure.min,
                                 measure: measure,
                                 measureCaption: measure.caption,
-                                isPopover: false
+                                isPopover: false,
+                                isConvert:false
                             }
                         );
                     } else {
@@ -115,11 +111,13 @@ angular.module('recipes').controller('RecipesController',
                                 amount: measure.min,
                                 measure: measure,
                                 measureCaption: measure.caption,
-                                isPopover: false
+                                isPopover: false,
+                                isConvert:false
                             }
                         );    
                     }
                 });
+                $scope.selectedIngridient='';
             }).catch(function(err) {
                 
             });
@@ -157,11 +155,49 @@ angular.module('recipes').controller('RecipesController',
         };
         
         $scope.amountApply = function(item) {
+            if(item.selectedMeasure!==''){
+                Measures.get(
+                        {
+                            measureId: item.selectedMeasure
+                        }
+                ).$promise.then(function(measure) {
+                    item.measure=measure;
+                    item.amount=$scope.measuresList.find(x=> x.id === item.selectedMeasure).value;
+                });    
+            }
             item.amount=Number((item.amount - item.amount % item.measure.step).toFixed(2));
             if(item.amount<item.measure.min){
                 item.amount=item.measure.min;
             }
             item.isPopover=false;
+            item.isConvert=false;
+        };
+        
+        $scope.converter = function(item) {
+            item.isPopover=false;
+            console.log(item.measure.converter);
+            $scope.measuresList=[];
+            item.selectedMeasure='';
+            item.measure.converter.forEach(function(measure, i, arr) {
+                var value=0;
+                if(measure.rate===0){
+                    value=1;
+                }
+                else {
+                    value=Number((item.amount * measure.rate).toFixed(2));
+                }
+                if(item.amount<item.measure.min){
+                    item.amount=item.measure.min;
+                }
+                    $scope.measuresList.push(
+                        {
+                            id: measure.id,
+                            value: value,
+                            caption: value + ' ' + measure.caption,
+                        }
+                    );
+            });
+            item.isConvert=true;
         };
         
     //Steps
@@ -181,13 +217,13 @@ angular.module('recipes').controller('RecipesController',
                 }  
             }
         };
-
+        
         $scope.newStep = function () {
             if ($scope.recipe) {
                 $scope.recipe.steps.push(
                     {
                         'index': $scope.recipe.steps.length,
-                        action: 'action ' + ($scope.recipe.steps.length + 1),
+                        action: $scope.actionStep,
                         device: 'device',
                         duration: 'duration'
                     }
@@ -196,12 +232,13 @@ angular.module('recipes').controller('RecipesController',
                 $scope.stepData.push(
                     {
                         'index': $scope.stepData.length,
-                        action: 'action ' + ($scope.stepData.length + 1),
+                        action: $scope.actionStep,
                         device: 'device',
                         duration: 'duration'
                     }
                 );   
             }
+            $scope.actionStep='';
         };
 
         $scope.removeStep = function (node) {

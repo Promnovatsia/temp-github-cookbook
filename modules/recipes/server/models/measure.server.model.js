@@ -16,7 +16,7 @@ module.exports = function(sequelize, DataTypes) {
             allowNull: false
         },
         converter: {
-            type: DataTypes.JSONB
+            type: DataTypes.ARRAY(DataTypes.JSONB)
             /*{
                 measureId: {
                     type: DataTypes.INTEGER,

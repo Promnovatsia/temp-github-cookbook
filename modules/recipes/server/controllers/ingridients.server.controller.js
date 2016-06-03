@@ -176,7 +176,6 @@ exports.ingridientByID = function(req, res, next, id) {
                 message: 'No ingridient with that identifier has been found'
             });
         } else {
-            console.log(ingridient);
             req.ingridient = ingridient;
             next();
             return null;

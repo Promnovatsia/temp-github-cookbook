@@ -41,6 +41,14 @@ angular.module('recipes').controller('MeasuresController',
             measure.step++;
         };
         
+        $scope.newSubMeasure = function(measure){
+            measure.converter.push({
+                id: 1,
+                caption: "л",
+                rate: 1
+            });    
+        };
+        
         $scope.create = function(isValid) {
             $scope.error = null;
 
@@ -55,13 +63,13 @@ angular.module('recipes').controller('MeasuresController',
                 {
                     caption: this.caption,
                     step: this.step,
-                    min: this.min
+                    min: this.min,
+                    converter: this.converter
                 }
             );
-
             // Redirect after save
             measure.$save(function(response) {
-                $location.path('measures/' + response.id);
+                $location.path('measures');
 
             // Clear form fields
                 $scope.caption = '';
@@ -81,9 +89,8 @@ angular.module('recipes').controller('MeasuresController',
             }
 
             var measure = $scope.measure;
-            console.log(measure);
             measure.$update(function() {
-                $location.path('measures/' + measure.id);
+                $location.path('measures');
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
             });
