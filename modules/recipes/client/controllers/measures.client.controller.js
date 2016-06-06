@@ -6,7 +6,9 @@ angular.module('recipes').controller('MeasuresController',
     function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
         
         $scope.authentication = Authentication;
+        $scope.converter=[];
         
+        $scope.uncountable=false;
         $scope.find = function() {
             $scope.measures = Measures.query();
         };
@@ -16,7 +18,18 @@ angular.module('recipes').controller('MeasuresController',
                 {
                     measureId: $stateParams.measureId
                 }
-            );
+            ).$promise.then(function (measure){
+                $scope.converter=measure.converter;
+                console.log($scope.converter);
+                $scope.measure=measure;
+                $scope.converter.forEach(function(item, i, arr) {
+                    item.index = i;
+                });
+            });
+        };
+        
+        $scope.getMeasuresList = function() {
+            return Measures.query().$promise;
         };
         
         $scope.minMinus = function(measure) {
@@ -41,12 +54,35 @@ angular.module('recipes').controller('MeasuresController',
             measure.step++;
         };
         
-        $scope.newSubMeasure = function(measure){
-            measure.converter.push({
-                id: 1,
-                caption: "л",
-                rate: 1
-            });    
+        $scope.newSubMeasure = function(id){
+            if(!id || id % 1 !== 0) {
+                $scope.selectedMeasure='';
+                return;
+            }
+            Measures.get(
+                {
+                    measureId: id
+                }
+            ).$promise.then(function(measure) {
+                $scope.converter.push({
+                    id: measure.id,
+                    index: $scope.converter.length,
+                    caption: measure.caption,
+                    rate: 1,
+                    exchange: true
+                });
+                $scope.converter.forEach(function(item, i, arr) {
+                    item.index = i;
+                });
+            });
+            $scope.selectedMeasure='';
+        };
+        
+        $scope.removeSubMeasure = function(node){
+            $scope.converter.splice(node.index,1);
+            $scope.converter.forEach(function(item, i, arr) {
+                item.index = i;
+            });
         };
         
         $scope.create = function(isValid) {
@@ -64,9 +100,23 @@ angular.module('recipes').controller('MeasuresController',
                     caption: this.caption,
                     step: this.step,
                     min: this.min,
-                    converter: this.converter
+                    converter: []
                 }
             );
+            $scope.converter.forEach(function(item, i, arr) {
+                if(!item.exchange || $scope.uncountable){
+                    item.rate=0;
+                }
+                measure.converter.push(
+                    {
+                        id:item.id,
+                        caption:item.caption,
+                        rate: item.rate
+                    }
+                );    
+            });
+            console.log($scope.converter);
+            console.log(measure);
             // Redirect after save
             measure.$save(function(response) {
                 $location.path('measures');
@@ -89,6 +139,21 @@ angular.module('recipes').controller('MeasuresController',
             }
 
             var measure = $scope.measure;
+            measure.converter=[];
+            $scope.converter.forEach(function(item, i, arr) {
+                if(!item.exchange || $scope.uncountable){
+                    item.rate=0;
+                }
+                measure.converter.push(
+                    {
+                        id:item.id,
+                        caption:item.caption,
+                        rate: item.rate
+                    }
+                );    
+            });
+            console.log($scope.converter);
+            console.log(measure);
             measure.$update(function() {
                 $location.path('measures');
             }, function(errorResponse) {

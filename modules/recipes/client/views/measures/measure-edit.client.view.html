@@ -13,37 +13,52 @@
                     </label>
                     <input class="form-control" type="text" ng-model="measure.caption" placeholder="Name" />
                 </div>
-                <div class="col-md-3">
-                    <label for="min">
+                <div class="col-md-4">
+                    <label for="min" ng-hide="uncountable">
                         Measure minimum value
                     </label>
+                    <label for="min" ng-show="uncountable">
+                        Measure uncountable
+                    </label>
                     <div class="input-group">
-                        <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" data-nodrag ng-click="minMinus(measure)" id="minMinus">
+                        <span class="input-group-addon" ng-hide="uncountable">
+                            <a class="btn btn-link btn-xs" ng-click="uncountable=true" >
+                                <span class="glyphicon glyphicon-scale"></span>
+                                Countable
+                            </a>
+                        </span>
+                        <span class="input-group-addon" ng-show="uncountable">
+                            <a class="btn btn-link btn-xs" ng-click="uncountable=false" >
+                                <span class="glyphicon glyphicon-lock"></span>
+                                Uncountable
+                            </a>
+                        </span>
+                        <span class="input-group-addon" ng-hide="uncountable">
+                            <a class="btn btn-link btn-xs" ng-click="minMinus(measure)" id="minMinus" >
                                 <span class="glyphicon glyphicon-minus"></span>
                             </a>
                         </span>
-                        <input class="form-control" type="number" ng-model="measure.min" placeholder="Min" />
-                        <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs pull-left" data-nodrag ng-click="minPlus(measure)" id="minPlus">
+                        <input class="form-control" type="number" ng-model="measure.min" ng-hide="uncountable" placeholder="Min" />
+                        <span class="input-group-addon" ng-hide="uncountable">
+                            <a class="btn btn-link btn-xs pull-left" ng-click="minPlus(measure)" id="minPlus">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </span>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" ng-hide="uncountable">
                     <label for="step">
                         Measure step value
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" data-nodrag ng-click="stepMinus(measure)" id="amountMinus">
+                            <a class="btn btn-link btn-xs" ng-click="stepMinus(measure)" id="amountMinus">
                                 <span class="glyphicon glyphicon-minus"></span>
                             </a>
                         </span>
                         <input class="form-control" type="number" ng-model="measure.step" placeholder="Step" />
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" data-nodrag ng-click="stepPlus(measure)" id="amountPlus">
+                            <a class="btn btn-link btn-xs" ng-click="stepPlus(measure)" id="amountPlus">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </span>
@@ -58,36 +73,55 @@
                     <table ui-tree="treeSubMeasures" id="tree-root" class="table table-responsive">
                         <thead>
                             <tr>
-                                <th>
-                                    <label for="subMeasureIndex" ng-show="measure.converter.length>0">
+                                <th width=10%>
+                                    <label for="subMeasureIndex" ng-show="converter.length>0">
                                         Sort
                                     </label>
                                 </th>
-                                <th width="80%">
-                                    <label for="subMeasureCaption" ng-show="measure.converter.length>0">
-                                        Measure
+                                <th width="25%">
+                                    <label for="subMeasureRate" ng-show="converter.length>0">
+                                        Conversion
                                     </label>
                                 </th>
-                                <th>
-                                    <label for="subMeasureRate" ng-show="measure.converter.length>0">
-                                        Conversion rate
-                                    </label>
-                                </th>
+                                <th></th>
                             </tr>
                         </thead>
-                        <tbody ui-tree-nodes ng-model="measure.converter">
-                            <tr ng-repeat="subMeasure in measure.converter" ui-tree-node>
+                        <tbody ui-tree-nodes ng-model="converter">
+                            <tr ng-repeat="subMeasure in converter" ui-tree-node>
                                 <td>
                                     <i class="glyphicon glyphicon-sort" ui-tree-handle></i>
                                     {{subMeasure.index+1}}
                                 </td>
                                 <td>
-                                    <div class="form-group" data-nodrag>
-                                        <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" placeholder="Action"></textarea>
+                                    <div class="input-group" ng-hide="uncountable">
+                                        <span class="input-group-addon" ng-show="subMeasure.exchange">
+                                            <a class="btn btn-link btn-xs" ng-click="subMeasure.exchange=false">
+                                                <span class="glyphicon glyphicon-retweet">
+                                                    Rate
+                                                </span>
+                                            </a>
+                                        </span>
+                                        <span class="input-group-addon" ng-hide="subMeasure.exchange">
+                                            <a class="btn btn-link btn-xs" ng-click="subMeasure.exchange=true">
+                                                <span class="glyphicon glyphicon-lock">
+                                                    Convertable to
+                                                </span>
+                                            </a>
+                                        </span>
+                                        <input class="form-control" type="number" min="0" ng-show="subMeasure.exchange" ng-model="subMeasure.rate" placeholder="Rate" />
+                                        <span class="input-group-addon" ng-show="subMeasure.exchange">
+                                            {{subMeasure.caption}}
+                                        </span>
+                                        <span class="input-group-addon" ng-hide="subMeasure.exchange">
+                                            {{subMeasure.caption}}
+                                        </span>
                                     </div>
+                                    <span class="btn btn-secondary" ng-show="uncountable">
+                                        {{subMeasure.caption}}
+                                    </span>
                                 </td>
                                 <td>
-                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep(this)">
+                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeSubMeasure(this)">
                                         <span class="glyphicon glyphicon-remove"></span>
                                     </a>
                                 </td>
@@ -98,11 +132,13 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" class="form-control"
-                                ng-model="actionStep"
+                                ng-model="selectedMeasure"
                                 data-animation="am-flip-x"
-                                placeholder="Enter new step here or press plus"
+                                bs-options="obj.id as obj.caption for obj in getMeasuresList()"
+                                placeholder="Measure"
+                                bs-typeahead
                             >
-                        <span class="input-group-addon" ng-click="newSubMeasure(measure)">
+                        <span class="input-group-addon" ng-click="newSubMeasure(selectedMeasure)">
                             <span class="glyphicon glyphicon-plus"></span>
                         </span> 
                     </div> 

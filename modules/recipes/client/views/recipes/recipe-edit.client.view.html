@@ -60,7 +60,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-5">
-                                                <div class="input-group">
+                                                <div class="input-group" ng-hide="ingridient.measure.min==0">
                                                     <span class="input-group-addon" ng-hide="ingridient.isConvert || ingridient.isPopover">
                                                         <a class="btn btn-link btn-xs" data-nodrag ng-click="amountMinus(ingridient)" id="amountMinus">
                                                             <span class="glyphicon glyphicon-minus"></span>
@@ -91,15 +91,30 @@
                                                             bs-select
                                                         > 
                                                     </span>
-                                                    <span class="input-group-addon" ng-show="ingridient.isConvert || ingridient.isPopover"
-                                                          ng-click="amountApply(ingridient)"
-                                                        >
+                                                    <span class="input-group-addon" ng-show="ingridient.isConvert || ingridient.isPopover" ng-click="amountApply(ingridient)">
                                                         <i class="glyphicon glyphicon-random"></i>
                                                     </span>
                                                     <span class="input-group-addon" ng-hide="ingridient.isConvert || ingridient.isPopover">
                                                         <a class="btn btn-link btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
                                                             <span class="glyphicon glyphicon-plus"></span>
                                                         </a>
+                                                    </span>
+                                                </div>
+                                                <div class="input-group" ng-show="ingridient.measure.min==0">
+                                                    <span class="input-group-addon" ng-hide="ingridient.isConvert" ng-click="converter(ingridient)">
+                                                            {{ingridient.measure.caption}}
+                                                    </span>
+                                                    <span ng-show="ingridient.isConvert || ingridient.isPopover">
+                                                        <input type="text" class="form-control"
+                                                            ng-model="ingridient.selectedMeasure"
+                                                            bs-options="obj.id as obj.caption for obj in measuresList"
+                                                            placeholder="Choose conversion"
+                                                            ng-show="ingridient.isConvert"
+                                                            bs-select
+                                                        > 
+                                                    </span>
+                                                    <span class="input-group-addon" ng-show="ingridient.isConvert || ingridient.isPopover" ng-click="amountApply(ingridient)">
+                                                        <i class="glyphicon glyphicon-random"></i>
                                                     </span>
                                                 </div>
                                             </div>
