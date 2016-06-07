@@ -103,6 +103,10 @@ angular.module('recipes').controller('MeasuresController',
                     converter: []
                 }
             );
+            if($scope.uncountable){
+                measure.min=0;
+                measure.step=0;
+            }
             $scope.converter.forEach(function(item, i, arr) {
                 if(!item.exchange || $scope.uncountable){
                     item.rate=0;
@@ -139,6 +143,10 @@ angular.module('recipes').controller('MeasuresController',
             }
 
             var measure = $scope.measure;
+            if($scope.uncountable){
+                measure.min=0;
+                measure.step=0;
+            }
             measure.converter=[];
             $scope.converter.forEach(function(item, i, arr) {
                 if(!item.exchange || $scope.uncountable){

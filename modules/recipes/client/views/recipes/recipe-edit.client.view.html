@@ -38,8 +38,8 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody ui-tree-nodes ng-model="recipe.ingridients">
-                                <tr ng-repeat="ingridient in recipe.ingridients" ui-tree-node>
+                            <tbody ui-tree-nodes ng-model="ingridientData">
+                                <tr ng-repeat="ingridient in ingridientData" ui-tree-node>
                                     <td>
                                         <strong>{{ingridient.index+1}}</strong>
                                         <i class="glyphicon glyphicon-sort" ui-tree-handle></i>
@@ -51,7 +51,7 @@
                                                 <div class="input-group">
                                                     <span class="btn btn-link btn-xs" ng-show="ingridient.infoCard" 
                                                           ng-click="ingridient.info = !ingridient.info">
-                                                        <i class="glyphicon glyphicon-text-background"></i>
+                                                        <span class="glyphicon glyphicon-text-background"></span>
                                                     </span>
                                                     <span ng-if="ingridient.image" ng-show="ingridient.info">
                                                         <img ng-src="./uploads/ingridients/pictures/{{ingridient.image}}" class="img-thumbnail user-profile-picture">
@@ -66,55 +66,70 @@
                                                             <span class="glyphicon glyphicon-minus"></span>
                                                         </a>
                                                     </span>
-                                                    <a class="btn btn-default btn-block" 
-                                                       ng-click="ingridient.isPopover = true" 
-                                                       ng-hide="ingridient.isConvert || ingridient.isPopover">
+                                                    <span class="input-group-addon" ng-hide="ingridient.isConvert || ingridient.isPopover">
+                                                        <a class="btn btn-link btn-xs" ng-click="ingridient.isPopover = true">
                                                             {{ingridient.amount}}
-                                                    </a>
+                                                        </a>
+                                                    </span>
                                                     <span class="input-group-addon" ng-hide="ingridient.isConvert" ng-click="converter(ingridient)">
-                                                            {{ingridient.measure.caption}}
+                                                        {{ingridient.measure.caption}}
                                                     </span>
                                                     <span class="input-group-addon" ng-show="ingridient.isConvert" ng-click="ingridient.isConvert=false">
-                                                            {{ingridient.amount}} {{ingridient.measure.caption}}
+                                                        <span class="glyphicon glyphicon-menu-left"></span>
+                                                        {{ingridient.amount}} {{ingridient.measure.caption}}
                                                     </span>
-                                                    <span ng-show="ingridient.isConvert || ingridient.isPopover">
+                                                    <span ng-show="(ingridient.isConvert || ingridient.isPopover) && ingridient.selectedMeasure==''">
                                                         <input class="form-control" type="number" 
                                                                ng-model="ingridient.amount" 
                                                                placeholder="Amount" 
                                                                ng-show="ingridient.isPopover"
                                                         >
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" 
                                                             ng-model="ingridient.selectedMeasure"
-                                                            bs-options="obj.id as obj.caption for obj in measuresList"
+                                                            bs-options="obj.caption as obj.caption for obj in measuresList"
                                                             placeholder="Choose conversion"
                                                             ng-show="ingridient.isConvert"
                                                             bs-select
-                                                        > 
+                                                        >
                                                     </span>
-                                                    <span class="input-group-addon" ng-show="ingridient.isConvert || ingridient.isPopover" ng-click="amountApply(ingridient)">
-                                                        <i class="glyphicon glyphicon-random"></i>
+                                                    <span class="input-group-addon" ng-show="(ingridient.isConvert || ingridient.isPopover) && ingridient.selectedMeasure!=''" ng-click="amountApply(ingridient)">
+                                                        <a class="btn btn-secondary btn-xs" ng-click="amountApply(ingridient)">
+                                                            {{ingridient.selectedMeasure}}
+                                                            <span class="glyphicon glyphicon-random"></span>
+                                                        </a>
                                                     </span>
                                                     <span class="input-group-addon" ng-hide="ingridient.isConvert || ingridient.isPopover">
-                                                        <a class="btn btn-link btn-xs" data-nodrag ng-click="amountPlus(ingridient)" id="amountPlus">
+                                                        <a class="btn btn-link btn-xs" ng-click="amountPlus(ingridient)" id="amountPlus">
                                                             <span class="glyphicon glyphicon-plus"></span>
                                                         </a>
                                                     </span>
                                                 </div>
                                                 <div class="input-group" ng-show="ingridient.measure.min==0">
-                                                    <span class="input-group-addon" ng-hide="ingridient.isConvert" ng-click="converter(ingridient)">
+                                                    <span class="input-group-addon" ng-hide="ingridient.isConvert">
+                                                        <a class="btn btn-link btn-xs" ng-click="converter(ingridient)">
                                                             {{ingridient.measure.caption}}
+                                                        </a>
                                                     </span>
-                                                    <span ng-show="ingridient.isConvert || ingridient.isPopover">
+                                                    <span class="input-group-addon" ng-show="ingridient.isConvert">
+                                                        <a class="btn btn-secondary btn-xs" ng-click="ingridient.isConvert=false">
+                                                            <span class="glyphicon glyphicon-menu-left"></span>    
+                                                            {{ingridient.measure.caption}}
+                                                        </a>
+                                                    </span>
+                                                    <span ng-show="(ingridient.isConvert || ingridient.isPopover) && ingridient.selectedMeasure==''">
                                                         <input type="text" class="form-control"
                                                             ng-model="ingridient.selectedMeasure"
-                                                            bs-options="obj.id as obj.caption for obj in measuresList"
+                                                            bs-options="obj.caption as obj.caption for obj in measuresList"
                                                             placeholder="Choose conversion"
                                                             ng-show="ingridient.isConvert"
                                                             bs-select
                                                         > 
                                                     </span>
-                                                    <span class="input-group-addon" ng-show="ingridient.isConvert || ingridient.isPopover" ng-click="amountApply(ingridient)">
-                                                        <i class="glyphicon glyphicon-random"></i>
+                                                    <span class="input-group-addon" ng-show="(ingridient.isConvert || ingridient.isPopover) && ingridient.selectedMeasure!=''">
+                                                        <a class="btn btn-secondary btn-xs" ng-click="amountApply(ingridient)">
+                                                            {{ingridient.selectedMeasure}}
+                                                            <span class="glyphicon glyphicon-random"></span>
+                                                        </a>
                                                     </span>
                                                 </div>
                                             </div>
@@ -165,8 +180,8 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody ui-tree-nodes ng-model="recipe.steps">
-                                <tr ng-repeat="step in recipe.steps" ui-tree-node>
+                            <tbody ui-tree-nodes ng-model="stepData">
+                                <tr ng-repeat="step in stepData" ui-tree-node>
                                     <td>
                                         <strong>{{step.index+1}}</strong>
                                         <i class="glyphicon glyphicon-sort" ui-tree-handle></i> 

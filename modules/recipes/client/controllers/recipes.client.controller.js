@@ -39,6 +39,7 @@ angular.module('recipes').controller('RecipesController',
                 }
                 recipe.ingridients.sort($scope.sort);
                 $scope.recipe = recipe;
+                $scope.ingridientData=$scope.recipe.ingridients;
             });
         };
         
@@ -46,6 +47,7 @@ angular.module('recipes').controller('RecipesController',
       
         $scope.ingridientData = [];
         $scope.measuresList = [];
+        
         $scope.getIngridientList = function() {
             return Ingridients.query().$promise;
         };
@@ -58,15 +60,9 @@ angular.module('recipes').controller('RecipesController',
         
         $scope.treeIngridients = {
             dropped : function (e) {
-                if($scope.recipe){
-                    $scope.recipe.ingridients.forEach(function(item, i, arr) {
-                        item.index = i;
-                    });
-                } else {
-                    $scope.ingridientData.forEach(function(item, i, arr) {
-                        item.index = i;
-                    }); 
-                }
+                $scope.ingridientData.forEach(function(item, i, arr) {
+                    item.index = i;
+                }); 
             }
         };     
         
@@ -85,37 +81,20 @@ angular.module('recipes').controller('RecipesController',
                             measureId: newIngridient.measureDefault
                         }
                 ).$promise.then(function(measure) {
-                    if($scope.recipe){
-                        $scope.recipe.ingridients.push(
-                            {
-                                id: newIngridient.id,
-                                'index': $scope.recipe.ingridients.length,
-                                caption: newIngridient.caption,
-                                infoCard: newIngridient.infoCard,
-                                image: newIngridient.image,
-                                amount: measure.min,
-                                measure: measure,
-                                measureCaption: measure.caption,
-                                isPopover: false,
-                                isConvert:false
-                            }
-                        );
-                    } else {
-                        $scope.ingridientData.push(
-                            {
-                                id: newIngridient.id,
-                                'index': $scope.ingridientData.length,
-                                caption: newIngridient.caption,
-                                infoCard: newIngridient.infoCard,
-                                image: newIngridient.image,
-                                amount: measure.min,
-                                measure: measure,
-                                measureCaption: measure.caption,
-                                isPopover: false,
-                                isConvert:false
-                            }
-                        );    
-                    }
+                    $scope.ingridientData.push(
+                        {
+                            id: newIngridient.id,
+                            'index': $scope.ingridientData.length,
+                            caption: newIngridient.caption,
+                            infoCard: newIngridient.infoCard,
+                            image: newIngridient.image,
+                            amount: measure.min,
+                            measure: measure,
+                            measureCaption: measure.caption,
+                            isPopover: false,
+                            isConvert:false
+                        }
+                    );    
                 });
                 $scope.selectedIngridient='';
             }).catch(function(err) {
@@ -124,17 +103,10 @@ angular.module('recipes').controller('RecipesController',
         };
         
         $scope.removeIngridient = function (node) {
-            if($scope.recipe){
-                $scope.recipe.ingridients.splice(node.ingridient.index,1);
-                $scope.recipe.ingridients.forEach(function(item, i, arr) {
-                    item.index = i;
-                });
-            } else {
-                $scope.ingridientData.splice(node.ingridient.index,1);
-                $scope.ingridientData.forEach(function(item, i, arr) {
-                    item.index = i;
-                });
-            } 
+            $scope.ingridientData.splice(node.ingridient.index,1);
+            $scope.ingridientData.forEach(function(item, i, arr) {
+                item.index = i;
+            });
         };
         
     //UI func
@@ -156,13 +128,14 @@ angular.module('recipes').controller('RecipesController',
         
         $scope.amountApply = function(item) {
             if(item.selectedMeasure!==''){
+                var id = $scope.measuresList.find(x=> x.caption === item.selectedMeasure).id;
                 Measures.get(
-                        {
-                            measureId: item.selectedMeasure
-                        }
+                    {
+                        measureId: id
+                    }
                 ).$promise.then(function(measure) {
                     item.measure=measure;
-                    item.amount=$scope.measuresList.find(x=> x.id === item.selectedMeasure).value;
+                    item.amount=$scope.measuresList.find(x=> x.caption === item.selectedMeasure).value;
                 });    
             }
             item.amount=Number((item.amount - item.amount % item.measure.step).toFixed(2));
@@ -175,7 +148,6 @@ angular.module('recipes').controller('RecipesController',
         
         $scope.converter = function(item) {
             item.isPopover=false;
-            console.log(item.measure.converter);
             $scope.measuresList=[];
             item.selectedMeasure='';
             item.measure.converter.forEach(function(measure, i, arr) {
@@ -206,53 +178,29 @@ angular.module('recipes').controller('RecipesController',
 
         $scope.treeSteps = {
             dropped : function (e) {
-                if ($scope.recipe) {
-                    $scope.recipe.steps.forEach(function(item, i, arr) {
-                        item.index = i;
-                    });   
-                } else {
-                    $scope.stepData.forEach(function(item, i, arr) {
-                        item.index = i;
-                    });
-                }  
+                $scope.stepData.forEach(function(item, i, arr) {
+                    item.index = i;
+                });  
             }
         };
         
         $scope.newStep = function () {
-            if ($scope.recipe) {
-                $scope.recipe.steps.push(
-                    {
-                        'index': $scope.recipe.steps.length,
-                        action: $scope.actionStep,
-                        device: 'device',
-                        duration: 'duration'
-                    }
-                );    
-            } else {
-                $scope.stepData.push(
-                    {
-                        'index': $scope.stepData.length,
-                        action: $scope.actionStep,
-                        device: 'device',
-                        duration: 'duration'
-                    }
-                );   
-            }
+            $scope.stepData.push(
+                {
+                    'index': $scope.stepData.length,
+                    action: $scope.actionStep,
+                    device: 'device',
+                    duration: 'duration'
+                }
+            );   
             $scope.actionStep='';
         };
 
         $scope.removeStep = function (node) {
-            if ($scope.recipe) {
-                $scope.recipe.steps.splice(node.step.index,1);
-                $scope.recipe.steps.forEach(function(item, i, arr) {
-                    item.index = i;
-                });
-            } else {
-                $scope.stepData.splice(node.step.index,1);
-                $scope.stepData.forEach(function(item, i, arr) {
-                    item.index = i;
-                });    
-            } 
+            $scope.stepData.splice(node.step.index,1);
+            $scope.stepData.forEach(function(item, i, arr) {
+                item.index = i;
+            });    
         };
         
     // Create new Recipe
@@ -274,8 +222,6 @@ angular.module('recipes').controller('RecipesController',
                     ingridients: $scope.ingridientData
                 }
             );
-            console.log($scope.ingridientData);
-            console.log(recipe);
 
             // Redirect after save
             recipe.$save(function(response) {
@@ -301,7 +247,8 @@ angular.module('recipes').controller('RecipesController',
             }
 
             var recipe = $scope.recipe;
-            console.log($scope.recipe.ingridients);
+            recipe.ingridients=$scope.ingridientData;
+            recipe.steps=$scope.stepData;
             recipe.$update(function() {
                 $location.path('recipes/' + recipe.id);
             }, function(errorResponse) {
