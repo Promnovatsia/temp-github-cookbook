@@ -36,9 +36,6 @@ module.exports = function(sequelize, DataTypes) {
             }*/
         }
     },{
-        associate: function(models) {
-            Measure.hasMany(models.ingridientAmount);
-        },
         timestamps: false
     });
     

@@ -3,28 +3,69 @@
 module.exports = function(sequelize, DataTypes) {
 
     var Shelf = sequelize.define('shelf', {
-        caption: {
-            type: DataTypes.STRING,
-            allowNull: false
+        override: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: "shelves",
+                key: "id"
+            }
         },
-        minStorage: {
-            type: DataTypes.INTEGER
+        fallback: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: "shelves",
+                key: "id"
+            }
         },
-        maxStorage: {
-            type: DataTypes.INTEGER
+        product: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: "products",
+                key: "id"
+            }
         },
-        currentStorage: {
-            type: DataTypes.INTEGER
+        stored: {
+            type: DataTypes.FLOAT
         },
-        desiredStorage: {
-            type: DataTypes.INTEGER
+        desired: {
+            type: DataTypes.FLOAT
         },
-        
-        
+        max: {
+            type: DataTypes.FLOAT
+        },
+        deficit: {
+            type: DataTypes.FLOAT
+        },
+        spoilOpenedAt: {
+            type: DataTypes.DATE
+        },
+        spoilSealedAt: {
+            type: DataTypes.DATE
+        },
+        unsealedAt: {
+            type: DataTypes.DATE
+        },
+        isSpoiled: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        isSealed: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        place: {
+            type: DataTypes.STRING
+        }
     },{
+        timestamps: true,
+        paranoid:true,
         associate: function(models) {
-            //Ingridient.belongsTo(models.recipe);
-            //Ingridient.belongsTo(models.measure);
+            Shelf.belongsTo(models.user);
+            Shelf.belongsTo(models.ingridient);
+            Shelf.belongsTo(models.measure);
+            Shelf.hasMany(models.shelfQuery);
         }
     });
     
