@@ -14,6 +14,13 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.STRING
             //TODO validate as URL
         },
+        defaultIngridient: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: "ingridients",
+                key: "id"
+            }
+        },
         shelfLifeSealed: {
             type: DataTypes.INTEGER
         },
@@ -50,5 +57,5 @@ module.exports = function(sequelize, DataTypes) {
         }
     });
     
-return Ingridient;
+return Product;
 };

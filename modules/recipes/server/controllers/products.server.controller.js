@@ -8,6 +8,7 @@ var path = require('path'),
     fs = require('fs'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
+        Product = db.product,
         Ingridient = db.ingridient
     ;
 
@@ -21,9 +22,7 @@ function decodeBase64Image(dataString) {
     response.data = new Buffer(matches[2], 'base64');
     return response;
 }
-/**
- * Create an ingridient
- */
+
 exports.create = function(req, res) {
 
     req.body.userId = req.user.id;
@@ -31,17 +30,17 @@ exports.create = function(req, res) {
     if (req.body.image) {
         var imageBuffer = decodeBase64Image(req.body.image);
         var fileName = req.body.caption + '.jpg';
-        fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {});
+        fs.writeFile('./public/uploads/products/pictures/'+fileName, imageBuffer.data, function(err) {});
         req.body.image = fileName;
     }
     
-    Ingridient.create(req.body).then(function(ingridient) {
-        if (!ingridient) {
+    Product.create(req.body).then(function(product) {
+        if (!product) {
             return res.send('users/signup', {
-                errors: 'Could not create the ingridient'
+                errors: 'Could not create the product'
             });
         } else {
-            return res.json(ingridient);
+            return res.json(product);
         }
     }).catch(function(err) {
         return res.status(400).send({
@@ -54,23 +53,20 @@ exports.create = function(req, res) {
  * Show the current ingridient
  */
 exports.read = function(req, res) {
-    res.json(req.ingridient);
+    res.json(req.product);
 };
 
-/**
- * Update a ingridient
- */
 exports.update = function(req, res) {
     
     // Find the recipe
-    Ingridient.findById(req.body.id).then(function(ingridient) {
-        if (ingridient) {
+    Product.findById(req.body.id).then(function(product) {
+        if (product) {
             
             var fileName;
             if (req.body.image) {
                 var imageBuffer = decodeBase64Image(req.body.image);
                 fileName = req.body.caption + '.jpg';
-                fs.writeFile('./public/uploads/ingridients/pictures/'+fileName, imageBuffer.data, function(err) {
+                fs.writeFile('./public/uploads/products/pictures/'+fileName, imageBuffer.data, function(err) {
                     if (err){
                         console.log('Error in write file');
                         return res.status(400).send({
@@ -80,15 +76,15 @@ exports.update = function(req, res) {
                 });
             }
             
-            ingridient.update(
+            product.update(
                 {
                     caption: req.body.caption,
                     infoCard: req.body.infoCard,
                     image: fileName,
-                    measureDefault: req.body.measureDefault
+                    measureId: req.body.measureId
                 }
             ).then(function() {
-                return res.json(ingridient);
+                return res.json(product);
             }).catch(function(err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
@@ -96,7 +92,7 @@ exports.update = function(req, res) {
             });
         } else {
             return res.status(400).send({
-                message: 'Unable to find the ingridient'
+                message: 'Unable to find the product'
             });
         }
     }).catch(function(err) {
@@ -106,75 +102,43 @@ exports.update = function(req, res) {
     });
 };    
 
-/**
- * Delete an ingridient
- */
-exports.delete = function(req, res) {
-    
-    var ingridient = req.ingridient;
-    // Find the ingridient
-    Ingridient.findById(ingridient.id).then(function(recipe) {
-        if (recipe) {
-            // Delete the ingridient
-      ingridient.destroy().then(function() {
-          return res.json(ingridient);
-      }).catch(function(err) {
-          return res.status(400).send({
-              message: errorHandler.getErrorMessage(err)
-          });
-      });
-        } else {
-            return res.status(400).send({
-                message: 'Unable to find the ingridient'
-            });
-        }
-    }).catch(function(err) {
-        return res.status(400).send({
-            message: errorHandler.getErrorMessage(err)
-        });
-    });
-};
-
-/**
- * List of ingridients
- */
 exports.list = function(req, res) {
-    Ingridient.findAll(
+    Product.findAll(
         {}
-    ).then(function(ingridients) {
-        if (!ingridients) {
+    ).then(function(products) {
+        if (!products) {
             return res.status(404).send({
-                message: 'No ingridients found'
+                message: 'No products found'
             });
         } else {
-            return res.json(ingridients);
+            return res.json(products);
         }
     }).catch(function(err) {
         res.jsonp(err);
     });
 };
 
-exports.ingridientByID = function(req, res, next, id) {
+exports.productByID = function(req, res, next, id) {
 
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
-            message: 'Ingridient is invalid'
+            message: 'Product is invalid'
         });
     }
   
-    Ingridient.findOne(
+    Product.findOne(
         {
             where: {
                 id: id
             }
         }
-    ).then(function(ingridient) {
-        if (!ingridient) {
+    ).then(function(product) {
+        if (!product) {
             return res.status(404).send({
-                message: 'No ingridient with that identifier has been found'
+                message: 'No product with that identifier has been found'
             });
         } else {
-            req.ingridient = ingridient;
+            req.product = product;
             next();
             return null;
         }

@@ -49,6 +49,12 @@ exports.invokeRolesPolicies = function() {
                 }, {
                     resources: '/api/measures/:measureId',
                     permissions: '*'
+                }, {
+                    resources: '/api/products',
+                    permissions: '*'
+                }, {
+                    resources: '/api/products/:productId',
+                    permissions: '*'
                 }
             ]
         }, {
@@ -59,6 +65,18 @@ exports.invokeRolesPolicies = function() {
                     permissions: ['get', 'post']
                 }, {
                     resources: '/api/recipes/:recipeId',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/measures',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/measures/:measureId',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/products',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/products/:productId',
                     permissions: ['get']
                 }
             ]

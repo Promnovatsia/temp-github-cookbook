@@ -7,7 +7,8 @@ var path = require('path'),
     recipesPolicy = require('../policies/recipes.server.policy'),
     recipes = require(path.resolve('./modules/recipes/server/controllers/recipes.server.controller')),
     ingridients = require(path.resolve('./modules/recipes/server/controllers/ingridients.server.controller')),
-    measures = require(path.resolve('./modules/recipes/server/controllers/measures.server.controller'))
+    measures = require(path.resolve('./modules/recipes/server/controllers/measures.server.controller')),
+    products = require(path.resolve('./modules/recipes/server/controllers/products.server.controller'))
 ;
 
 module.exports = function(app) {
@@ -51,10 +52,23 @@ module.exports = function(app) {
         .get(measures.read)
         .put(measures.update)
     ;
+    
+    app.route('/api/products')
+        .all(recipesPolicy.isAllowed)
+        .get(products.list)
+        .post(products.create)
+    ;
+    
+    app.route('/api/products/:productId')
+        .all(recipesPolicy.isAllowed)
+        .get(products.read)
+        .put(products.update)
+    ;
 
     // Finish by binding the recipe middleware
     app.param('recipeId', recipes.recipeByID);
     app.param('ingridientId', ingridients.ingridientByID);
     app.param('measureId', measures.measureByID);
+    app.param('productId', products.productByID);
 
 };
