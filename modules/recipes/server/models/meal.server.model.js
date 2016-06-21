@@ -6,6 +6,9 @@ module.exports = function(sequelize, DataTypes) {
         type: {
             type: DataTypes.STRING
         },
+        weekday: {
+            type: DataTypes.INTEGER
+        },
         portions: {
             type: DataTypes.INTEGER,
             defaultValue: 2
@@ -21,12 +24,7 @@ module.exports = function(sequelize, DataTypes) {
     },{
         timestamps: true,
         paranoid: true,
-        createdAt: false,
-        associate: function(models) {
-            Meal.belongsTo(models.user);
-            Meal.belongsTo(models.recipe);
-            Meal.hasMany(models.shelfQuery);
-        }
+        createdAt: false
     });
 
 return Meal;    

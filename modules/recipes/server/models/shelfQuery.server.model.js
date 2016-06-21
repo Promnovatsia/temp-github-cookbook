@@ -17,10 +17,10 @@ module.exports = function(sequelize, DataTypes) {
             allowNull: false,
             defaultValue: false
         },
-        meal: {
+        menu: {
             type: DataTypes.INTEGER,
             references: {
-                model: "meals",
+                model: "menus",
                 key: "id"
             }
         }
