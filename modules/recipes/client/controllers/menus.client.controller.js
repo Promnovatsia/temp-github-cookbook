@@ -1,14 +1,12 @@
 'use strict';
 
 // Recipes controller
-angular.module('recipes').controller('RecipesController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients', 'Measures',
+angular.module('recipes').controller('MenusController', 
+                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Menu', 'Recipes','Ingridients', 'Measures',
     function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
         
         $scope.authentication = Authentication;      
-        
-        $scope.quantity = 5;
-        
+
         $scope.sort = function(a, b) {
             return a.index - b.index;
         };

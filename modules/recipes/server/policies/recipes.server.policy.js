@@ -55,6 +55,12 @@ exports.invokeRolesPolicies = function() {
                 }, {
                     resources: '/api/products/:productId',
                     permissions: '*'
+                },{
+                    resources: '/api/menu',
+                    permissions: '*'
+                }, {
+                    resources: '/api/menu/:menuId',
+                    permissions: '*'
                 }
             ]
         }, {

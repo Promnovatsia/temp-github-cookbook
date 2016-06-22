@@ -13,11 +13,11 @@ angular.module('recipes').run(['Menus',
                 title: 'List Recipes',
                 state: 'recipes.list'
             });
-            Menus.addSubMenuItem('topbar', 'recipes', {
+            /*Menus.addSubMenuItem('topbar', 'recipes', {
                 title: 'Create Recipes',
                 state: 'recipes.create',
                 roles: ['user']
-            });    
+            }); */   
         Menus.addMenuItem('topbar', {
             title: 'Ingridients',
             state: 'ingridients',
@@ -39,7 +39,18 @@ angular.module('recipes').run(['Menus',
             state: 'shelf',
             type: 'dropdown',
             roles: ['user']
-        });            
+        });
+        Menus.addMenuItem('topbar', {
+            title: 'Menus',
+            state: 'menu',
+            type: 'dropdown',
+            roles: ['user']
+        });
+            Menus.addSubMenuItem('topbar', 'menu', {
+                title: 'Brouse Menu',
+                state: 'menu.list',
+                roles: ['user']
+            });
         
         //admin management
             Menus.addSubMenuItem('topbar', 'admin', {

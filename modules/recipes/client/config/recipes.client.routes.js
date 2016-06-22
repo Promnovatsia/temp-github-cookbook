@@ -118,6 +118,32 @@ angular.module('recipes').config(['$stateProvider',
                     roles: ['admin']
                 } 
             })
+        .state('menu', {
+            abstract: true,
+            url: '/menu',
+            template: '<ui-view/>'
+        })
+            .state('menu.list', {
+                url: '',
+                templateUrl: 'modules/recipes/client/views/menus/menus-list.client.view.html',
+                data: {
+                    roles: ['admin']
+                } 
+            })
+            .state('menu.create',{
+                url: '/create',
+                templateUrl: 'modules/recipes/client/views/products/product-create.client.view.html',
+                data: {
+                    roles: ['admin']
+                } 
+            })
+            .state('menu.edit',{
+                url: '/:productId',
+                templateUrl: 'modules/recipes/client/views/products/product-edit.client.view.html',
+                data: {
+                    roles: ['admin']
+                } 
+            })
         ;
     }
 ]);

@@ -4,7 +4,11 @@
             Recipes
         </h1>
     </div>
-    <form>
+    <div class="alert alert-warning text-center" ng-if="!recipes.length">
+        No recipes yet, why don't you <a ui-sref="recipes.create">create one</a>?
+    </div>
+    <div ng-if="recipes.length">
+        <form>
         <div class="form-group">
             <div class="input-group">
                 <div class="input-group-addon">
@@ -13,9 +17,10 @@
                 <input type="text" class="form-control" placeholder="Search recipes" ng-model="filterRecipes">
             </div>
         </div>
-    </form>
+        </form>    
+    </div>
     <div class="list-group">
-        <a ng-repeat="recipe in recipes | filter:filterRecipes" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
+        <a ng-repeat="recipe in recipes | filter:filterRecipes | limitTo:quantity" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
             <small class="list-group-item-text">
                 Posted on
                 <span ng-bind="recipe.created | date:'mediumDate'"></span>
@@ -25,8 +30,5 @@
             <h4 class="list-group-item-heading" ng-bind="recipe.title"></h4>
             <p class="list-group-item-text" ng-bind="recipe.content"></p>
         </a>
-    </div>
-    <div class="alert alert-warning text-center" ng-if="!recipes.length">
-        No recipes yet, why don't you <a ui-sref="recipes.create">create one</a>?
     </div>
 </section>
