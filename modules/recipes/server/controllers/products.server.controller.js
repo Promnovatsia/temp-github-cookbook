@@ -5,33 +5,21 @@
  */
 var path = require('path'),
     async = require('async'),
-    fs = require('fs'),
+    cloudinary = require('cloudinary'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
         Product = db.product,
         Ingridient = db.ingridient
     ;
 
-function decodeBase64Image(dataString) {
-    var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/) , response = {};
-        if (matches.length !== 3) {
-            console.log('Error in decoding file');
-            return new Error('Invalid input string');
-        }
-    response.type = matches[1];
-    response.data = new Buffer(matches[2], 'base64');
-    return response;
-}
-
 exports.create = function(req, res) {
 
     req.body.userId = req.user.id;
     
+    var image = '';
     if (req.body.image) {
-        var imageBuffer = decodeBase64Image(req.body.image);
-        var fileName = req.body.caption + '.jpg';
-        fs.writeFile('./public/uploads/products/pictures/'+fileName, imageBuffer.data, function(err) {});
-        req.body.image = fileName;
+        image = req.body.image;
+        req.body.image='';
     }
     
     Product.create(req.body).then(function(product) {
@@ -40,7 +28,20 @@ exports.create = function(req, res) {
                 errors: 'Could not create the product'
             });
         } else {
-            return res.json(product);
+            if(image!=='') {
+                cloudinary.uploader.upload(image).then(function(result) {
+                    image=result.public_id+'.'+result.format;
+                    product.update(
+                        {
+                            image: image
+                        }
+                    ).then(function() {
+                        return res.json(product);
+                    });
+                });
+            } else {
+                return res.json(product);
+            }
         }
     }).catch(function(err) {
         return res.status(400).send({
@@ -49,47 +50,49 @@ exports.create = function(req, res) {
     });       
 };
 
-/**
- * Show the current ingridient
- */
 exports.read = function(req, res) {
     res.json(req.product);
 };
 
 exports.update = function(req, res) {
     
-    // Find the recipe
     Product.findById(req.body.id).then(function(product) {
         if (product) {
-            
-            var fileName;
+            var image = '';
             if (req.body.image) {
-                var imageBuffer = decodeBase64Image(req.body.image);
-                fileName = req.body.caption + '.jpg';
-                fs.writeFile('./public/uploads/products/pictures/'+fileName, imageBuffer.data, function(err) {
-                    if (err){
-                        console.log('Error in write file');
+                cloudinary.uploader.upload(req.body.image).then(function(result){
+                    image=result.public_id+'.'+result.format;
+                    product.update(
+                        {
+                            caption: req.body.caption,
+                            infoCard: req.body.infoCard,
+                            image: image,
+                            measureDefault: req.body.measureDefault
+                        }
+                    ).then(function() {
+                        return res.json(product);
+                    }).catch(function(err) {
                         return res.status(400).send({
                             message: errorHandler.getErrorMessage(err)
                         });
-                    }    
+                    });
+                });
+            } else {
+                product.update(
+                    {
+                        caption: req.body.caption,
+                        infoCard: req.body.infoCard,
+                        image: null,
+                        measureDefault: req.body.measureDefault
+                    }
+                ).then(function() {
+                    return res.json(product);
+                }).catch(function(err) {
+                    return res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
+                    });
                 });
             }
-            
-            product.update(
-                {
-                    caption: req.body.caption,
-                    infoCard: req.body.infoCard,
-                    image: fileName,
-                    measureId: req.body.measureId
-                }
-            ).then(function() {
-                return res.json(product);
-            }).catch(function(err) {
-                return res.status(400).send({
-                    message: errorHandler.getErrorMessage(err)
-                });
-            });
         } else {
             return res.status(400).send({
                 message: 'Unable to find the product'

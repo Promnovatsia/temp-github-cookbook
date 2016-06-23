@@ -84,6 +84,8 @@ angular.module('recipes').controller('IngridientsController',
         var uploader = $scope.uploader = new FileUploader({
             url: '/api/pictures/ingridients'
         });
+        
+        $scope.imageurl='http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
 
         // FILTERS
 
