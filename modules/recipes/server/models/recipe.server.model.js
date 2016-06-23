@@ -28,6 +28,9 @@ module.exports = function(sequelize, DataTypes) {
                 },
                 duration: {
                     type: DataTypes.STRING
+                },
+                image: {
+                    type: DataTypes.STRING
                 }*/
         },
         content: {
@@ -41,6 +44,17 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0
+        },
+        image: {
+            type: DataTypes.STRING
+        },
+        infoCard: {
+            type: DataTypes.TEXT
+        },
+        isPrivate: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         }
     },{
         associate: function(models) {

@@ -5,6 +5,7 @@
  */
 var path = require('path'),
     async = require('async'),
+    cloudinary = require('cloudinary'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
         Recipe = db.recipe,
@@ -15,13 +16,28 @@ var path = require('path'),
  * Create a recipe
  */
 exports.create = function(req, res) {
+    var image='';
     req.body.userId = req.user.id;
+    async.forEach(req.body.steps, function (item,callback){
+        if (item.image) {
+            cloudinary.uploader.upload(req.body.image).then(function(result){
+                item.image=result.public_id+'.'+result.format;
+                callback();
+            });
+        } else {
+            callback();
+        }
+    });
+    if (req.body.image){
+        image = req.body.image;
+        req.body.image='';            
+    }
     Recipe.create(req.body).then(function(recipe) {
         if (!recipe) {
             return res.send('users/signup', {
                 errors: 'Could not create the recipe'
             });
-        } else { 
+        } else {
             async.forEach(req.body.ingridients, function (item,callback){
                 Ingridient.findById(item.id).then(function(ingridient) {
                     recipe.addIngridient(ingridient, {
@@ -30,11 +46,23 @@ exports.create = function(req, res) {
                         amount: item.amount,
                         measureCaption: item.measure.caption
                     });
-                    console.log('added ' + ingridient);
                     callback();
                 });
             });
-            return res.json(recipe);
+            if(image!=='') {
+                cloudinary.uploader.upload(image).then(function(result) {
+                    image=result.public_id+'.'+result.format;
+                    recipe.update(
+                        {
+                            image: image
+                        }
+                    ).then(function() {
+                        return res.json(recipe);
+                    });
+                });
+            } else {
+                return res.json(recipe);
+            }   
         }
     })
     .catch(function(err) {
@@ -62,7 +90,7 @@ exports.update = function(req, res) {
                     async.forEach(req.body.ingridients, function (item,callback){
                         Ingridient.findById(item.id).then(function(ingridient) {
                             recipe.addIngridient(ingridient, {
-                                index:item.index,
+                                index: item.index,
                                 measureId: item.measure.id,
                                 amount: item.amount,
                                 measureCaption: item.measure.caption
@@ -123,8 +151,22 @@ exports.delete = function(req, res) {
  * List of recipes
  */
 exports.list = function(req, res) {
+    var getNonPrivateAndOwned = {
+        $or: [
+            {
+                isPrivate: false
+            }, {
+                userId: req.user.id
+            }
+        ]
+    };
+    if (req.user.roles.indexOf('admin')!==-1) {
+        console.log('override private');
+        getNonPrivateAndOwned = {};
+    }
     Recipe.findAll(
         {
+            where: getNonPrivateAndOwned,
             include: [db.user, db.ingridient]
         }
     ).then(function(recipes) {
@@ -150,12 +192,23 @@ exports.recipeByID = function(req, res, next, id) {
             message: 'Recipe is invalid'
         });
     }
+    console.log(req.user);
+    var getNonPrivateAndOwned = {
+        id: id,
+        $or: [
+            {
+                isPrivate: false
+            }, {
+                userId: req.user.id
+            }
+        ]
+    };//complete private block with error instead of return
     Recipe.findOne(
         {
             where: {
                 id: id
             },
-            include: [db.ingridient]
+            include: [db.user, db.ingridient]
         }
     ).then(function(recipe) {
         if (!recipe) {

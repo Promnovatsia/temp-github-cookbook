@@ -8,6 +8,7 @@ angular.module('recipes').controller('RecipesController',
         $scope.authentication = Authentication;      
         
         $scope.quantity = 5;
+        $scope.imageurl='http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
         
         $scope.sort = function(a, b) {
             return a.index - b.index;
