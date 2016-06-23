@@ -36,7 +36,7 @@ public/lib/owasp-password-strength-test
 public/dist/
 public/uploads/users/profile/*
 public/uploads/ingridients/*
-config/env/local.js
+config/env/*
 *.pem
 
 modules/*/client/css
