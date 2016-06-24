@@ -12,7 +12,6 @@ module.exports = function(sequelize, DataTypes) {
         },
         image: {
             type: DataTypes.STRING
-            //TODO validate as URL
         },
         defaultIngridient: {
             type: DataTypes.INTEGER,

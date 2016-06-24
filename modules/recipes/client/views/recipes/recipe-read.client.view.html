@@ -16,12 +16,17 @@
             <span ng-bind="recipe.createdAt | date:'mediumDate'"></span>
             автором
             <span ng-bind="recipe.user.username"></span>
+            <span class="glyphicon glyphicon-eye-close" ng-show="recipe.isPrivate">
+                Секретный
+            </span>
         </em>
     </small>
     <hr>
     <small>
         Количество порций: 
         <span ng-bind="recipe.portions"></span>
+<!-- TODO добавить ввод числа основного ингридиента и преобразование под него-->
+        <!--        TODO добавить селектор и преобразование чисел-->
     </small>
     <hr>
     <label for="ingridients">

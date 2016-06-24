@@ -12,7 +12,6 @@ module.exports = function(sequelize, DataTypes) {
         },
         image: {
             type: DataTypes.STRING
-            //TODO validate as URL
         },
         measureDefault: {
             type: DataTypes.INTEGER,

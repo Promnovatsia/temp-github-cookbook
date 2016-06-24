@@ -9,6 +9,8 @@ angular.module('recipes').controller('RecipesController',
         
         $scope.quantity = 5;
         $scope.imageurl='http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
+        $scope.portionsEdit = false;
+        $scope.portions=2;
         
         $scope.sort = function(a, b) {
             return a.index - b.index;
@@ -43,6 +45,7 @@ angular.module('recipes').controller('RecipesController',
                 recipe.ingridients.sort($scope.sort);
                 $scope.recipe = recipe;
                 $scope.ingridientData=$scope.recipe.ingridients;
+                //NOTE add title etc. to scope end change edit.view
             });
         };
         
@@ -62,6 +65,7 @@ angular.module('recipes').controller('RecipesController',
     //create view
         
         $scope.treeIngridients = {
+            //FIX ME возможность перетащить шаг в ингридиенты и наоборот 
             dropped : function (e) {
                 $scope.ingridientData.forEach(function(item, i, arr) {
                     item.index = i;
@@ -72,6 +76,7 @@ angular.module('recipes').controller('RecipesController',
         $scope.newIngridient = function (id) {
             if(!id || id % 1 !== 0) {
                 $scope.selectedIngridient='';
+                //TODO не сбрасывать выбор, а открыть интерфейс вноса незанесенного ингридиента
                 return;
             }
             Ingridients.get(
@@ -95,7 +100,8 @@ angular.module('recipes').controller('RecipesController',
                             measure: measure,
                             measureCaption: measure.caption,
                             isPopover: false,
-                            isConvert:false
+                            isConvert:false,
+                            selectedMeasure: ''
                         }
                     );    
                 });
@@ -130,23 +136,26 @@ angular.module('recipes').controller('RecipesController',
         };
         
         $scope.amountApply = function(item) {
-            if(item.selectedMeasure!==''){
-                var id = $scope.measuresList.find(x=> x.caption === item.selectedMeasure).id;
+            if(item.selectedMeasure!=='' && item.isConvert===true){
+                var targetMeasure = $scope.measuresList.find(x=> x.caption === item.selectedMeasure);
                 Measures.get(
                     {
-                        measureId: id
+                        measureId: targetMeasure.id
                     }
                 ).$promise.then(function(measure) {
                     item.measure=measure;
-                    item.amount=$scope.measuresList.find(x=> x.caption === item.selectedMeasure).value;
+                    item.amount=targetMeasure.value;
                 });    
             }
-            item.amount=Number((item.amount - item.amount % item.measure.step).toFixed(2));
+            if(item.amount % item.measure.step > 0) {
+                item.amount=Number((item.amount - item.amount % item.measure.step + item.measure.step).toFixed(2));    
+            }
             if(item.amount<item.measure.min){
                 item.amount=item.measure.min;
             }
             item.isPopover=false;
             item.isConvert=false;
+            item.selectedMeasure='';
         };
         
         $scope.converter = function(item) {
@@ -194,6 +203,7 @@ angular.module('recipes').controller('RecipesController',
                     action: $scope.actionStep,
                     device: 'device',
                     duration: 'duration'
+                    //CHANGES image: ''
                 }
             );   
             $scope.actionStep='';
@@ -220,6 +230,9 @@ angular.module('recipes').controller('RecipesController',
             var recipe = new Recipes(
                 {
                     title: this.title,
+                    infoCard: this.infoCard,
+                    //CHANGES image: this.image,
+                    protions: this.portions,
                     content: this.content,
                     steps: this.stepData,
                     ingridients: $scope.ingridientData

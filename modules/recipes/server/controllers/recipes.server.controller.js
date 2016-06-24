@@ -161,7 +161,6 @@ exports.list = function(req, res) {
         ]
     };
     if (req.user.roles.indexOf('admin')!==-1) {
-        console.log('override private');
         getNonPrivateAndOwned = {};
     }
     Recipe.findAll(
@@ -192,17 +191,6 @@ exports.recipeByID = function(req, res, next, id) {
             message: 'Recipe is invalid'
         });
     }
-    console.log(req.user);
-    var getNonPrivateAndOwned = {
-        id: id,
-        $or: [
-            {
-                isPrivate: false
-            }, {
-                userId: req.user.id
-            }
-        ]
-    };//complete private block with error instead of return
     Recipe.findOne(
         {
             where: {
@@ -216,9 +204,19 @@ exports.recipeByID = function(req, res, next, id) {
                 message: 'No recipe with that identifier has been found'
             });
         } else {
-            req.recipe = recipe;
-            next();
-            return null;
+            if (
+                req.user.roles.indexOf('admin')!==-1 || 
+                (recipe.isPrivate && recipe.user.id===req.user.id)
+            ) {
+                req.recipe = recipe;
+                next();
+                return null; 
+            } else {
+                return res.status(403).send({
+                    message: 'This recipe is set as private by its owner'
+                });    
+            }
+            
         }
     }).catch(function(err) {
         return next(err);
