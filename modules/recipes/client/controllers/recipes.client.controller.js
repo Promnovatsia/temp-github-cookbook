@@ -137,7 +137,16 @@ angular.module('recipes').controller('RecipesController',
         
         $scope.amountApply = function(item) {
             if(item.selectedMeasure!=='' && item.isConvert===true){
-                var targetMeasure = $scope.measuresList.find(x=> x.caption === item.selectedMeasure);
+                var targetMeasure = '';
+                $scope.measuresList.forEach(function(elem,i,arr){
+                    if (elem.caption === item.selectedMeasure){
+                        targetMeasure=elem;
+                    }
+                });
+                if (targetMeasure === '') {
+                    item.selectedMeasure='';
+                    return;
+                }
                 Measures.get(
                     {
                         measureId: targetMeasure.id
