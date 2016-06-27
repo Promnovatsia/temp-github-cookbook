@@ -127,23 +127,35 @@ angular.module('recipes').controller('MenusController',
         };
         
         $scope.amountApply = function(item) {
-            if(item.selectedMeasure!==''){
-                var id = $scope.measuresList.find(x=> x.caption === item.selectedMeasure).id;
+            if(item.selectedMeasure!=='' && item.isConvert===true){
+                var targetMeasure = '';
+                $scope.measuresList.forEach(function(elem,i,arr){
+                    if (elem.caption === item.selectedMeasure){
+                        targetMeasure=elem;
+                    }
+                });
+                if (targetMeasure === '') {
+                    item.selectedMeasure='';
+                    return;
+                }
                 Measures.get(
                     {
-                        measureId: id
+                        measureId: targetMeasure.id
                     }
                 ).$promise.then(function(measure) {
                     item.measure=measure;
-                    item.amount=$scope.measuresList.find(x=> x.caption === item.selectedMeasure).value;
+                    item.amount=targetMeasure.value;
                 });    
             }
-            item.amount=Number((item.amount - item.amount % item.measure.step).toFixed(2));
+            if(item.amount % item.measure.step > 0) {
+                item.amount=Number((item.amount - item.amount % item.measure.step + item.measure.step).toFixed(2));    
+            }
             if(item.amount<item.measure.min){
                 item.amount=item.measure.min;
             }
             item.isPopover=false;
             item.isConvert=false;
+            item.selectedMeasure='';
         };
         
         $scope.converter = function(item) {
