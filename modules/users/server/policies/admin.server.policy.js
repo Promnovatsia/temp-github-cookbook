@@ -3,9 +3,7 @@
 var
   path = require('path'),
   config = require(path.resolve('./config/config')),
-  redisInstance = require('redis').createClient(config.redis.port, config.redis.host, {
-    no_ready_check: true
-  }),
+  redisInstance = require('redis').createClient(process.env.REDIS_URL),
   acl = require('acl');
 
 /**
