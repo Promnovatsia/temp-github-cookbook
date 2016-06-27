@@ -33,7 +33,7 @@ public/lib/owasp-password-strength-test
 
 # SEAN.JS app and assets
 # ======================
-public/dist/
+!public/dist/
 public/uploads/users/profile/*
 public/uploads/ingridients/*
 config/env/*
