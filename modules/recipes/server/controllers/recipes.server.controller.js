@@ -151,17 +151,26 @@ exports.delete = function(req, res) {
  * List of recipes
  */
 exports.list = function(req, res) {
-    var getNonPrivateAndOwned = {
-        $or: [
+    var getNonPrivateAndOwned = '';
+    if (req.user) { 
+        getNonPrivateAndOwned = {
+            $or: [
+                {
+                    isPrivate: false
+                }, {
+                    userId: req.user.id
+                }
+            ]
+        };
+        if (req.user.roles.indexOf('admin')!==-1) {
+            getNonPrivateAndOwned = {};
+        }
+    } else {
+        getNonPrivateAndOwned = {
             {
                 isPrivate: false
-            }, {
-                userId: req.user.id
             }
-        ]
-    };
-    if (req.user.roles.indexOf('admin')!==-1) {
-        getNonPrivateAndOwned = {};
+        }
     }
     Recipe.findAll(
         {
