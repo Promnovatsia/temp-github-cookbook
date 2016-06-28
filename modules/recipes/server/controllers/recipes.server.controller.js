@@ -167,10 +167,8 @@ exports.list = function(req, res) {
         }
     } else {
         getNonPrivateAndOwned = {
-            {
-                isPrivate: false
-            }
-        }
+            isPrivate: false
+        };
     }
     Recipe.findAll(
         {
