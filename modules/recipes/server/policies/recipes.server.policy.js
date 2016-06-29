@@ -13,7 +13,7 @@ var
 // Using the redis backend
 
 //Use redis database 1
-redisInstance.select(0);
+//redisInstance.select(0);
 
 if (config.redis.password) {
   redisInstance.auth(config.redis.password);
