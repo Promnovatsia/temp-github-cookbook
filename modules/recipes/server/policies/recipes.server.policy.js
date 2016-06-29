@@ -3,14 +3,14 @@
 var
   path = require('path'),
   config = require(path.resolve('./config/config')),
-  /*redisInstance = require('redis').createClient(process.env.REDIS_URL),
-  */acl = require('acl');
+  redisInstance = require('redis').createClient(process.env.REDIS_URL),
+  acl = require('acl');
 
 /**
  * Module dependencies.
  */
 
-/*// Using the redis backend
+// Using the redis backend
 
 //Use redis database 1
 redisInstance.select(1);
@@ -19,8 +19,8 @@ if (config.redis.password) {
   redisInstance.auth(config.redis.password);
 }
 
-acl = new acl(new acl.redisBackend(redisInstance, 'acl'));*/
-acl = new acl(new acl.memoryBackend());
+acl = new acl(new acl.redisBackend(redisInstance, 'acl'));
+
 /**
  * Invoke recipes Permissions
  */
@@ -77,10 +77,10 @@ exports.invokeRolesPolicies = function() {
                     resources: '/api/measures/:measureId',
                     permissions: ['get']
                 }, {
-                    resources: '/api/products',
+                    resources: '/api/ingridients',
                     permissions: ['get']
                 }, {
-                    resources: '/api/products/:productId',
+                    resources: '/api/ingridients/:ingridientId',
                     permissions: ['get']
                 }
             ]
@@ -93,6 +93,18 @@ exports.invokeRolesPolicies = function() {
                 }, {
                     resources: '/api/recipes/:recipeId',
                     permissions: ['get']
+                }, {
+                    resources: '/api/measures',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/measures/:measureId',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/ingridients',
+                    permissions: ['get']
+                }, {
+                    resources: '/api/ingridients/:ingridientId',
+                    permissions: ['get']
                 }
             ]
         }
@@ -103,9 +115,10 @@ exports.invokeRolesPolicies = function() {
  * Check If recipes Policy Allows
  */
 exports.isAllowed = function(req, res, next) {
+    console.log(req.user);
   var roles = (req.user) ? req.user.roles : ['guest'];
 
-  // If an recipe is being processed and the current user created it then allow any manipulation
+  // If a recipe is being processed and the current user created it then allow any manipulation
   if (req.recipe && req.user && req.recipe.userId === req.user.id) {
     return next();
   }
@@ -114,8 +127,10 @@ exports.isAllowed = function(req, res, next) {
   acl.areAnyRolesAllowed(roles, req.route.path, req.method.toLowerCase(), function(err, isAllowed) {
     if (err) {
       // An authorization error occurred.
+        console.log('An authorization error occurred');
       return res.status(500).send('Unexpected authorization error');
     } else {
+        console.log(roles);
       if (isAllowed) {
         // Access granted! Invoke next middleware
         return next();
