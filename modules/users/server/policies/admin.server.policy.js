@@ -3,13 +3,14 @@
 var
   path = require('path'),
   config = require(path.resolve('./config/config')),
-  redisInstance = require('redis').createClient(process.env.REDIS_URL),
+  //redisInstance = require('redis').createClient(process.env.REDIS_URL),
   acl = require('acl');
 
 /**
  * Module dependencies.
  */
 
+/*
 // Using the redis backend
 
 //Use redis database 1
@@ -20,6 +21,8 @@ if (config.redis.password) {
 }
 
 acl = new acl(new acl.redisBackend(redisInstance, 'acl'));
+*/
+acl = new acl(new acl.memoryBackend());
 
 /**
  * Invoke Admin Permissions
