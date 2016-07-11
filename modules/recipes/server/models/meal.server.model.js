@@ -1,8 +1,8 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
     
-    var Meal = sequelize.define('meal',{
+    var Meal = sequelize.define('meal', {
         type: {
             type: DataTypes.STRING
         },
@@ -20,12 +20,18 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
+        },
+        startTime: {
+            type: DataTypes.INTEGER
+        },
+        serveTime: {
+            type: DataTypes.INTEGER
         }
-    },{
+    }, {
         timestamps: true,
         paranoid: true,
         createdAt: false
     });
 
-return Meal;    
+    return Meal;
 };

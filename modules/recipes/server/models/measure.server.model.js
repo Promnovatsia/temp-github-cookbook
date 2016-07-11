@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
 
     var Measure = sequelize.define('measure', {
         caption: {
@@ -35,9 +35,9 @@ module.exports = function(sequelize, DataTypes) {
                 }
             }*/
         }
-    },{
+    }, {
         timestamps: false
     });
     
-return Measure;
+    return Measure;
 };

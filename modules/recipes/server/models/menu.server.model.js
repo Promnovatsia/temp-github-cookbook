@@ -1,37 +1,41 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
     
-    var Menu = sequelize.define('menu',{
+    var Menu = sequelize.define('menu', {
         week: {
             type: DataTypes.INTEGER
         },
         types: {
             type: DataTypes.JSONB
-                /*
-                index: DataTypes.INTEGER,
-                caption: DataTypes.STRING
-                */
+            /*{
+                caption: {
+                    type: DataTypes.STRING
+                },
+                serveTime: {
+                    type: DataTypes.INTEGER
+                }
+            }*/
         },
         weekDayMask: {
             type: DataTypes.ARRAY(DataTypes.BOOLEAN),
-            defaultValue: [true,true,true,true,true,true,false]
+            defaultValue: [true, true, true, true, true, true, false]
         },
         isDone: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
         }
-    },{
+    }, {
         timestamps: false,
-        associate: function(models) {
+        associate: function (models) {
             Menu.belongsTo(models.user);
             Menu.hasMany(models.shelfQuery);
-            Menu.belongsToMany(models.recipe,{
-                through: models.ingridientAmount
+            Menu.belongsToMany(models.recipe, {
+                through: models.meal
             });
         }
     });
 
-return Menu;    
+    return Menu;
 };

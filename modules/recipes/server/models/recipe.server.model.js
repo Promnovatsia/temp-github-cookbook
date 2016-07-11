@@ -1,8 +1,8 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
     
-    var Recipe = sequelize.define('recipe',{
+    var Recipe = sequelize.define('recipe', {
         title: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -10,12 +10,13 @@ module.exports = function(sequelize, DataTypes) {
                 len: {
                     args: [1, 250],
                     msg: "Recipe title must be between 1 and 250 characters in length"
-                },
+                }
             }
         },
         steps: {
             type: DataTypes.ARRAY(DataTypes.JSONB)
-                /*'index' : {
+            /*{
+                'index' : {
                     type: DataTypes.INTEGER,
                     allowNull: false
                 },
@@ -31,7 +32,8 @@ module.exports = function(sequelize, DataTypes) {
                 },
                 image: {
                     type: DataTypes.STRING
-                }*/
+                }
+            }*/
         },
         content: {
             type: DataTypes.TEXT
@@ -55,18 +57,26 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
+        },
+        duration: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
+        },
+        author: {
+            type: DataTypes.STRING    
         }
-    },{
-        associate: function(models) {
+    }, {
+        associate: function (models) {
             Recipe.belongsTo(models.user);
-            Recipe.belongsToMany(models.ingridient,{
+            Recipe.belongsToMany(models.ingridient, {
                 through: models.ingridientAmount
             });
-            Recipe.belongsToMany(models.menu,{
+            Recipe.belongsToMany(models.menu, {
                 through: models.meal
             });
         }
     });
 
-return Recipe;    
+    return Recipe;
 };

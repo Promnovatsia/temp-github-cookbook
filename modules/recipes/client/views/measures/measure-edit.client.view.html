@@ -21,12 +21,6 @@
                         Measure uncountable
                     </label>
                     <div class="input-group">
-                        <span class="input-group-addon" ng-hide="uncountable">
-                            <a class="btn btn-link btn-xs" ng-click="uncountable=true" >
-                                <span class="glyphicon glyphicon-scale"></span>
-                                Countable
-                            </a>
-                        </span>
                         <span class="input-group-addon" ng-show="uncountable">
                             <a class="btn btn-link btn-xs" ng-click="uncountable=false" >
                                 <span class="glyphicon glyphicon-lock"></span>
@@ -34,13 +28,19 @@
                             </a>
                         </span>
                         <span class="input-group-addon" ng-hide="uncountable">
-                            <a class="btn btn-link btn-xs" ng-click="minMinus(measure)" id="minMinus" >
+                            <a class="btn btn-link btn-xs" ng-click="uncountable=true" >
+                                <span class="glyphicon glyphicon-scale"></span>
+                                Countable
+                            </a>
+                        </span>
+                        <span class="input-group-addon" ng-hide="uncountable">
+                            <a class="btn btn-link btn-xs" ng-click="minMinus(measure)" ng-hide="measure.min==0">
                                 <span class="glyphicon glyphicon-minus"></span>
                             </a>
                         </span>
                         <input class="form-control" type="number" ng-model="measure.min" ng-hide="uncountable" placeholder="Min" />
                         <span class="input-group-addon" ng-hide="uncountable">
-                            <a class="btn btn-link btn-xs pull-left" ng-click="minPlus(measure)" id="minPlus">
+                            <a class="btn btn-link btn-xs pull-left" ng-click="minPlus(measure)">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </span>
@@ -52,13 +52,13 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" ng-click="stepMinus(measure)" id="amountMinus">
+                            <a class="btn btn-link btn-xs" ng-click="stepMinus(measure)" ng-hide="measure.step==0">
                                 <span class="glyphicon glyphicon-minus"></span>
                             </a>
                         </span>
                         <input class="form-control" type="number" ng-model="measure.step" placeholder="Step" />
                         <span class="input-group-addon">
-                            <a class="btn btn-link btn-xs" ng-click="stepPlus(measure)" id="amountPlus">
+                            <a class="btn btn-link btn-xs" ng-click="stepPlus(measure)">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </span>

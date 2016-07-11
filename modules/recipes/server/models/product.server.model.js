@@ -1,8 +1,13 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
 
     var Product = sequelize.define('product', {
+        EAN: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'default'
+        },
         caption: {
             type: DataTypes.STRING,
             allowNull: false
@@ -36,25 +41,27 @@ module.exports = function(sequelize, DataTypes) {
         },
         nutrition: {
             type: DataTypes.JSONB
-            /*energy : {
+            /*{
+                energy: {
                     type: DataTypes.FLOAT
-            },
-            fat: {
+                },
+                fat: {
                     type: DataTypes.FLOAT
-            },
-            protein: {
+                },
+                protein: {
                     type: DataTypes.FLOAT
-            },
-            carbohydrates: {
+                },
+                carbohydrates: {
                     type: DataTypes.FLOAT
+                }
             }*/
         }
-    },{
+    }, {
         timestamps: false,
-        associate: function(models) {
+        associate: function (models) {
             Product.belongsTo(models.measure);
         }
     });
     
-return Product;
+    return Product;
 };

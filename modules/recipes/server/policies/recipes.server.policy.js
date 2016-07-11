@@ -117,7 +117,6 @@ exports.invokeRolesPolicies = function() {
  * Check If recipes Policy Allows
  */
 exports.isAllowed = function(req, res, next) {
-    console.log(req.user);
   var roles = (req.user) ? req.user.roles : ['guest'];
 
   // If a recipe is being processed and the current user created it then allow any manipulation
@@ -132,7 +131,6 @@ exports.isAllowed = function(req, res, next) {
         console.log('An authorization error occurred');
       return res.status(500).send('Unexpected authorization error');
     } else {
-        console.log(roles);
       if (isAllowed) {
         // Access granted! Invoke next middleware
         return next();

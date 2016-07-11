@@ -1,8 +1,8 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
     
-    var ShelfQuery = sequelize.define('shelfQuery',{
+    var ShelfQuery = sequelize.define('shelfQuery', {
         requested: {
             type: DataTypes.FLOAT
         },
@@ -23,16 +23,22 @@ module.exports = function(sequelize, DataTypes) {
                 model: "menus",
                 key: "id"
             }
+        },
+        EAN: {
+            type: DataTypes.STRING
+        },
+        itemCaption: {
+            type: DataTypes.STRING
         }
-    },{
+    }, {
         paranoid: true,
-        associate: function(models) {
+        createdAt: false,
+        associate: function (models) {
             ShelfQuery.belongsTo(models.user);
             ShelfQuery.belongsTo(models.measure);
             ShelfQuery.belongsTo(models.shelf);
-            //ShelfQuery.belongsTo(models.trelloCard);
         }
     });
 
-return ShelfQuery;  
+    return ShelfQuery;
 };

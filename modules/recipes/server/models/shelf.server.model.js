@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
 
     var Shelf = sequelize.define('shelf', {
         override: {
@@ -58,10 +58,10 @@ module.exports = function(sequelize, DataTypes) {
         place: {
             type: DataTypes.STRING
         }
-    },{
+    }, {
         timestamps: true,
-        paranoid:true,
-        associate: function(models) {
+        paranoid: true,
+        associate: function (models) {
             Shelf.belongsTo(models.user);
             Shelf.belongsTo(models.ingridient);
             Shelf.belongsTo(models.measure);
@@ -69,5 +69,5 @@ module.exports = function(sequelize, DataTypes) {
         }
     });
     
-return Shelf;
+    return Shelf;
 };

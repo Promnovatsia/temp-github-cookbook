@@ -8,11 +8,10 @@ var path = require('path'),
     fs = require('fs'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-        Measure = db.measure
-    ;
+    Measure = db.measure;
 
-exports.create = function(req, res) {
-    Measure.create(req.body).then(function(measure) {
+exports.create = function (req, res) {
+    Measure.create(req.body).then(function (measure) {
         if (!measure) {
             return res.send('users/signup', {
                 errors: 'Could not create the measure'
@@ -20,20 +19,20 @@ exports.create = function(req, res) {
         } else {
             return res.json(measure);
         }
-    }).catch(function(err) {
+    }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
     });       
 };
 
-exports.read = function(req, res) {
+exports.read = function (req, res) {
     res.json(req.measure);
 };
 
-exports.update = function(req, res) {
-    Measure.findById(req.body.id).then(function(measure) {
-        measure.update(req.body).then(function(measure) {
+exports.update = function (req, res) {
+    Measure.findById(req.body.id).then(function (measure) {
+        measure.update(req.body).then(function (measure) {
             if (!measure) {
                 return res.status(404).send({
                     message: 'No measure found'
@@ -41,20 +40,20 @@ exports.update = function(req, res) {
             } else {
                 return res.json(measure);
             }
-        }).catch(function(err) {
+        }).catch(function (err) {
             res.json(err);
         });
         return null;
-    }).catch(function(err) {
+    }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
     });
 };
 
-exports.list = function(req, res) {
+exports.list = function (req, res) {
     Measure.findAll({    
-    }).then(function(measures) {
+    }).then(function (measures) {
         if (!measures) {
             return res.status(404).send({
                 message: 'No measures found'
@@ -62,12 +61,12 @@ exports.list = function(req, res) {
         } else {
             return res.json(measures);
         }
-    }).catch(function(err) {
+    }).catch(function (err) {
         res.jsonp(err);
     });
 };
 
-exports.measureByID = function(req, res, next, id) {
+exports.measureByID = function (req, res, next, id) {
 
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
@@ -79,7 +78,7 @@ exports.measureByID = function(req, res, next, id) {
         where: {
             id: id
         }
-    }).then(function(measure) {
+    }).then(function (measure) {
         if (!measure) {
             return res.status(404).send({
                 message: 'No measure with that identifier has been found'
@@ -89,7 +88,7 @@ exports.measureByID = function(req, res, next, id) {
             next();
             return null;
         }
-    }).catch(function(err) {
+    }).catch(function (err) {
         return next(err);
     });
 };
