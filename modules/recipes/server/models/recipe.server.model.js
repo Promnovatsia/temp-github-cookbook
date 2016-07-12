@@ -13,6 +13,37 @@ module.exports = function (sequelize, DataTypes) {
                 }
             }
         },
+        isPrivate: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        author: {
+            type: DataTypes.STRING
+        },
+        image: {
+            type: DataTypes.STRING
+        },
+        infoCard: {
+            type: DataTypes.TEXT
+        },
+        portions: {
+            type: DataTypes.INTEGER,
+            defaultValue: 2
+        },
+        mainIngridient: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
+        },
+        duration: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
+        },
+        content: {
+            type: DataTypes.TEXT
+        },
         steps: {
             type: DataTypes.ARRAY(DataTypes.JSONB)
             /*{
@@ -34,37 +65,6 @@ module.exports = function (sequelize, DataTypes) {
                     type: DataTypes.STRING
                 }
             }*/
-        },
-        content: {
-            type: DataTypes.TEXT
-        },
-        portions: {
-            type: DataTypes.INTEGER,
-            defaultValue: 2
-        },
-        mainIngridient: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0
-        },
-        image: {
-            type: DataTypes.STRING
-        },
-        infoCard: {
-            type: DataTypes.TEXT
-        },
-        isPrivate: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        duration: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0
-        },
-        author: {
-            type: DataTypes.STRING    
         }
     }, {
         associate: function (models) {

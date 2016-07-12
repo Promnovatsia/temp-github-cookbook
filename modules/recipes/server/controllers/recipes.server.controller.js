@@ -8,40 +8,39 @@ var path = require('path'),
     cloudinary = require('cloudinary'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-        Recipe = db.recipe,
-        Ingridient = db.ingridient
-    ;
+    Recipe = db.recipe,
+    Ingridient = db.ingridient;
 
 /**
  * Create a recipe
  */
-exports.create = function(req, res) {
-    var image='';
+exports.create = function (req, res) {
+    var image = '';
     req.body.userId = req.user.id;
-    async.forEach(req.body.steps, function (item,callback){
+    async.forEach(req.body.steps, function (item, callback) {
         if (item.image) {
-            cloudinary.uploader.upload(req.body.image).then(function(result){
-                item.image=result.public_id+'.'+result.format;
+            cloudinary.uploader.upload(req.body.image).then(function (result) {
+                item.image = result.public_id + '.' + result.format;
                 callback();
             });
         } else {
             callback();
         }
     });
-    if (req.body.image){
+    if (req.body.image) {
         image = req.body.image;
-        req.body.image='';            
+        req.body.image = '';
     }
-    Recipe.create(req.body).then(function(recipe) {
+    Recipe.create(req.body).then(function (recipe) {
         if (!recipe) {
             return res.send('users/signup', {
                 errors: 'Could not create the recipe'
             });
         } else {
-            async.forEach(req.body.ingridients, function (item,callback){
-                Ingridient.findById(item.id).then(function(ingridient) {
+            async.forEach(req.body.ingridients, function (item, callback) {
+                Ingridient.findById(item.id).then(function (ingridient) {
                     recipe.addIngridient(ingridient, {
-                        index:item.index,
+                        index: item.index,
                         measureId: item.measure.id,
                         amount: item.amount,
                         measureCaption: item.measure.caption
@@ -49,46 +48,45 @@ exports.create = function(req, res) {
                     callback();
                 });
             });
-            if(image!=='') {
-                cloudinary.uploader.upload(image).then(function(result) {
-                    image=result.public_id+'.'+result.format;
+            if (image !== '') {
+                cloudinary.uploader.upload(image).then(function (result) {
+                    image = result.public_id + '.' + result.format;
                     recipe.update(
                         {
                             image: image
                         }
-                    ).then(function() {
+                    ).then(function () {
                         return res.json(recipe);
                     });
                 });
             } else {
                 return res.json(recipe);
-            }   
+            }
         }
-    })
-    .catch(function(err) {
+    }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
-    });       
+    });
 };
 
 /**
  * Show the current recipe
  */
-exports.read = function(req, res) {
+exports.read = function (req, res) {
     res.json(req.recipe);
 };
 
 /**
  * Update a recipe
  */
-exports.update = function(req, res) {
-    Recipe.findById(req.body.id).then(function(recipe) {
+exports.update = function (req, res) {
+    Recipe.findById(req.body.id).then(function (recipe) {
         if (recipe) {
-            recipe.update(req.body).then(function() {
-                recipe.setIngridients([]).then(function (tasks){
-                    async.forEach(req.body.ingridients, function (item,callback){
-                        Ingridient.findById(item.id).then(function(ingridient) {
+            recipe.update(req.body).then(function () {
+                recipe.setIngridients([]).then(function (tasks) {
+                    async.forEach(req.body.ingridients, function (item, callback) {
+                        Ingridient.findById(item.id).then(function (ingridient) {
                             recipe.addIngridient(ingridient, {
                                 index: item.index,
                                 measureId: item.measure.id,
@@ -99,37 +97,36 @@ exports.update = function(req, res) {
                         });
                     });
                     return res.json(recipe);
-                }).catch(function(err) {
+                }).catch(function (err) {
                     return res.status(400).send({
                         message: errorHandler.getErrorMessage(err)
                     });
                 });
-            })
-            .catch(function(err) {
+            }).catch(function (err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
                 });
-            });    
+            });
         } else {
             return res.status(400).send({
                 message: 'Unable to find the recipe'
-            });    
+            });
         }
     });
-};    
+};
 
 /**
  * Delete an recipe
  */
-exports.delete = function(req, res) {
+exports.delete = function (req, res) {
     var recipe = req.recipe;
     // Find the recipe
-    Recipe.findById(recipe.id).then(function(recipe) {
+    Recipe.findById(recipe.id).then(function (recipe) {
         if (recipe) {
             // Delete the recipe
-            recipe.destroy().then(function() {
+            recipe.destroy().then(function () {
                 return res.json(recipe);
-            }).catch(function(err) {
+            }).catch(function (err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
                 });
@@ -140,7 +137,7 @@ exports.delete = function(req, res) {
             });
         }
         return null;
-    }).catch(function(err) {
+    }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
@@ -150,9 +147,9 @@ exports.delete = function(req, res) {
 /**
  * List of recipes
  */
-exports.list = function(req, res) {
+exports.list = function (req, res) {
     var getNonPrivateAndOwned = '';
-    if (req.user) { 
+    if (req.user) {
         getNonPrivateAndOwned = {
             $or: [
                 {
@@ -162,7 +159,7 @@ exports.list = function(req, res) {
                 }
             ]
         };
-        if (req.user.roles.indexOf('admin')!==-1) {
+        if (req.user.roles.indexOf('admin') !== -1) {
             getNonPrivateAndOwned = {};
         }
     } else {
@@ -173,9 +170,12 @@ exports.list = function(req, res) {
     Recipe.findAll(
         {
             where: getNonPrivateAndOwned,
-            include: [db.user, db.ingridient]
+            include: [
+                {model: db.user, attributes: ['id', 'username']},
+                {model: db.ingridient}
+            ]
         }
-    ).then(function(recipes) {
+    ).then(function (recipes) {
         if (!recipes) {
             return res.status(404).send({
                 message: 'No recipes found'
@@ -183,7 +183,7 @@ exports.list = function(req, res) {
         } else {
             return res.json(recipes);
         }
-    }).catch(function(err) {
+    }).catch(function (err) {
         res.jsonp(err);
     });
 };
@@ -191,7 +191,7 @@ exports.list = function(req, res) {
 /**
  * recipe middleware
  */
-exports.recipeByID = function(req, res, next, id) {
+exports.recipeByID = function (req, res, next, id) {
     
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
@@ -199,7 +199,7 @@ exports.recipeByID = function(req, res, next, id) {
         });
     }
     var getNonPrivateAndOwned = '';
-    if (req.user) { 
+    if (req.user) {
         getNonPrivateAndOwned = {
             id: id,
             $or: [
@@ -210,9 +210,9 @@ exports.recipeByID = function(req, res, next, id) {
                 }
             ]
         };
-        if (req.user.roles.indexOf('admin')!==-1) {
+        if (req.user.roles.indexOf('admin') !== -1) {
             getNonPrivateAndOwned = {
-                id: id    
+                id: id
             };
         }
     } else {
@@ -224,19 +224,25 @@ exports.recipeByID = function(req, res, next, id) {
     Recipe.findOne(
         {
             where: getNonPrivateAndOwned,
-            include: [db.user, db.ingridient]
+            include: [
+                {model: db.user, attributes: ['id', 'username']},
+                {model: db.ingridient}
+            ]
         }
-    ).then(function(recipe) {
+    ).then(function (recipe) {
         if (!recipe) {
             return res.status(404).send({
                 message: 'No recipe with that identifier has been found'
             });
         } else {
+            if (recipe.user) {
+                recipe.author = recipe.user.displayname;
+            }
             req.recipe = recipe;
             next();
-            return null;     
+            return null;
         }
-    }).catch(function(err) {
+    }).catch(function (err) {
         return next(err);
     });
 };
