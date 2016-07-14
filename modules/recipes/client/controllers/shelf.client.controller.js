@@ -83,33 +83,4 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         }
     };
 
-    var uploader = $scope.uploader = new FileUploader({
-        url: '/api/pictures/ingridients'
-    });
-
-    $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
-
-    // FILTERS
-
-    uploader.filters.push({
-        name: 'imageFilter',
-        fn: function (item, options) {
-            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
-        }
-    });
-
-        // Called after the user selected a new picture file
-    $scope.uploader.onAfterAddingFile = function (fileItem) {
-        if ($window.FileReader) {
-            var fileReader = new FileReader();
-            fileReader.readAsDataURL(fileItem._file);
-
-            fileReader.onload = function (fileReaderEvent) {
-                $timeout(function () {
-                    $scope.imageURL = fileReaderEvent.target.result;
-                }, 0);
-            };
-        }
-    };
 }
