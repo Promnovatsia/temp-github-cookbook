@@ -45,6 +45,7 @@ after_script:
   - nsp audit-package
   - grunt coverage
 notifications:
+  slack: promnov:5SkisXHRFhGIKhVsHbEc1s2u
   webhooks:
     urls:
       - $GITTER_IM_URL

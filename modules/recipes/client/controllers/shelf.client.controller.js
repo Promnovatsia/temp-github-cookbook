@@ -4,8 +4,8 @@
 angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Recipes', 'Ingridients', 'Measures', 'FileUploader'];
-function ShelfController($scope, $stateParams, $location, $window, $timeout, Authentication, Recipes, Ingridients, Measures, FileUploader) {
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'Ingridients', 'Measures'];
+function ShelfController($scope, $stateParams, $location, $window, Authentication, Ingridients, Measures) {
 
     $scope.authentication = Authentication;
 
