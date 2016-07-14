@@ -4,8 +4,8 @@
 angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'Ingridients', 'Measures'];
-function ShelfController($scope, $stateParams, $location, $window, Authentication, Ingridients, Measures) {
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'Ingridients', 'Measures', 'Shelf'];
+function ShelfController($scope, $stateParams, $location, $window, Authentication, Ingridients, Measures, Shelf) {
 
     $scope.authentication = Authentication;
 
@@ -33,9 +33,9 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             return false;
         }
 
-        // Create new Recipe object
+        // Create new Shelf object
 
-        var ingridient = new Ingridients(
+        var shelf = new Ingridients(
             {
                 caption: this.caption,
                 infoCard: this.infoCard,
@@ -45,7 +45,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         );
 
         // Redirect after save
-        ingridient.$save(function (response) {
+        shelf.$save(function (response) {
             $location.path('ingridients/' + response.id);
 
         // Clear form fields
