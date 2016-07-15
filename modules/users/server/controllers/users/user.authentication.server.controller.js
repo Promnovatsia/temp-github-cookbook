@@ -34,12 +34,12 @@ exports.signup = function(req, res) {
   user.hashedPassword = user.encryptPassword(req.body.password, user.salt);
   user.displayName = user.firstName + ' ' + user.lastName;
 
-  //FIX ME MUST DELETE THIS WHEN PRODUCTION
+  /*//FIX ME MUST DELETE THIS WHEN PRODUCTION
   if (req.body.is_admin === true) {
     user.roles = ["admin", "user"];
   } else {
     user.roles = ["user"];
-  }
+  }*/
 
   user.save().then(function() {
     req.login(user, function(err) {
