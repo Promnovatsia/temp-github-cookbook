@@ -853,83 +853,94 @@ angular.module('core').service('Socket', ['Authentication', '$state', '$timeout'
 'use strict';
 
 // Configuring the Recipes module
-angular.module('recipes').run(['Menus',
-    function(Menus) {
+angular
+    .module('recipes')
+    .run(['Menus', function (Menus) {
+        
         Menus.addMenuItem('topbar', {
-            title: 'Recipes',
-            state: 'recipes',
-            type: 'dropdown',
+            title: 'Книга рецептов',
+            state: 'recipes.list',
+            type: 'button',
             roles: ['*']
         });
-            Menus.addSubMenuItem('topbar', 'recipes', {
-                title: 'List Recipes',
-                state: 'recipes.list'
-            });
-            /*Menus.addSubMenuItem('topbar', 'recipes', {
-                title: 'Create Recipes',
-                state: 'recipes.create',
-                roles: ['user']
-            }); */   
+       /* Menus.addSubMenuItem('topbar', 'recipes', {
+            title: 'List Recipes',
+            state: 'recipes.list'
+        });*/
+        /*Menus.addSubMenuItem('topbar', 'recipes', {
+            title: 'Create Recipes',
+            state: 'recipes.create',
+            roles: ['user']
+        }); */
+        
         Menus.addMenuItem('topbar', {
-            title: 'Ingridients',
+            title: 'Ингредиенты',
             state: 'ingridients',
             type: 'dropdown',
             roles: ['user']
         });
-            Menus.addSubMenuItem('topbar', 'ingridients', {
-                title: 'List Ingridients',
-                state: 'ingridients.list',
-                roles: ['user']
-            });
-            Menus.addSubMenuItem('topbar', 'ingridients', {
-                title: 'Create Ingridient',
-                state: 'ingridients.create',
-                roles: ['user']
-            });
+        Menus.addSubMenuItem('topbar', 'ingridients', {
+            title: 'Справочник',
+            state: 'ingridients.list',
+            roles: ['user']
+        });
+        Menus.addSubMenuItem('topbar', 'ingridients', {
+            title: 'Добавить ингредиент',
+            state: 'ingridients.create',
+            roles: ['user']
+        });
+        
         Menus.addMenuItem('topbar', {
-            title: 'Shelf',
+            title: '(В разработке) Продукты',
             state: 'shelf',
             type: 'dropdown',
             roles: ['user']
         });
+        Menus.addSubMenuItem('topbar', 'shelf', {
+            title: 'Холодильник',
+            state: 'shelf.list',
+            roles: ['user']
+        });
+        
         Menus.addMenuItem('topbar', {
-            title: 'Menus',
+            title: 'Меню',
             state: 'menu',
             type: 'dropdown',
             roles: ['user']
         });
-            Menus.addSubMenuItem('topbar', 'menu', {
-                title: 'Brouse Menu',
-                state: 'menu.list',
-                roles: ['user']
-            });
+        Menus.addSubMenuItem('topbar', 'menu', {
+            title: '(В разработке) Текущее меню',
+            state: 'menu.list',
+            roles: ['user']
+        });
         
         //admin management
-            Menus.addSubMenuItem('topbar', 'admin', {
-                title: 'Manage Measures',
-                state: 'measures.list',
-                roles: ['admin']
-            });
-            Menus.addSubMenuItem('topbar', 'admin', {
-                title: 'Manage Products',
-                state: 'products.list',
-                roles: ['admin']
-            });
-  }
-]);
+        Menus.addSubMenuItem('topbar', 'admin', {
+            title: 'Manage Measures',
+            state: 'measures.list',
+            roles: ['admin']
+        });
+        Menus.addSubMenuItem('topbar', 'admin', {
+            title: 'Manage Products',
+            state: 'products.list',
+            roles: ['admin']
+        });
+    }]);
 'use strict';
 
 // Setting up route
-angular.module('recipes').config(['$stateProvider',
-  function($stateProvider) {
+angular
+    .module('recipes')
+    .config(['$stateProvider', function ($stateProvider) {
     // Recipes state routing
 
-    $stateProvider
-        .state('recipes', {
-            abstract: true,
-            url: '/recipes',
-            template: '<ui-view/>'
-        })
+        $stateProvider
+        
+            .state('recipes', {
+                abstract: true,
+                url: '/recipes',
+                template: '<ui-view/>'
+            })
             .state('recipes.list', {
                 url: '',
                 templateUrl: 'modules/recipes/client/views/recipes/recipes-list.client.view.html'
@@ -951,12 +962,13 @@ angular.module('recipes').config(['$stateProvider',
                 data: {
                     roles: ['user', 'admin']
                 }
-        })
-        .state('ingridients',{
-            abstract: true,
-            url: '/ingridients',
-            template: '<ui-view/>'
-        })
+            })
+        
+            .state('ingridients', {
+                abstract: true,
+                url: '/ingridients',
+                template: '<ui-view/>'
+            })
             .state('ingridients.list', {
                 url: '',
                 templateUrl: 'modules/recipes/client/views/ingridients/ingridients-list.client.view.html',
@@ -985,1069 +997,963 @@ angular.module('recipes').config(['$stateProvider',
                     roles: ['user', 'admin']
                 }
             })
-        .state('measures', {
-            abstract: true,
-            url: '/measures',
-            template: '<ui-view/>'
-        })
+        
+            .state('measures', {
+                abstract: true,
+                url: '/measures',
+                template: '<ui-view/>'
+            })
             .state('measures.list', {
                 url: '',
                 templateUrl: 'modules/recipes/client/views/measures/measures-list.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-            .state('measures.create',{
+            .state('measures.create', {
                 url: '/create',
                 templateUrl: 'modules/recipes/client/views/measures/measure-create.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-            .state('measures.edit',{
+            .state('measures.edit', {
                 url: '/:measureId',
                 templateUrl: 'modules/recipes/client/views/measures/measure-edit.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-        .state('products', {
-            abstract: true,
-            url: '/products',
-            template: '<ui-view/>'
-        })
+        
+            .state('products', {
+                abstract: true,
+                url: '/products',
+                template: '<ui-view/>'
+            })
             .state('products.list', {
                 url: '',
                 templateUrl: 'modules/recipes/client/views/products/products-list.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-            .state('products.create',{
+            .state('products.create', {
                 url: '/create',
                 templateUrl: 'modules/recipes/client/views/products/product-create.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-            .state('products.edit',{
+            .state('products.edit', {
                 url: '/:productId',
                 templateUrl: 'modules/recipes/client/views/products/product-edit.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-        .state('menu', {
-            abstract: true,
-            url: '/menu',
-            template: '<ui-view/>'
-        })
+        
+            .state('menu', {
+                abstract: true,
+                url: '/menu',
+                template: '<ui-view/>'
+            })
             .state('menu.list', {
                 url: '',
                 templateUrl: 'modules/recipes/client/views/menus/menus-list.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-            .state('menu.create',{
+            .state('menu.create', {
                 url: '/create',
                 templateUrl: 'modules/recipes/client/views/products/product-create.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-            .state('menu.edit',{
+            .state('menu.edit', {
                 url: '/:productId',
                 templateUrl: 'modules/recipes/client/views/products/product-edit.client.view.html',
                 data: {
                     roles: ['admin']
-                } 
+                }
             })
-        ;
-    }
-]);
+        
+            .state('shelf', {
+                abstract: true,
+                url: '/shelf',
+                template: '<ui-view/>'
+            })
+            .state('shelf.list', {
+                url: '',
+                templateUrl: 'modules/recipes/client/views/shelf/shelf-list.client.view.html',
+                data: {
+                    roles: ['user']
+                }
+            });
+    }]);
 'use strict';
 
 // Recipes controller
-angular.module('recipes').controller('IngridientsController', 
-                                     ['$scope', '$stateParams', '$location', '$window', '$timeout' ,'Authentication', 'Recipes','Ingridients','Measures', 'FileUploader',
-    function($scope, $stateParams, $location, $window, $timeout, Authentication, Recipes, Ingridients, Measures, FileUploader) {
-        
-        $scope.authentication = Authentication;
-        
-        $scope.find = function() {
-            $scope.ingridients = Ingridients.query();
-        };
-        
-        $scope.findOne = function() {
-            $scope.ingridient = Ingridients.get(
-                {
-                    ingridientId: $stateParams.ingridientId
-                }
-            );
-        };
-        
-        $scope.getMeasuresList = function() {
-            return Measures.query().$promise;
-        };
-        
-        $scope.create = function(isValid) {
-            $scope.error = null;
+angular
+    .module('recipes')
+    .controller('IngridientsController', IngridientsController);
+IngridientsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Recipes', 'Ingridients', 'Measures', 'FileUploader'];
+function IngridientsController($scope, $stateParams, $location, $window, $timeout, Authentication, Recipes, Ingridients, Measures, FileUploader) {
 
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
-                return false;
+    $scope.authentication = Authentication;
+
+    $scope.find = function () {
+        $scope.ingridients = Ingridients.query();
+    };
+
+    $scope.findOne = function () {
+        $scope.ingridient = Ingridients.get(
+            {
+                ingridientId: $stateParams.ingridientId
             }
+        );
+    };
 
-            // Create new Recipe object
+    $scope.getMeasuresList = function () {
+        return Measures.query().$promise;
+    };
 
-            var ingridient = new Ingridients(
-                {
-                    caption: this.caption,
-                    infoCard: this.infoCard,
-                    image: $scope.imageURL,
-                    measureDefault: $scope.measureDefault
-                }
-            );
+    $scope.create = function (isValid) {
+        $scope.error = null;
 
-            // Redirect after save
-            ingridient.$save(function(response) {
-                $location.path('ingridients/' + response.id);
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
+            return false;
+        }
 
-            // Clear form fields
-                $scope.caption = '';
-                $scope.infoCard = '';
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-        $scope.update = function(isValid) {
-            $scope.error = null;
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
-                return false;
+        // Create new Recipe object
+
+        var ingridient = new Ingridients(
+            {
+                caption: this.caption,
+                infoCard: this.infoCard,
+                image: $scope.imageURL,
+                measureDefault: $scope.measureDefault
             }
+        );
 
-            var ingridient = $scope.ingridient;
-            ingridient.image = $scope.imageURL;
-            ingridient.$update(function() {
-                $location.path('ingridients/' + ingridient.id);
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-        $scope.remove = function(ingridient) {
-            if (ingridient) {
-                ingridient.$remove();
-                $location.path('ingridients');
-            } else {
-                $scope.ingridient.$remove(function() {
-                    $location.path('ingridient');
-                });
-            }
-        };
-        
-        var uploader = $scope.uploader = new FileUploader({
-            url: '/api/pictures/ingridients'
+        // Redirect after save
+        ingridient.$save(function (response) {
+            $location.path('ingridients/' + response.id);
+
+        // Clear form fields
+            $scope.caption = '';
+            $scope.infoCard = '';
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
         });
-        
-        $scope.imageurl='http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
+    };
 
-        // FILTERS
+    $scope.update = function (isValid) {
+        $scope.error = null;
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
+            return false;
+        }
 
-        uploader.filters.push({
-            name: 'imageFilter',
-            fn: function(item /*{File|FileLikeObject}*/, options) {
-                var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-                return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
-            }
+        var ingridient = $scope.ingridient;
+        ingridient.image = $scope.imageURL;
+        ingridient.$update(function () {
+            $location.path('ingridients/' + ingridient.id);
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
         });
-        
-            // Called after the user selected a new picture file
-        $scope.uploader.onAfterAddingFile = function(fileItem) {
-            if ($window.FileReader) {
-                var fileReader = new FileReader();
-                fileReader.readAsDataURL(fileItem._file);
-                
-                fileReader.onload = function(fileReaderEvent) {
-                    $timeout(function() {
-                        $scope.imageURL = fileReaderEvent.target.result;
-                    }, 0);
-                };
-            }
-            console.log($scope.imageURL);
-        };
-    }                                  
-]);
+    };
+
+    $scope.remove = function (ingridient) {
+        if (ingridient) {
+            ingridient.$remove();
+            $location.path('ingridients');
+        } else {
+            $scope.ingridient.$remove(function () {
+                $location.path('ingridient');
+            });
+        }
+    };
+
+    var uploader = $scope.uploader = new FileUploader({
+        url: '/api/pictures/ingridients'
+    });
+
+    $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
+
+    // FILTERS
+
+    uploader.filters.push({
+        name: 'imageFilter',
+        fn: function (item, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+        }
+    });
+
+        // Called after the user selected a new picture file
+    $scope.uploader.onAfterAddingFile = function (fileItem) {
+        if ($window.FileReader) {
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL(fileItem._file);
+
+            fileReader.onload = function (fileReaderEvent) {
+                $timeout(function () {
+                    $scope.imageURL = fileReaderEvent.target.result;
+                }, 0);
+            };
+        }
+    };
+}
 'use strict';
 
 // Recipes controller
-angular.module('recipes').controller('MeasuresController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients', 'Measures',
-    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
+angular
+    .module('recipes')
+    .controller('MeasuresController', MeasuresController);
+MeasuresController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes', 'Ingridients', 'Measures'];
+
+function MeasuresController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
         
-        $scope.authentication = Authentication;
-        $scope.converter=[];
-        
-        $scope.uncountable=false;
-        $scope.find = function() {
-            $scope.measures = Measures.query();
-        };
-        
-        $scope.findOne = function() {
-            $scope.measure = Measures.get(
-                {
-                    measureId: $stateParams.measureId
-                }
-            ).$promise.then(function (measure){
-                $scope.converter=measure.converter;
-                console.log($scope.converter);
-                $scope.measure=measure;
-                $scope.converter.forEach(function(item, i, arr) {
+    $scope.authentication = Authentication;
+    $scope.converter = [];
+
+    $scope.uncountable = false;
+    $scope.find = function () {
+        $scope.measures = Measures.query();
+    };
+
+    $scope.findOne = function () {
+        $scope.measure = Measures.get(
+            {
+                measureId: $stateParams.measureId
+            }
+        ).$promise.then(function (measure) {
+            $scope.converter = measure.converter;
+            $scope.measure = measure;
+            if ($scope.converter) {
+                $scope.converter.forEach(function (item, i, arr) {
                     item.index = i;
                 });
+            }
+        });
+    };
+
+    $scope.getMeasuresList = function () {
+        return Measures.query().$promise;
+    };
+
+    $scope.minMinus = function (measure) {
+        measure.min--;
+        if (measure.min < 0) {
+            measure.min = 0;
+        }
+    };
+
+    $scope.minPlus = function (measure) {
+        measure.min++;
+    };
+
+    $scope.stepMinus = function (measure) {
+        measure.step--;
+        if (measure.step < 0) {
+            measure.step = 0;
+        }
+    };
+
+    $scope.stepPlus = function (measure) {
+        measure.step++;
+    };
+
+    $scope.newSubMeasure = function (id) {
+        if (!id || id % 1 !== 0) {
+            $scope.selectedMeasure = '';
+            return;
+        }
+        Measures.get(
+            {
+                measureId: id
+            }
+        ).$promise.then(function (measure) {
+            $scope.converter.push({
+                id: measure.id,
+                index: $scope.converter.length,
+                caption: measure.caption,
+                rate: 1,
+                exchange: true
             });
-        };
-        
-        $scope.getMeasuresList = function() {
-            return Measures.query().$promise;
-        };
-        
-        $scope.minMinus = function(measure) {
-            measure.min--;
-            if (measure.min<0){
-                measure.min=0;
+            $scope.converter.forEach(function (item, i, arr) {
+                item.index = i;
+            });
+        });
+        $scope.selectedMeasure = '';
+    };
+
+    $scope.removeSubMeasure = function (node) {
+        $scope.converter.splice(node.index, 1);
+        $scope.converter.forEach(function (item, i, arr) {
+            item.index = i;
+        });
+    };
+
+    $scope.create = function (isValid) {
+        $scope.error = null;
+
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
+            return false;
+        }
+
+        // Create new Recipe object
+
+        var measure = new Measures(
+            {
+                caption: this.caption,
+                step: this.step,
+                min: this.min,
+                converter: []
             }
-        };
-        
-        $scope.minPlus = function(measure) {
-            measure.min++;
-        };
-        
-        $scope.stepMinus = function(measure) {
-            measure.step--;
-            if (measure.step<0){
-                measure.step=0;
+        );
+        if ($scope.uncountable) {
+            measure.min = 0;
+            measure.step = 0;
+        }
+        $scope.converter.forEach(function (item, i, arr) {
+            if (!item.exchange || $scope.uncountable) {
+                item.rate = 0;
             }
-        };
-        
-        $scope.stepPlus = function(measure) {
-            measure.step++;
-        };
-        
-        $scope.newSubMeasure = function(id){
-            if(!id || id % 1 !== 0) {
-                $scope.selectedMeasure='';
+            measure.converter.push(
+                {
+                    id: item.id,
+                    caption: item.caption,
+                    rate: item.rate
+                }
+            );
+        });
+        // Redirect after save
+        measure.$save(function (response) {
+            $location.path('measures');
+
+        // Clear form fields
+            $scope.caption = '';
+            $scope.step = '';
+            $scope.min = '';
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+    $scope.update = function (isValid) {
+
+        $scope.error = null;
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'measureForm');
+            return false;
+        }
+
+        var measure = $scope.measure;
+        if ($scope.uncountable) {
+            measure.min = 0;
+            measure.step = 0;
+        }
+        measure.converter = [];
+        $scope.converter.forEach(function (item, i, arr) {
+            if (!item.exchange || $scope.uncountable) {
+                item.rate = 0;
+            }
+            measure.converter.push(
+                {
+                    id: item.id,
+                    caption: item.caption,
+                    rate: item.rate
+                }
+            );
+        });
+        measure.$update(function () {
+            $location.path('measures');
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('MenusController', MenusController);
+MenusController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Menu', 'Recipes', 'Ingridients', 'Measures'];
+
+function MenusController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
+
+    $scope.authentication = Authentication;
+
+    $scope.sort = function (a, b) {
+        return a.index - b.index;
+    };
+
+// Find a list of Recipes
+    $scope.find = function () {
+        $scope.recipes = Recipes.query();
+    };
+
+// Find existing Recipe
+    $scope.findOne = function () {
+        Recipes.get(
+            {
+                recipeId: $stateParams.recipeId
+            }
+        ).$promise.then(function (recipe) {
+            if (recipe.ingridients.length > 0) {
+                recipe.ingridients.forEach(function (item, i, arr) {
+                    Measures.get(
+                        {
+                            measureId: item.ingridientAmount.measureId
+                        }
+                    ).$promise.then(function (measure) {
+                        item.measure = measure;
+                        item.index = item.ingridientAmount.index;
+                        item.amount = item.ingridientAmount.amount;
+                        item.measureCaption = measure.caption;
+                    });
+                });
+            }
+            recipe.ingridients.sort($scope.sort);
+            $scope.recipe = recipe;
+            $scope.ingridientData = $scope.recipe.ingridients;
+        });
+    };
+
+// Update existing Recipe
+    $scope.update = function (isValid) {
+        $scope.error = null;
+
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'recipeForm');
+            return false;
+        }
+
+        var recipe = $scope.recipe;
+        recipe.ingridients = $scope.ingridientData;
+        recipe.steps = $scope.stepData;
+        recipe.$update(function () {
+            $location.path('recipes/' + recipe.id);
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+    // Remove existing Recipe
+    $scope.remove = function (recipe) {
+        if (recipe) {
+            recipe.$remove();
+            $location.path('recipes');
+        } else {
+            $scope.recipe.$remove(function () {
+                $location.path('recipes');
+            });
+        }
+    };
+
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('ProductsController', ProductsController);
+ProductsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Products', 'Ingridients', 'Measures',  'FileUploader'];
+function ProductsController($scope, $stateParams, $location, $window, $timeout, Authentication, Products, Ingridients, Measures, FileUploader) {
+
+    $scope.authentication = Authentication;
+
+    $scope.find = function () {
+        $scope.products = Products.query();
+    };
+
+    $scope.findOne = function () {
+        $scope.product = Products.get(
+            {
+                productId: $stateParams.productId
+            }
+        );
+    };
+
+    $scope.getMeasuresList = function () {
+        return Measures.query().$promise;
+    };
+
+    $scope.create = function (isValid) {
+        $scope.error = null;
+
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'productForm');
+            return false;
+        }
+
+        // Create new Recipe object
+
+        var product = new Products(
+            {
+                caption: this.caption,
+                infoCard: this.infoCard,
+                image: $scope.imageURL,
+                measureId: $scope.measureId
+            }
+        );
+
+        // Redirect after save
+        product.$save(function (response) {
+            $location.path('products/' + response.id);
+
+        // Clear form fields
+            $scope.caption = '';
+            $scope.infoCard = '';
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+    $scope.update = function (isValid) {
+        $scope.error = null;
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'productForm');
+            return false;
+        }
+
+        var product = $scope.product;
+        product.image = $scope.imageURL;
+        product.$update(function () {
+            $location.path('products/' + product.id);
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+    $scope.remove = function (ingridient) {
+        if (ingridient) {
+            ingridient.$remove();
+            $location.path('ingridients');
+        } else {
+            $scope.ingridient.$remove(function () {
+                $location.path('ingridient');
+            });
+        }
+    };
+
+    var uploader = $scope.uploader = new FileUploader({
+        url: '/api/pictures/products'
+    });
+
+    // FILTERS
+
+    uploader.filters.push({
+        name: 'imageFilter',
+        fn: function (item, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+        }
+    });
+
+        // Called after the user selected a new picture file
+    $scope.uploader.onAfterAddingFile = function (fileItem) {
+        if ($window.FileReader) {
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL(fileItem._file);
+
+            fileReader.onload = function (fileReaderEvent) {
+                $timeout(function () {
+                    $scope.imageURL = fileReaderEvent.target.result;
+                }, 0);
+            };
+        }
+    };
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('RecipesController', RecipesController);
+RecipesController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes', 'Ingridients', 'Measures'];
+
+function RecipesController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
+
+    $scope.authentication = Authentication;
+
+    $scope.quantity = 5;
+    $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
+    $scope.portionsEdit = false;
+    $scope.portions = 2;
+
+    $scope.sort = function (a, b) {
+        return a.index - b.index;
+    };
+
+// Find a list of Recipes
+    $scope.find = function () {
+        $scope.recipes = Recipes.query();
+    };
+
+// Find existing Recipe
+    $scope.findOne = function () {
+        Recipes.get(
+            {
+                recipeId: $stateParams.recipeId
+            }
+        ).$promise.then(function (recipe) {
+            if (recipe.ingridients.length > 0) {
+                recipe.ingridients.forEach(function (item, i, arr) {
+                    Measures.get(
+                        {
+                            measureId: item.ingridientAmount.measureId
+                        }
+                    ).$promise.then(function (measure) {
+                        item.measure = measure;
+                        item.index = item.ingridientAmount.index;
+                        item.amount = item.ingridientAmount.amount;
+                        item.measureCaption = measure.caption;
+                    });
+                });
+            }
+            recipe.ingridients.sort($scope.sort);
+            $scope.recipe = recipe;
+            $scope.ingridientData = $scope.recipe.ingridients;
+            //NOTE add title etc. to scope end change edit.view
+        });
+    };
+
+//Igridients
+
+    $scope.ingridientData = [];
+    $scope.measuresList = [];
+
+    $scope.getIngridientList = function () {
+        return Ingridients.query().$promise;
+    };
+
+    $scope.getMeasuresList = function () {
+        return Measures.query().$promise;
+    };
+
+//create view
+
+    $scope.treeIngridients = {
+        //FIX ME возможность перетащить шаг в ингридиенты и наоборот 
+        dropped : function (e) {
+            $scope.ingridientData.forEach(function (item, i, arr) {
+                item.index = i;
+            });
+        }
+    };
+
+    $scope.newIngridient = function (id) {
+        if (!id || id % 1 !== 0) {
+            $scope.selectedIngridient = '';
+            //TODO не сбрасывать выбор, а открыть интерфейс вноса незанесенного ингридиента
+            return;
+        }
+        Ingridients.get(
+            {
+                ingridientId: id
+            }
+        ).$promise.then(function (newIngridient) {
+            Measures.get(
+                {
+                    measureId: newIngridient.measureDefault
+                }
+            ).$promise.then(function (measure) {
+                $scope.ingridientData.push(
+                    {
+                        id: newIngridient.id,
+                        index: $scope.ingridientData.length,
+                        caption: newIngridient.caption,
+                        infoCard: newIngridient.infoCard,
+                        image: newIngridient.image,
+                        amount: measure.min,
+                        measure: measure,
+                        measureCaption: measure.caption,
+                        isPopover: false,
+                        isConvert: false,
+                        selectedMeasure: ''
+                    }
+                );
+            });
+            $scope.selectedIngridient = '';
+        }).catch(function (err) {});
+    };
+
+    $scope.removeIngridient = function (node) {
+        $scope.ingridientData.splice(node.ingridient.index, 1);
+        $scope.ingridientData.forEach(function (item, i, arr) {
+            item.index = i;
+        });
+    };
+
+//UI func
+
+    $scope.globalPopoverEnable = false;
+
+    $scope.amountMinus = function (item) {
+        item.amount = Number((item.amount - item.measure.step).toFixed(2));
+        if (item.amount < item.measure.min) {
+            item.amount = item.measure.min;
+        }
+        item.isPopover = false;
+    };
+
+    $scope.amountPlus = function (item) {
+        item.amount = Number((item.amount + item.measure.step).toFixed(2));
+        item.isPopover = false;
+    };
+
+    $scope.amountApply = function (item) {
+        if (item.selectedMeasure !== '' && item.isConvert === true) {
+            var targetMeasure = '';
+            $scope.measuresList.forEach(function (elem, i, arr) {
+                if (elem.caption === item.selectedMeasure) {
+                    targetMeasure = elem;
+                }
+            });
+            if (targetMeasure === '') {
+                item.selectedMeasure = '';
                 return;
             }
             Measures.get(
                 {
-                    measureId: id
+                    measureId: targetMeasure.id
                 }
-            ).$promise.then(function(measure) {
-                $scope.converter.push({
+            ).$promise.then(function (measure) {
+                item.measure = measure;
+                item.amount = targetMeasure.value;
+            });
+        }
+        if (item.amount % item.measure.step > 0) {
+            item.amount = Number((item.amount - item.amount % item.measure.step + item.measure.step).toFixed(2));
+        }
+        if (item.amount < item.measure.min) {
+            item.amount = item.measure.min;
+        }
+        item.isPopover = false;
+        item.isConvert = false;
+        item.selectedMeasure = '';
+    };
+
+    $scope.converter = function (item) {
+        item.isPopover = false;
+        $scope.measuresList = [];
+        item.selectedMeasure = '';
+        item.measure.converter.forEach(function (measure, i, arr) {
+            var value = 0;
+            if (measure.rate === 0) {
+                value = 1;
+            } else {
+                value = Number((item.amount * measure.rate).toFixed(2));
+            }
+            if (item.amount < item.measure.min) {
+                item.amount = item.measure.min;
+            }
+            $scope.measuresList.push(
+                {
                     id: measure.id,
-                    index: $scope.converter.length,
-                    caption: measure.caption,
-                    rate: 1,
-                    exchange: true
-                });
-                $scope.converter.forEach(function(item, i, arr) {
-                    item.index = i;
-                });
-            });
-            $scope.selectedMeasure='';
-        };
-        
-        $scope.removeSubMeasure = function(node){
-            $scope.converter.splice(node.index,1);
-            $scope.converter.forEach(function(item, i, arr) {
-                item.index = i;
-            });
-        };
-        
-        $scope.create = function(isValid) {
-            $scope.error = null;
-
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
-                return false;
-            }
-
-            // Create new Recipe object
-
-            var measure = new Measures(
-                {
-                    caption: this.caption,
-                    step: this.step,
-                    min: this.min,
-                    converter: []
+                    value: value,
+                    caption: value + ' ' + measure.caption
                 }
             );
-            if($scope.uncountable){
-                measure.min=0;
-                measure.step=0;
-            }
-            $scope.converter.forEach(function(item, i, arr) {
-                if(!item.exchange || $scope.uncountable){
-                    item.rate=0;
-                }
-                measure.converter.push(
-                    {
-                        id:item.id,
-                        caption:item.caption,
-                        rate: item.rate
-                    }
-                );    
-            });
-            console.log($scope.converter);
-            console.log(measure);
-            // Redirect after save
-            measure.$save(function(response) {
-                $location.path('measures');
-
-            // Clear form fields
-                $scope.caption = '';
-                $scope.step = '';
-                $scope.min = '';
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-        $scope.update = function(isValid) {
-            
-            $scope.error = null;
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'measureForm');
-                return false;
-            }
-
-            var measure = $scope.measure;
-            if($scope.uncountable){
-                measure.min=0;
-                measure.step=0;
-            }
-            measure.converter=[];
-            $scope.converter.forEach(function(item, i, arr) {
-                if(!item.exchange || $scope.uncountable){
-                    item.rate=0;
-                }
-                measure.converter.push(
-                    {
-                        id:item.id,
-                        caption:item.caption,
-                        rate: item.rate
-                    }
-                );    
-            });
-            console.log($scope.converter);
-            console.log(measure);
-            measure.$update(function() {
-                $location.path('measures');
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-    }
-]);
-'use strict';
-
-// Recipes controller
-angular.module('recipes').controller('MenusController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Menu', 'Recipes','Ingridients', 'Measures',
-    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
-        
-        $scope.authentication = Authentication;      
-
-        $scope.sort = function(a, b) {
-            return a.index - b.index;
-        };
-        
-    // Find a list of Recipes
-        $scope.find = function() {
-            $scope.recipes = Recipes.query();
-        };
-        
-    // Find existing Recipe
-        $scope.findOne = function() {
-            Recipes.get(
-                {
-                    recipeId: $stateParams.recipeId
-                }
-            ).$promise.then(function(recipe) {
-                if (recipe.ingridients.length>0) {
-                    recipe.ingridients.forEach(function(item, i, arr) {
-                        Measures.get(
-                            {
-                                measureId: item.ingridientAmount.measureId
-                            }
-                        ).$promise.then(function(measure) {
-                            item.measure = measure;
-                            item.index = item.ingridientAmount.index;
-                            item.amount = item.ingridientAmount.amount;
-                            item.measureCaption = measure.caption;
-                        });
-                    });   
-                }
-                recipe.ingridients.sort($scope.sort);
-                $scope.recipe = recipe;
-                $scope.ingridientData=$scope.recipe.ingridients;
-            });
-        };
-        
-    //Igridients
-      
-        $scope.ingridientData = [];
-        $scope.measuresList = [];
-        
-        $scope.getIngridientList = function() {
-            return Ingridients.query().$promise;
-        };
-        
-        $scope.getMeasuresList = function() {
-            return Measures.query().$promise;
-        };
-
-    //create view
-        
-        $scope.treeIngridients = {
-            dropped : function (e) {
-                $scope.ingridientData.forEach(function(item, i, arr) {
-                    item.index = i;
-                }); 
-            }
-        };     
-        
-        $scope.newIngridient = function (id) {
-            if(!id || id % 1 !== 0) {
-                $scope.selectedIngridient='';
-                return;
-            }
-            Ingridients.get(
-                {
-                    ingridientId: id
-                }
-            ).$promise.then(function(newIngridient){
-                Measures.get(
-                        {
-                            measureId: newIngridient.measureDefault
-                        }
-                ).$promise.then(function(measure) {
-                    $scope.ingridientData.push(
-                        {
-                            id: newIngridient.id,
-                            'index': $scope.ingridientData.length,
-                            caption: newIngridient.caption,
-                            infoCard: newIngridient.infoCard,
-                            image: newIngridient.image,
-                            amount: measure.min,
-                            measure: measure,
-                            measureCaption: measure.caption,
-                            isPopover: false,
-                            isConvert:false
-                        }
-                    );    
-                });
-                $scope.selectedIngridient='';
-            }).catch(function(err) {
-                
-            });
-        };
-        
-        $scope.removeIngridient = function (node) {
-            $scope.ingridientData.splice(node.ingridient.index,1);
-            $scope.ingridientData.forEach(function(item, i, arr) {
-                item.index = i;
-            });
-        };
-        
-    //UI func
-        
-        $scope.globalPopoverEnable = false;
-        
-        $scope.amountMinus = function(item) {
-            item.amount=Number((item.amount-item.measure.step).toFixed(2));
-            if(item.amount<item.measure.min){
-                item.amount=item.measure.min;
-            }
-            item.isPopover=false;
-        };
-        
-        $scope.amountPlus = function(item) {
-            item.amount=Number((item.amount+item.measure.step).toFixed(2));
-            item.isPopover=false;
-        };
-        
-        $scope.amountApply = function(item) {
-            if(item.selectedMeasure!=='' && item.isConvert===true){
-                var targetMeasure = '';
-                $scope.measuresList.forEach(function(elem,i,arr){
-                    if (elem.caption === item.selectedMeasure){
-                        targetMeasure=elem;
-                    }
-                });
-                if (targetMeasure === '') {
-                    item.selectedMeasure='';
-                    return;
-                }
-                Measures.get(
-                    {
-                        measureId: targetMeasure.id
-                    }
-                ).$promise.then(function(measure) {
-                    item.measure=measure;
-                    item.amount=targetMeasure.value;
-                });    
-            }
-            if(item.amount % item.measure.step > 0) {
-                item.amount=Number((item.amount - item.amount % item.measure.step + item.measure.step).toFixed(2));    
-            }
-            if(item.amount<item.measure.min){
-                item.amount=item.measure.min;
-            }
-            item.isPopover=false;
-            item.isConvert=false;
-            item.selectedMeasure='';
-        };
-        
-        $scope.converter = function(item) {
-            item.isPopover=false;
-            $scope.measuresList=[];
-            item.selectedMeasure='';
-            item.measure.converter.forEach(function(measure, i, arr) {
-                var value=0;
-                if(measure.rate===0){
-                    value=1;
-                }
-                else {
-                    value=Number((item.amount * measure.rate).toFixed(2));
-                }
-                if(item.amount<item.measure.min){
-                    item.amount=item.measure.min;
-                }
-                    $scope.measuresList.push(
-                        {
-                            id: measure.id,
-                            value: value,
-                            caption: value + ' ' + measure.caption,
-                        }
-                    );
-            });
-            item.isConvert=true;
-        };
-        
-    //Steps
-        
-        $scope.stepData = [];
-
-        $scope.treeSteps = {
-            dropped : function (e) {
-                $scope.stepData.forEach(function(item, i, arr) {
-                    item.index = i;
-                });  
-            }
-        };
-        
-        $scope.newStep = function () {
-            $scope.stepData.push(
-                {
-                    'index': $scope.stepData.length,
-                    action: $scope.actionStep,
-                    device: 'device',
-                    duration: 'duration'
-                }
-            );   
-            $scope.actionStep='';
-        };
-
-        $scope.removeStep = function (node) {
-            $scope.stepData.splice(node.step.index,1);
-            $scope.stepData.forEach(function(item, i, arr) {
-                item.index = i;
-            });    
-        };
-        
-    // Create new Recipe
-        $scope.create = function(isValid) {
-            $scope.error = null;
-
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'recipeForm');
-                return false;
-            }
-
-            // Create new Recipe object
-
-            var recipe = new Recipes(
-                {
-                    title: this.title,
-                    content: this.content,
-                    steps: this.stepData,
-                    ingridients: $scope.ingridientData
-                }
-            );
-
-            // Redirect after save
-            recipe.$save(function(response) {
-                $location.path('recipes/' + response.id);
-
-            // Clear form fields
-                $scope.title = '';
-                $scope.content = '';
-                $scope.stepData = [];
-                $scope.ingridientData = [];
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-
-    // Update existing Recipe
-        $scope.update = function(isValid) {
-            $scope.error = null;
-
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'recipeForm');
-                return false;
-            }
-
-            var recipe = $scope.recipe;
-            recipe.ingridients=$scope.ingridientData;
-            recipe.steps=$scope.stepData;
-            recipe.$update(function() {
-                $location.path('recipes/' + recipe.id);
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-        // Remove existing Recipe
-        $scope.remove = function(recipe) {
-            if (recipe) {
-                recipe.$remove();
-                $location.path('recipes');
-            } else {
-                $scope.recipe.$remove(function() {
-                    $location.path('recipes');
-                });
-            }
-        };
-
-    }    
-]);
-'use strict';
-
-// Recipes controller
-angular.module('recipes').controller('ProductsController', 
-                                     ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Products', 'Ingridients', 'Measures',  'FileUploader',
-    function($scope, $stateParams, $location, $window, $timeout, Authentication, Products, Ingridients, Measures, FileUploader) {
-        
-        $scope.authentication = Authentication;
-        
-        $scope.find = function() {
-            $scope.products = Products.query();
-        };
-        
-        $scope.findOne = function() {
-            $scope.product = Products.get(
-                {
-                    productId: $stateParams.productId
-                }
-            );
-        };
-        
-        $scope.getMeasuresList = function() {
-            return Measures.query().$promise;
-        };
-        
-        $scope.create = function(isValid) {
-            $scope.error = null;
-
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'productForm');
-                return false;
-            }
-
-            // Create new Recipe object
-
-            var product = new Products(
-                {
-                    caption: this.caption,
-                    infoCard: this.infoCard,
-                    image: $scope.imageURL,
-                    measureId: $scope.measureId
-                }
-            );
-
-            // Redirect after save
-            product.$save(function(response) {
-                $location.path('products/' + response.id);
-
-            // Clear form fields
-                $scope.caption = '';
-                $scope.infoCard = '';
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-        $scope.update = function(isValid) {
-            $scope.error = null;
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'productForm');
-                return false;
-            }
-
-            var product = $scope.product;
-            product.image = $scope.imageURL;
-            product.$update(function() {
-                $location.path('products/' + product.id);
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-        $scope.remove = function(ingridient) {
-            if (ingridient) {
-                ingridient.$remove();
-                $location.path('ingridients');
-            } else {
-                $scope.ingridient.$remove(function() {
-                    $location.path('ingridient');
-                });
-            }
-        };
-        
-        var uploader = $scope.uploader = new FileUploader({
-            url: '/api/pictures/products'
         });
+        item.isConvert = true;
+    };
 
-        // FILTERS
+//Steps
 
-        uploader.filters.push({
-            name: 'imageFilter',
-            fn: function(item /*{File|FileLikeObject}*/, options) {
-                var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-                return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+    $scope.stepData = [];
+
+    $scope.treeSteps = {
+        dropped: function (e) {
+            $scope.stepData.forEach(function (item, i, arr) {
+                item.index = i;
+            });
+        }
+    };
+
+    $scope.newStep = function () {
+        $scope.stepData.push(
+            {
+                index: $scope.stepData.length,
+                action: $scope.actionStep,
+                device: 'device',
+                duration: 'duration'
+                //CHANGES image: ''
             }
+        );
+        $scope.actionStep = '';
+    };
+
+    $scope.removeStep = function (node) {
+        $scope.stepData.splice(node.step.index, 1);
+        $scope.stepData.forEach(function (item, i, arr) {
+            item.index = i;
         });
-        
-            // Called after the user selected a new picture file
-        $scope.uploader.onAfterAddingFile = function(fileItem) {
-            if ($window.FileReader) {
-                var fileReader = new FileReader();
-                fileReader.readAsDataURL(fileItem._file);
-                
-                fileReader.onload = function(fileReaderEvent) {
-                    $timeout(function() {
-                        $scope.imageURL = fileReaderEvent.target.result;
-                    }, 0);
-                };
+    };
+
+// Create new Recipe
+    $scope.create = function (isValid) {
+        $scope.error = null;
+
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'recipeForm');
+            return false;
+        }
+
+        // Create new Recipe object
+
+        var recipe = new Recipes(
+            {
+                title: this.title,
+                infoCard: this.infoCard,
+                //CHANGES image: this.image,
+                protions: this.portions,
+                content: this.content,
+                steps: this.stepData,
+                ingridients: $scope.ingridientData
             }
-            console.log($scope.imageURL);
-        };
-    }                                  
-]);
+        );
+
+        // Redirect after save
+        recipe.$save(function (response) {
+            $location.path('recipes/' + response.id);
+
+        // Clear form fields
+            $scope.title = '';
+            $scope.content = '';
+            $scope.stepData = [];
+            $scope.ingridientData = [];
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+// Update existing Recipe
+    $scope.update = function (isValid) {
+        $scope.error = null;
+
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'recipeForm');
+            return false;
+        }
+
+        var recipe = $scope.recipe;
+        recipe.ingridients = $scope.ingridientData;
+        recipe.steps = $scope.stepData;
+        recipe.$update(function () {
+            $location.path('recipes/' + recipe.id);
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+    // Remove existing Recipe
+    $scope.remove = function (recipe) {
+        if (recipe) {
+            recipe.$remove();
+            $location.path('recipes');
+        } else {
+            $scope.recipe.$remove(function () {
+                $location.path('recipes');
+            });
+        }
+    };
+
+}
 'use strict';
 
 // Recipes controller
-angular.module('recipes').controller('RecipesController', 
-                                     ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes','Ingridients', 'Measures',
-    function($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
-        
-        $scope.authentication = Authentication;      
-        
-        $scope.quantity = 5;
-        $scope.imageurl='http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
-        $scope.portionsEdit = false;
-        $scope.portions=2;
-        
-        $scope.sort = function(a, b) {
-            return a.index - b.index;
-        };
-        
-    // Find a list of Recipes
-        $scope.find = function() {
-            $scope.recipes = Recipes.query();
-        };
-        
-    // Find existing Recipe
-        $scope.findOne = function() {
-            Recipes.get(
-                {
-                    recipeId: $stateParams.recipeId
-                }
-            ).$promise.then(function(recipe) {
-                if (recipe.ingridients.length>0) {
-                    recipe.ingridients.forEach(function(item, i, arr) {
-                        Measures.get(
-                            {
-                                measureId: item.ingridientAmount.measureId
-                            }
-                        ).$promise.then(function(measure) {
-                            item.measure = measure;
-                            item.index = item.ingridientAmount.index;
-                            item.amount = item.ingridientAmount.amount;
-                            item.measureCaption = measure.caption;
-                        });
-                    });   
-                }
-                recipe.ingridients.sort($scope.sort);
-                $scope.recipe = recipe;
-                $scope.ingridientData=$scope.recipe.ingridients;
-                //NOTE add title etc. to scope end change edit.view
+angular
+    .module('recipes')
+    .controller('ShelfController', ShelfController);
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'Ingridients', 'Measures'];
+function ShelfController($scope, $stateParams, $location, $window, Authentication, Ingridients, Measures) {
+
+    $scope.authentication = Authentication;
+
+    $scope.find = function () {
+        $scope.ingridients = Ingridients.query();
+    };
+
+    $scope.findOne = function () {
+        $scope.ingridient = Ingridients.get(
+            {
+                ingridientId: $stateParams.ingridientId
+            }
+        );
+    };
+
+    $scope.getMeasuresList = function () {
+        return Measures.query().$promise;
+    };
+
+    $scope.create = function (isValid) {
+        $scope.error = null;
+
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
+            return false;
+        }
+
+        // Create new Recipe object
+
+        var ingridient = new Ingridients(
+            {
+                caption: this.caption,
+                infoCard: this.infoCard,
+                image: $scope.imageURL,
+                measureDefault: $scope.measureDefault
+            }
+        );
+
+        // Redirect after save
+        ingridient.$save(function (response) {
+            $location.path('ingridients/' + response.id);
+
+        // Clear form fields
+            $scope.caption = '';
+            $scope.infoCard = '';
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+    $scope.update = function (isValid) {
+        $scope.error = null;
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
+            return false;
+        }
+
+        var ingridient = $scope.ingridient;
+        ingridient.image = $scope.imageURL;
+        ingridient.$update(function () {
+            $location.path('ingridients/' + ingridient.id);
+        }, function (errorResponse) {
+            $scope.error = errorResponse.data.message;
+        });
+    };
+
+    $scope.remove = function (ingridient) {
+        if (ingridient) {
+            ingridient.$remove();
+            $location.path('ingridients');
+        } else {
+            $scope.ingridient.$remove(function () {
+                $location.path('ingridient');
             });
-        };
-        
-    //Igridients
-      
-        $scope.ingridientData = [];
-        $scope.measuresList = [];
-        
-        $scope.getIngridientList = function() {
-            return Ingridients.query().$promise;
-        };
-        
-        $scope.getMeasuresList = function() {
-            return Measures.query().$promise;
-        };
+        }
+    };
 
-    //create view
-        
-        $scope.treeIngridients = {
-            //FIX ME возможность перетащить шаг в ингридиенты и наоборот 
-            dropped : function (e) {
-                $scope.ingridientData.forEach(function(item, i, arr) {
-                    item.index = i;
-                }); 
-            }
-        };     
-        
-        $scope.newIngridient = function (id) {
-            if(!id || id % 1 !== 0) {
-                $scope.selectedIngridient='';
-                //TODO не сбрасывать выбор, а открыть интерфейс вноса незанесенного ингридиента
-                return;
-            }
-            Ingridients.get(
-                {
-                    ingridientId: id
-                }
-            ).$promise.then(function(newIngridient){
-                Measures.get(
-                        {
-                            measureId: newIngridient.measureDefault
-                        }
-                ).$promise.then(function(measure) {
-                    $scope.ingridientData.push(
-                        {
-                            id: newIngridient.id,
-                            'index': $scope.ingridientData.length,
-                            caption: newIngridient.caption,
-                            infoCard: newIngridient.infoCard,
-                            image: newIngridient.image,
-                            amount: measure.min,
-                            measure: measure,
-                            measureCaption: measure.caption,
-                            isPopover: false,
-                            isConvert:false,
-                            selectedMeasure: ''
-                        }
-                    );    
-                });
-                $scope.selectedIngridient='';
-            }).catch(function(err) {
-                
-            });
-        };
-        
-        $scope.removeIngridient = function (node) {
-            $scope.ingridientData.splice(node.ingridient.index,1);
-            $scope.ingridientData.forEach(function(item, i, arr) {
-                item.index = i;
-            });
-        };
-        
-    //UI func
-        
-        $scope.globalPopoverEnable = false;
-        
-        $scope.amountMinus = function(item) {
-            item.amount=Number((item.amount-item.measure.step).toFixed(2));
-            if(item.amount<item.measure.min){
-                item.amount=item.measure.min;
-            }
-            item.isPopover=false;
-        };
-        
-        $scope.amountPlus = function(item) {
-            item.amount=Number((item.amount+item.measure.step).toFixed(2));
-            item.isPopover=false;
-        };
-        
-        $scope.amountApply = function(item) {
-            if(item.selectedMeasure!=='' && item.isConvert===true){
-                var targetMeasure = '';
-                $scope.measuresList.forEach(function(elem,i,arr){
-                    if (elem.caption === item.selectedMeasure){
-                        targetMeasure=elem;
-                    }
-                });
-                if (targetMeasure === '') {
-                    item.selectedMeasure='';
-                    return;
-                }
-                Measures.get(
-                    {
-                        measureId: targetMeasure.id
-                    }
-                ).$promise.then(function(measure) {
-                    item.measure=measure;
-                    item.amount=targetMeasure.value;
-                });    
-            }
-            if(item.amount % item.measure.step > 0) {
-                item.amount=Number((item.amount - item.amount % item.measure.step + item.measure.step).toFixed(2));    
-            }
-            if(item.amount<item.measure.min){
-                item.amount=item.measure.min;
-            }
-            item.isPopover=false;
-            item.isConvert=false;
-            item.selectedMeasure='';
-        };
-        
-        $scope.converter = function(item) {
-            item.isPopover=false;
-            $scope.measuresList=[];
-            item.selectedMeasure='';
-            item.measure.converter.forEach(function(measure, i, arr) {
-                var value=0;
-                if(measure.rate===0){
-                    value=1;
-                }
-                else {
-                    value=Number((item.amount * measure.rate).toFixed(2));
-                }
-                if(item.amount<item.measure.min){
-                    item.amount=item.measure.min;
-                }
-                    $scope.measuresList.push(
-                        {
-                            id: measure.id,
-                            value: value,
-                            caption: value + ' ' + measure.caption,
-                        }
-                    );
-            });
-            item.isConvert=true;
-        };
-        
-    //Steps
-        
-        $scope.stepData = [];
-
-        $scope.treeSteps = {
-            dropped : function (e) {
-                $scope.stepData.forEach(function(item, i, arr) {
-                    item.index = i;
-                });  
-            }
-        };
-        
-        $scope.newStep = function () {
-            $scope.stepData.push(
-                {
-                    'index': $scope.stepData.length,
-                    action: $scope.actionStep,
-                    device: 'device',
-                    duration: 'duration'
-                    //CHANGES image: ''
-                }
-            );   
-            $scope.actionStep='';
-        };
-
-        $scope.removeStep = function (node) {
-            $scope.stepData.splice(node.step.index,1);
-            $scope.stepData.forEach(function(item, i, arr) {
-                item.index = i;
-            });    
-        };
-        
-    // Create new Recipe
-        $scope.create = function(isValid) {
-            $scope.error = null;
-
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'recipeForm');
-                return false;
-            }
-
-            // Create new Recipe object
-
-            var recipe = new Recipes(
-                {
-                    title: this.title,
-                    infoCard: this.infoCard,
-                    //CHANGES image: this.image,
-                    protions: this.portions,
-                    content: this.content,
-                    steps: this.stepData,
-                    ingridients: $scope.ingridientData
-                }
-            );
-
-            // Redirect after save
-            recipe.$save(function(response) {
-                $location.path('recipes/' + response.id);
-
-            // Clear form fields
-                $scope.title = '';
-                $scope.content = '';
-                $scope.stepData = [];
-                $scope.ingridientData = [];
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-
-    // Update existing Recipe
-        $scope.update = function(isValid) {
-            $scope.error = null;
-
-            if (!isValid) {
-                $scope.$broadcast('show-errors-check-validity', 'recipeForm');
-                return false;
-            }
-
-            var recipe = $scope.recipe;
-            recipe.ingridients=$scope.ingridientData;
-            recipe.steps=$scope.stepData;
-            recipe.$update(function() {
-                $location.path('recipes/' + recipe.id);
-            }, function(errorResponse) {
-                $scope.error = errorResponse.data.message;
-            });
-        };
-        
-        // Remove existing Recipe
-        $scope.remove = function(recipe) {
-            if (recipe) {
-                recipe.$remove();
-                $location.path('recipes');
-            } else {
-                $scope.recipe.$remove(function() {
-                    $location.path('recipes');
-                });
-            }
-        };
-
-    }    
-]);
+}
 /**
  * angular-strap
  * @version v2.3.8 - 2016-03-31

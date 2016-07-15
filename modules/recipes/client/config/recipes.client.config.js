@@ -6,15 +6,15 @@ angular
     .run(['Menus', function (Menus) {
         
         Menus.addMenuItem('topbar', {
-            title: 'Recipes',
-            state: 'recipes',
-            type: 'dropdown',
+            title: 'Книга рецептов',
+            state: 'recipes.list',
+            type: 'button',
             roles: ['*']
         });
-        Menus.addSubMenuItem('topbar', 'recipes', {
+       /* Menus.addSubMenuItem('topbar', 'recipes', {
             title: 'List Recipes',
             state: 'recipes.list'
-        });
+        });*/
         /*Menus.addSubMenuItem('topbar', 'recipes', {
             title: 'Create Recipes',
             state: 'recipes.create',
@@ -22,42 +22,42 @@ angular
         }); */
         
         Menus.addMenuItem('topbar', {
-            title: 'Ingridients',
+            title: 'Ингредиенты',
             state: 'ingridients',
             type: 'dropdown',
             roles: ['user']
         });
         Menus.addSubMenuItem('topbar', 'ingridients', {
-            title: 'List Ingridients',
+            title: 'Справочник',
             state: 'ingridients.list',
             roles: ['user']
         });
         Menus.addSubMenuItem('topbar', 'ingridients', {
-            title: 'Create Ingridient',
+            title: 'Добавить ингредиент',
             state: 'ingridients.create',
             roles: ['user']
         });
         
         Menus.addMenuItem('topbar', {
-            title: 'Shelf',
+            title: '(В разработке) Продукты',
             state: 'shelf',
             type: 'dropdown',
             roles: ['user']
         });
         Menus.addSubMenuItem('topbar', 'shelf', {
-            title: 'Brouse Shelf',
+            title: 'Холодильник',
             state: 'shelf.list',
             roles: ['user']
         });
         
         Menus.addMenuItem('topbar', {
-            title: 'Menus',
+            title: 'Меню',
             state: 'menu',
             type: 'dropdown',
             roles: ['user']
         });
         Menus.addSubMenuItem('topbar', 'menu', {
-            title: 'Brouse Menu',
+            title: '(В разработке) Текущее меню',
             state: 'menu.list',
             roles: ['user']
         });
