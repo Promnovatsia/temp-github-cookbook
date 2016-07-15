@@ -1,7 +1,7 @@
 <section ng-controller="RecipesController">
     <div class="page-header">
         <h1>
-            New Recipe
+            Новый рецепт
         </h1>
     </div>
     <div class="col-md-12">
@@ -9,26 +9,29 @@
             <fieldset>
                 <div class="form-group" show-errors>
                     <label for="title">
-                        Title
+                        Название
                     </label>
-                    <input name="title" type="text" ng-model="title" id="title" class="form-control" placeholder="Title" required>
+                    <input name="title" type="text" ng-model="title" id="title" class="form-control" required
+                        placeholder="Исчерпывающий заголовок рецепта до 250 символов" >
                     <div ng-messages="recipeForm.title.$error" role="alert">
                         <p class="help-block error-text" ng-message="required">
-                            Recipe title is required.
+                            Название рецепта обязательно
                         </p>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="infoCard">
-                        infoCard
+                        Пояснение и описание
                     </label>
-                    <textarea name="infoCard" ng-model="infoCard" id="infoCard" class="form-control" cols="30" rows="10" placeholder="infoCard"></textarea>
+                    <textarea name="infoCard" ng-model="infoCard" id="infoCard" class="form-control" cols="30" rows="10" 
+                        placeholder="Информация, видимая в списке рецептов рядом с картинкой рецепта">
+                    </textarea>
                 </div>
 <!-- TODO картинка рецепта -->
                 <div class="row">
                     <div class="form-group col-md-2">
                         <label for="portions">
-                            Portions
+                            Количество порций
                         </label>
                         <div class="input-group">
                             <span class="input-group-addon" ng-hide="portions == 1 || portionsEdit">
@@ -39,7 +42,8 @@
                             <a class="btn btn-default btn-block" ng-click="portionsEdit = true" ng-hide="portionsEdit">
                                 {{portions}}
                             </a>
-                            <input class="form-control" type="number" ng-model="portions" placeholder="Amount" ng-show="portionsEdit">
+                            <input class="form-control" type="number" ng-model="portions" ng-show="portionsEdit"
+                                placeholder="Количество" >
                             <span class="input-group-addon" ng-show="portionsEdit">
                                 <a class="btn btn-link btn-xs" data-nodrag ng-click="portionsEdit = false">
                                     <span class="glyphicon glyphicon-random"></span>
@@ -55,14 +59,16 @@
                     <div class="form-group col-md-1"></div>
                     <div class="form-group col-md-8">
                         <label for="content" ng-show="ingridientData.length > 0">
-                            Main ingridient
+                            Главный ингредиент
                         </label>
-                        <input bs-select class="form-control" type="text" ng-model="mainIngridient" bs-options="obj.index as obj.caption for obj in ingridientData" placeholder="Choose ingridient" ng-show="ingridientData.length > 0">
+                        <input type="text" class="form-control" ng-show="ingridientData.length > 0" ng-model="mainIngridient" bs-select bs-options="obj.index as obj.caption for obj in ingridientData" 
+                            placeholder="Выберите главный ингредиент рецепта"
+                        >
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="ingridients">
-                        Ingridients
+                        Ингредиенты
                     </label>
                     <div class="col-md-12">
                         <table ui-tree="treeIngridients" id="tree-root-ingridient" class="table table-responsive" data-drag-delay="100">
@@ -70,12 +76,12 @@
                                 <tr>
                                     <th>
                                         <label for="ingridientIndex" ng-show="ingridientData.length>0">
-                                            Sort
+                                            Порядок
                                         </label>
                                     </th>
                                     <th width="60%">
                                         <label for="tree-root-ingridient" ng-show="ingridientData.length>0">
-                                            Ingridients
+                                            Количество
                                         </label>
                                     </th>
                                 </tr>
@@ -91,8 +97,7 @@
                                             <div class="col-md-7">
                                                 {{ingridient.caption}}
                                                 <div class="input-group">
-                                                    <span class="btn btn-link btn-xs" ng-show="ingridient.infoCard" 
-                                                          ng-click="ingridient.info = !ingridient.info">
+                                                    <span class="btn btn-link btn-xs" ng-show="ingridient.infoCard" ng-click="ingridient.info = !ingridient.info">
                                                         <span class="glyphicon glyphicon-text-background"></span>
                                                     </span>
                                                     <span ng-if="ingridient.image" ng-show="ingridient.info">
@@ -125,17 +130,13 @@
                                                         </a>
                                                     </span>
                                                     <span ng-show="ingridient.isPopover">
-                                                        <input class="form-control" type="number" 
-                                                               ng-model="ingridient.amount" 
-                                                               placeholder="Amount" 
+                                                        <input class="form-control" type="number" ng-model="ingridient.amount" 
+                                                               placeholder="Количество" 
                                                         >
                                                     </span>
                                                     <span ng-show="ingridient.isConvert && ingridient.selectedMeasure==''">
-                                                        <input type="text" class="form-control" 
-                                                            ng-model="ingridient.selectedMeasure"
-                                                            bs-options="obj.caption as obj.caption for obj in measuresList"
-                                                            placeholder="Choose conversion"
-                                                            bs-select 
+                                                        <input type="text" class="form-control" ng-model="ingridient.selectedMeasure" bs-select bs-options="obj.caption as obj.caption for obj in measuresList"
+                                                            placeholder="Выберите вариант"
                                                         > 
                                                     </span>
                                                     <span class="input-group-addon" ng-show="ingridient.isPopover || (ingridient.isConvert  && ingridient.selectedMeasure!='')">
@@ -165,12 +166,8 @@
                                                         </a>
                                                     </span>
                                                     <span ng-show="ingridient.isPopover || (ingridient.isConvert  && ingridient.selectedMeasure!='')">
-                                                        <input type="text" class="form-control"
-                                                            ng-model="ingridient.selectedMeasure"
-                                                            bs-options="obj.caption as obj.caption for obj in measuresList"
-                                                            placeholder="Choose conversion"
-                                                            ng-show="ingridient.isConvert"
-                                                            bs-select
+                                                        <input type="text" class="form-control" ng-show="ingridient.isConvert" ng-model="ingridient.selectedMeasure" bs-select bs-options="obj.caption as obj.caption for obj in measuresList"
+                                                            placeholder="Выберите вариант" 
                                                         > 
                                                     </span>
                                                     <span class="input-group-addon" ng-show="ingridient.isPopover || (ingridient.isConvert  && ingridient.selectedMeasure!='')">
@@ -194,13 +191,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input type="text" class="form-control"
-                                ng-model="selectedIngridient"
-                                data-animation="am-flip-x"
-                                bs-options="obj.id as obj.caption for obj in getIngridientList()"
-                                placeholder="Add ingridient"
-                                select-mode="true"
-                                bs-typeahead
+                            <input type="text" class="form-control" ng-model="selectedIngridient" bs-typeahead select-mode="true" bs-options="obj.id as obj.caption for obj in getIngridientList()"
+                                placeholder="Поиск ингредиента для добавления"
                             >
                             <span class="input-group-addon" ng-click="newIngridient(selectedIngridient)">
                                 <span class="glyphicon glyphicon-plus"></span>
@@ -210,7 +202,7 @@
                 </div>
                 <div class="form-group">
                     <label for="steps">
-                        Steps
+                        Инструкции
                     </label>
                     <div class="col-md-12">
                         <table ui-tree="treeSteps" id="tree-root-step" class="table table-responsive">
@@ -218,12 +210,12 @@
                                 <tr>
                                     <th>
                                         <label for="stepIndex" ng-show="stepData.length>0">
-                                            Sort
+                                            Порядок
                                         </label>
                                     </th>
                                     <th width="80%">
                                         <label for="stepData" ng-show="stepData.length>0">
-                                            Steps
+                                            Действие
                                         </label>
                                     </th>
                                 </tr>
@@ -237,7 +229,9 @@
 <!-- TODO картинка шага -->
                                     <td>
                                         <div class="form-group">
-                                            <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" placeholder="Action"></textarea>
+                                            <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" 
+                                                placeholder="Опишите действие на текущем шаге">
+                                            </textarea>
                                         </div>
                                     </td>
                                     <td>
@@ -251,11 +245,9 @@
                     </div>
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input type="text" class="form-control"
-                                    ng-model="actionStep"
-                                    data-animation="am-flip-x"
-                                    placeholder="Enter new step here or press plus"
-                                >
+                            <input type="text" class="form-control" ng-model="actionStep"
+                                placeholder="Введите новое действие и нажмите +"
+                            >
                             <span class="input-group-addon" ng-click="newStep()">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </span> 
@@ -264,9 +256,11 @@
                 </div>               
                 <div class="form-group">
                     <label for="content">
-                        Content
+                        Примечания
                     </label>
-                    <textarea name="content" ng-model="content" id="content" class="form-control" cols="30" rows="10" placeholder="Content"></textarea>
+                    <textarea name="content" ng-model="content" id="content" class="form-control" cols="30" rows="10"
+                        placeholder="Это дополнительная информация, показывающаяся после рецепта. Здесь можно описать какие ингредиенты можно добавить или заменить">
+                    </textarea>
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-default">
