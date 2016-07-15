@@ -10,13 +10,13 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     $scope.authentication = Authentication;
 
     $scope.find = function () {
-        $scope.ingridients = Ingridients.query();
+        $scope.shelves = Shelf.query();
     };
 
     $scope.findOne = function () {
-        $scope.ingridient = Ingridients.get(
+        $scope.shelf = Shelf.get(
             {
-                ingridientId: $stateParams.ingridientId
+                shelfId: $stateParams.shelfId
             }
         );
     };
@@ -35,18 +35,13 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
 
         // Create new Shelf object
 
-        var shelf = new Ingridients(
-            {
-                caption: this.caption,
-                infoCard: this.infoCard,
-                image: $scope.imageURL,
-                measureDefault: $scope.measureDefault
-            }
+        var shelf = new Shelf(
+            {}
         );
 
         // Redirect after save
         shelf.$save(function (response) {
-            $location.path('ingridients/' + response.id);
+            $location.path('shelf/' + response.id);
 
         // Clear form fields
             $scope.caption = '';
@@ -63,22 +58,22 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             return false;
         }
 
-        var ingridient = $scope.ingridient;
-        ingridient.image = $scope.imageURL;
-        ingridient.$update(function () {
-            $location.path('ingridients/' + ingridient.id);
+        var shelf = $scope.shelf;
+        shelf.image = $scope.imageURL;
+        shelf.$update(function () {
+            $location.path('shelf/' + shelf.id);
         }, function (errorResponse) {
             $scope.error = errorResponse.data.message;
         });
     };
 
-    $scope.remove = function (ingridient) {
-        if (ingridient) {
-            ingridient.$remove();
-            $location.path('ingridients');
+    $scope.remove = function (shelf) {
+        if (shelf) {
+            shelf.$remove();
+            $location.path('shelf');
         } else {
-            $scope.ingridient.$remove(function () {
-                $location.path('ingridient');
+            $scope.shelf.$remove(function () {
+                $location.path('shelf');
             });
         }
     };
