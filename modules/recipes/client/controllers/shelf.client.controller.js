@@ -1,13 +1,16 @@
 'use strict';
 
-// Recipes controller
 angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'Ingridients', 'Measures', 'Shelf'];
-function ShelfController($scope, $stateParams, $location, $window, Authentication, Ingridients, Measures, Shelf) {
 
-    $scope.authentication = Authentication;
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'Ingridients', 'Measures', 'Shelf'];
+
+function ShelfController($scope, $stateParams, $location, $window, Authentication, Ingridients, Measures, shelf) {
+
+    var vm = this;
+    vm.shelf = shelf;
+    vm.authentication = Authentication;
 
     $scope.find = function () {
         $scope.shelves = Shelf.query();

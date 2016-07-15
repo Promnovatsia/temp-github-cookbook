@@ -162,5 +162,18 @@ angular
                 data: {
                     roles: ['user']
                 }
+            })
+            .state('shelf.create', {
+                url: '/create',
+                templateUrl: 'modules/recipes/client/views/shelf/shelf-list.client.view.html',
+                controller: 'ArticlesController',
+                controllerAs: 'vm',
+                resolve: {
+                  articleResolve: newArticle
+                },
+                data: {
+                  roles: ['user', 'admin'],
+                  pageTitle: 'Articles Create'
+                }
             });
     }]);
