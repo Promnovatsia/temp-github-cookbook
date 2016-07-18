@@ -1,0 +1,88 @@
+<section ng-controller="ShelfController" ng-init="findOne()">
+    <div class="page-header">
+        <h1>
+            {{shelf.id ? 'Edit Shelf' : 'New Shelf'}} {{shelf.id}} {{shelf}}
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <form name="shelfForm" class="form-horizontal" ng-submit="save(shelfForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group" show-errors>
+                    <!--<label for="override">
+                        TODO override    
+                    </label>-->
+                    <!-- //TODO override UI-->
+                    <!-- <label for="fallback">
+                        TODO fallback    
+                    </label>-->
+                    <!-- //TODO fallback UI-->
+                    <!--<label for="stored">
+                        TODO stored    
+                    </label>-->
+                    <!-- //TODO stored UI-->   
+                    <!--<label for="desired">
+                        TODO desired    
+                    </label>-->
+                    <!-- //TODO desired UI-->        
+                    <!-- <label for="max">
+                        TODO max    
+                    </label>-->
+                    <!-- //TODO max UI-->              
+                    <!--<label for="deficit">
+                        TODO deficit    
+                    </label>-->
+                    <!-- //TODO deficit UI-->                 
+                    <!-- <label for="spoilOpenedAt">
+                        TODO spoilOpenedAt    
+                    </label>-->
+                    <!-- //TODO spoilOpenedAt UI-->                  
+                    <!-- <label for="spoilSealedAt">
+                        TODO spoilSealedAt    
+                    </label>-->
+                    <!-- //TODO spoilSealedAt UI-->                   
+                    <!--<label for="unsealedAt">
+                        TODO unsealedAt    
+                    </label>-->
+                    <!-- //TODO unsealedAt UI-->                    
+                    <!--<label for="isSpoiled">
+                        TODO isSpoiled    
+                    </label>-->
+                    <!-- //TODO isSpoiled UI-->                 
+                    <!--<label for="isSealed">
+                        TODO isSealed    
+                    </label>-->
+                    <!-- //TODO isSealed UI-->   
+                    <!--<label for="place">
+                        TODO place    
+                    </label>-->
+                    <!-- //TODO place UI-->  
+                    <!-- //TODO ingridient UI-->
+                    <!-- //TODO measure UI-->
+                    <!-- //TODO shelfQuery UI-->
+                    
+                    <label class="control-label" for="title">
+                        Title {{valid}}
+                    </label>
+                    <input name="title" type="text" ng-model="shelf.title" id="title" class="form-control" placeholder="Title" required>
+                    <div ng-messages="shelfForm.title.$error" role="alert">
+                        <p class="help-block error-text" ng-message="required">
+                            Article title is required.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="content">
+                        Content
+                    </label>
+                    <textarea name="content" data-ng-model="shelf.content" id="content" class="form-control" cols="30" rows="10" placeholder="Content"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Update' : 'Create'}}">
+                </div>
+                <div ng-show="error" class="text-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>

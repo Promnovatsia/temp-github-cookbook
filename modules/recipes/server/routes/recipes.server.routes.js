@@ -72,12 +72,19 @@ module.exports = function(app) {
     ;
     app.route('/api/menu/:menuId')
         .all(recipesPolicy.isAllowed)
-        .get(menus.create)
+        .get(menus.create) //FIXME post
     ;
+    //FUTURE доступ к меню по неделям /api/menu/week/:weekId
     
-    app.route('api/shelf/:shelfId')
+    app.route('/api/shelf')
         .all(recipesPolicy.isAllowed)
         .get(shelf.list)
+        .post(shelf.create)
+    ;
+    app.route('/api/shelf/:shelfId')
+        .all(recipesPolicy.isAllowed)
+        .get(shelf.read)
+        .put(shelf.update)
     ;
 
     // Finish by binding the recipe middleware

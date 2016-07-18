@@ -4,81 +4,63 @@ angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
 
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'Ingridients', 'Measures', 'Shelf'];
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService'];
 
-function ShelfController($scope, $stateParams, $location, $window, Authentication, Ingridients, Measures, shelf) {
+function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService) {
 
-    var vm = this;
-    vm.shelf = shelf;
-    vm.authentication = Authentication;
-
+    $scope.authentication = Authentication;
+    $scope.error = null;
+    
     $scope.find = function () {
-        $scope.shelves = Shelf.query();
+        $scope.shelves = ShelfService.query();
     };
-
+    
     $scope.findOne = function () {
-        $scope.shelf = Shelf.get(
-            {
-                shelfId: $stateParams.shelfId
-            }
-        );
-    };
-
-    $scope.getMeasuresList = function () {
-        return Measures.query().$promise;
-    };
-
-    $scope.create = function (isValid) {
-        $scope.error = null;
-
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
-            return false;
-        }
-
-        // Create new Shelf object
-
-        var shelf = new Shelf(
-            {}
-        );
-
-        // Redirect after save
-        shelf.$save(function (response) {
-            $location.path('shelf/' + response.id);
-
-        // Clear form fields
-            $scope.caption = '';
-            $scope.infoCard = '';
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
-    };
-
-    $scope.update = function (isValid) {
-        $scope.error = null;
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
-            return false;
-        }
-
-        var shelf = $scope.shelf;
-        shelf.image = $scope.imageURL;
-        shelf.$update(function () {
-            $location.path('shelf/' + shelf.id);
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
-    };
-
-    $scope.remove = function (shelf) {
-        if (shelf) {
-            shelf.$remove();
-            $location.path('shelf');
+        console.log($stateParams);
+        if ($stateParams.shelfId) {
+            $scope.shelf = ShelfService.get(
+                {
+                    shelfId: $stateParams.shelfId
+                }
+            );    
         } else {
-            $scope.shelf.$remove(function () {
-                $location.path('shelf');
-            });
+            $scope.shelf = new ShelfService(
+                {
+                    stored: 1,
+                    desired: 2,
+                    max: 3,
+                    deficit: 0
+                }
+            );     
+        }
+    };
+    
+    $scope.remove = function () {
+        if ($window.confirm('Are you sure you want to delete?')) {
+            $scope.shelf.$remove();
+            $location.path('shelf');    
         }
     };
 
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'shelfForm');
+            return false;
+        }
+        console.log("save");
+        $scope.shelf.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+
+        function successCallback(res) {
+            console.log("success");
+            $location.path('shelf/' + $scope.shelf.id);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
 }

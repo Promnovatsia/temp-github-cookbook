@@ -17,13 +17,14 @@ module.exports = function (sequelize, DataTypes) {
                 key: "id"
             }
         },
+        /* FUTURE product integration
         product: {
             type: DataTypes.INTEGER,
             references: {
                 model: "products",
                 key: "id"
             }
-        },
+        },*/
         stored: {
             type: DataTypes.FLOAT
         },

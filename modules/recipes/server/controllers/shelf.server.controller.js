@@ -7,21 +7,21 @@ var path = require('path'),
     async = require('async'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-    Menu = db.menu,
+    Shelf = db.shelf,
     Ingridient = db.ingridient
     ;
 
 exports.create = function(req, res) {
 
-    req.body.userId = req.user.id;
+    //req.body.userId = req.user.id;
     
-    Menu.create(req.body).then(function(menu) {
-        if (!menu) {
+    Shelf.create(req.body).then(function(shelf) {
+        if (!shelf) {
             return res.send('users/signup', {
-                errors: 'Could not create the menu'
+                errors: 'Could not create the shelf'
             });
         } else {
-            return res.json(menu);
+            return res.json(shelf);
         }
     }).catch(function(err) {
         return res.status(400).send({
@@ -31,22 +31,19 @@ exports.create = function(req, res) {
 };
 
 exports.read = function(req, res) {
-    res.json(req.menu);
+    res.json(req.shelf);
 };
 
 exports.update = function(req, res) {
     
-    Menu.findById(req.body.id).then(function(menu) {
-        if (menu) {
-            menu.update(
+    Shelf.findById(req.body.id).then(function(shelf) {
+        if (shelf) {
+            shelf.update(
                 {
-                    week: req.body.week,
-                    types: req.body.types,
-                    weekDayMask: req.body.weekDayMask,
-                    isDone: req.body.isDone
+                    
                 }
             ).then(function() {
-                return res.json(menu);
+                return res.json(shelf);
             }).catch(function(err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
@@ -54,7 +51,7 @@ exports.update = function(req, res) {
             });
         } else {
             return res.status(400).send({
-                message: 'Unable to find the menu'
+                message: 'Unable to find the shelf'
             });
         }
     }).catch(function(err) {
@@ -65,15 +62,15 @@ exports.update = function(req, res) {
 };    
 
 exports.list = function(req, res) {
-    Menu.findAll(
+    Shelf.findAll(
         {}
-    ).then(function(menus) {
-        if (!menus) {
+    ).then(function(shelves) {
+        if (!shelves) {
             return res.status(404).send({
-                message: 'No menus found'
+                message: 'No shelves found'
             });
         } else {
-            return res.json(menus);
+            return res.json(shelves);
         }
     }).catch(function(err) {
         res.jsonp(err);
@@ -84,23 +81,23 @@ exports.shelfByID = function(req, res, next, id) {
 
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
-            message: 'Menu is invalid'
+            message: 'Shelf is invalid'
         });
     }
   
-    Menu.findOne(
+    Shelf.findOne(
         {
             where: {
                 id: id
             }
         }
-    ).then(function(menu) {
-        if (!menu) {
+    ).then(function(shelf) {
+        if (!shelf) {
             return res.status(404).send({
-                message: 'No menu with that identifier has been found'
+                message: 'No shelf with that identifier has been found'
             });
         } else {
-            req.menu = menu;
+            req.shelf = shelf;
             next();
             return null;
         }

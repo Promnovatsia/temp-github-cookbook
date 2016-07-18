@@ -65,7 +65,7 @@ exports.invokeRolesPolicies = function() {
                     resources: '/api/shelf',
                     permissions: '*'
                 }, {
-                    resources: '/api/shelf/:shelf',
+                    resources: '/api/shelf/:shelfId',
                     permissions: '*'
                 }
             ]
@@ -113,6 +113,13 @@ exports.invokeRolesPolicies = function() {
                 }, {
                     resources: '/api/ingridients/:ingridientId',
                     permissions: ['get']
+                }, 
+                {   //FIXME in production delete these
+                    resources: '/api/shelf',
+                    permissions: '*'
+                }, {
+                    resources: '/api/shelf/:shelfId',
+                    permissions: '*'
                 }
             ]
         }
