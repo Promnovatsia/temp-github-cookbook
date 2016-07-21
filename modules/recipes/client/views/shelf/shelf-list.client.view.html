@@ -4,13 +4,39 @@
             Shelf
         </h1>
     </div>
+    <uib-progress>
+        <uib-bar value="20" type="danger">
+            <span style="color:white; white-space:nowrap;"> 
+                Deficit
+            </span>
+        </uib-bar>
+        <uib-bar value="30" type="warning">
+            <span style="color:white; white-space:nowrap;"> 
+                Less then desired
+            </span>
+        </uib-bar>
+        <uib-bar value="30" type="success">
+            <span style="color:white; white-space:nowrap;"> 
+                Desired
+            </span>
+        </uib-bar>
+        <uib-bar value="20" type="info">
+            <span style="color:white; white-space:nowrap;"> 
+                Abundance
+            </span>
+        </uib-bar>
+    </uib-progress> 
     <div class="list-group">
         <a ng-repeat="shelf in shelves" ui-sref="shelf.view({ shelfId: shelf.id })" class="list-group-item">
             <h4 class="list-group-item-heading" ng-bind="shelf.stored"></h4>
-            <p class="list-group-item-text" ng-bind="shelf.max"></p>
+            <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+                <span style="color:white; white-space:nowrap;"> 
+                    {{shelf.progressbar.text}}
+                </span>
+            </progressbar>
         </a>
     </div>
-    <div class="alert alert-warning text-center" ng-if="!shelves.length">
+    <div class="alert alert-warning text-center" ><!-- //FIXME ng-if="!shelves.length"-->
         No shelves yet, why don't you <a ui-sref="shelf.create">create one</a>?
     </div>
 </section>

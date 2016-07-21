@@ -1,13 +1,13 @@
 <section ng-controller="ShelfController" ng-init="findOne()">
     <div class="page-header">
         <h1>
-            {{shelf.id ? 'Edit Shelf' : 'New Shelf'}} {{shelf.id}} {{shelf}}
+            {{shelf.id ? 'Edit Shelf' : 'New Shelf'}} {{shelf.id}}
         </h1>
     </div>
     <div class="col-md-12">
         <form name="shelfForm" class="form-horizontal" ng-submit="save(shelfForm.$valid)" novalidate>
             <fieldset>
-                <div class="form-group" show-errors>
+                <div class="form-group">
                     <!--<label for="override">
                         TODO override    
                     </label>-->
@@ -16,37 +16,84 @@
                         TODO fallback    
                     </label>-->
                     <!-- //TODO fallback UI-->
-                    <!--<label for="stored">
-                        TODO stored    
-                    </label>-->
-                    <!-- //TODO stored UI-->   
-                    <!--<label for="desired">
-                        TODO desired    
-                    </label>-->
-                    <!-- //TODO desired UI-->        
-                    <!-- <label for="max">
-                        TODO max    
-                    </label>-->
-                    <!-- //TODO max UI-->              
-                    <!--<label for="deficit">
-                        TODO deficit    
-                    </label>-->
-                    <!-- //TODO deficit UI-->                 
-                    <!-- <label for="spoilOpenedAt">
-                        TODO spoilOpenedAt    
-                    </label>-->
-                    <!-- //TODO spoilOpenedAt UI-->                  
-                    <!-- <label for="spoilSealedAt">
-                        TODO spoilSealedAt    
-                    </label>-->
-                    <!-- //TODO spoilSealedAt UI-->                   
-                    <!--<label for="unsealedAt">
-                        TODO unsealedAt    
-                    </label>-->
-                    <!-- //TODO unsealedAt UI-->                    
-                    <!--<label for="isSpoiled">
-                        TODO isSpoiled    
-                    </label>-->
+                    <pre>
+                        {{shelf | json}} <!--FIXME remove json shelf on delevopment-->
+                    </pre>
+                    
+                    <label for="stored">
+                        Stored    
+                    </label>
+                    <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+                        <span style="color:white; white-space:nowrap;"> 
+                            {{shelf.progressbar.text}}
+                        </span>
+                    </progressbar>
+                    <uib-progress>
+                        <uib-bar value="20" type="danger">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Deficit
+                            </span>
+                        </uib-bar>
+                        <uib-bar value="30" type="warning">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Less then desired
+                            </span>
+                        </uib-bar>
+                        <uib-bar value="30" type="success">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Desired
+                            </span>
+                        </uib-bar>
+                        <uib-bar value="20" type="info">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Abundance
+                            </span>
+                        </uib-bar>
+                    </uib-progress>  
+                    
+                    <label for="deficit">
+                        Deficit amount    
+                    </label>
+                    <input name="deficit" type="number" ng-model="shelf.deficit" class="form-control">
+                    
+                    <label for="desired">
+                        Desired amount    
+                    </label>
+                    <input name="desired" type="number" ng-model="shelf.desired" class="form-control">
+                    
+                    <label for="max">
+                        Max amount    
+                    </label>
+                    <input name="max" type="number" ng-model="shelf.max" class="form-control">
+                    
+                    <label for="stored">
+                        STORED     
+                    </label>
+                    <input name="stored" type="number" ng-model="shelf.stored" class="form-control">
+                    
+                    <button ng-click="shelf.stored = shelf.stored +1; progressUpdate(shelf)">sto+1</button>
+                    <button ng-click="shelf.stored = shelf.stored -1; progressUpdate(shelf)">sto-1</button>
+                    
+                    <label for="spoilOpenedAt">
+                        spoilOpenedAt    
+                    </label>
+                    <input type="date" class="form-control" ng-model="shelf.spoilOpenedAt"/>
+                                      
+                    <label for="spoilSealedAt">
+                        spoilSealedAt    
+                    </label>
+                    <input type="date" class="form-control" ng-model="shelf.spoilSealedAt"/>
+                    
+                    <label for="unsealedAt">
+                        unsealedAt
+                    </label>
+                    <input type="date" class="form-control" ng-model="shelf.unsealedAt"/>                    
+                    
+                    <label for="isSpoiled">
+                        isSpoiled
+                    </label> 
+                    <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">Well</label>
+                    <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">Spoiled!</label>
                     <!-- //TODO isSpoiled UI-->                 
                     <!--<label for="isSealed">
                         TODO isSealed    
@@ -58,8 +105,9 @@
                     <!-- //TODO place UI-->  
                     <!-- //TODO ingridient UI-->
                     <!-- //TODO measure UI-->
-                    <!-- //TODO shelfQuery UI-->
-                    
+                    <!-- //TODO shelfQuery UI-->    
+                </div>
+                <div class="form-group" show-errors>
                     <label class="control-label" for="title">
                         Title {{valid}}
                     </label>
