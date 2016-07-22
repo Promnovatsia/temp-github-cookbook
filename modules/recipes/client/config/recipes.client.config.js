@@ -39,13 +39,13 @@ angular
         });
         
         Menus.addMenuItem('topbar', {
-            title: '(В разработке) Продукты',
+            title: 'Хранилище',
             state: 'shelf',
             type: 'dropdown',
             roles: ['user']
         });
         Menus.addSubMenuItem('topbar', 'shelf', {
-            title: 'Холодильник',
+            title: 'Полки',
             state: 'shelf.list',
             roles: ['user']
         });

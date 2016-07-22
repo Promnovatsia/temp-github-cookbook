@@ -3,19 +3,40 @@
 module.exports = function (sequelize, DataTypes) {
     
     var ShelfQuery = sequelize.define('shelfQuery', {
-        requested: {
-            type: DataTypes.FLOAT
-        },
-        recieved: {
-            type: DataTypes.FLOAT
-        },
-        comment: {
-            type: DataTypes.TEXT
-        },
-        isDelivered: {
+        isClosed: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
+        },
+        itemCaption: {
+            type: DataTypes.STRING
+        },
+        buy: {
+            type: DataTypes.FLOAT
+        },
+        bought: {
+            type: DataTypes.FLOAT
+        },
+        buyDate: {
+            type: DataTypes.DATE
+        },
+        use: {
+            type: DataTypes.FLOAT
+        },
+        used: {
+            type: DataTypes.FLOAT
+        },
+        useDate: {
+            type: DataTypes.DATE
+        },
+        spoil: {
+            type: DataTypes.FLOAT
+        },
+        spoilDate: {
+            type: DataTypes.DATE
+        },
+        comment: {
+            type: DataTypes.TEXT
         },
         menu: {
             type: DataTypes.INTEGER,
@@ -23,13 +44,7 @@ module.exports = function (sequelize, DataTypes) {
                 model: "menus",
                 key: "id"
             }
-        },
-        EAN: {
-            type: DataTypes.STRING
-        },
-        itemCaption: {
-            type: DataTypes.STRING
-        }
+        } 
     }, {
         paranoid: true,
         createdAt: false,
