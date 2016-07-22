@@ -3,6 +3,33 @@
 module.exports = function (sequelize, DataTypes) {
 
     var Shelf = sequelize.define('shelf', {
+        
+        caption: {
+            type: DataTypes.STRING        
+        },
+        measureCaption: {
+            type: DataTypes.STRING        
+        },
+        stored: {
+            type: DataTypes.FLOAT
+        },
+        desired: {
+            type: DataTypes.FLOAT
+        },
+        max: {
+            type: DataTypes.FLOAT
+        },
+        deficit: {
+            type: DataTypes.FLOAT
+        },
+        isSpoiled: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        place: {
+            type: DataTypes.STRING
+        },
         override: {
             type: DataTypes.INTEGER,
             references: {
@@ -17,49 +44,17 @@ module.exports = function (sequelize, DataTypes) {
                 key: "id"
             }
         },
+        /* FUTURE product integration
         product: {
             type: DataTypes.INTEGER,
             references: {
                 model: "products",
                 key: "id"
             }
-        },
-        stored: {
-            type: DataTypes.FLOAT
-        },
-        desired: {
-            type: DataTypes.FLOAT
-        },
-        max: {
-            type: DataTypes.FLOAT
-        },
-        deficit: {
-            type: DataTypes.FLOAT
-        },
-        spoilOpenedAt: {
-            type: DataTypes.DATE
-        },
-        spoilSealedAt: {
-            type: DataTypes.DATE
-        },
-        unsealedAt: {
-            type: DataTypes.DATE
-        },
-        isSpoiled: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        isSealed: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        place: {
-            type: DataTypes.STRING
-        }
+        },*/
     }, {
         timestamps: true,
+        createdAt: false,
         paranoid: true,
         associate: function (models) {
             Shelf.belongsTo(models.user);

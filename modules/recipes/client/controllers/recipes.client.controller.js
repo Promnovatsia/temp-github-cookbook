@@ -242,6 +242,7 @@ function RecipesController($scope, $stateParams, $location, Authentication, Reci
                 infoCard: this.infoCard,
                 //CHANGES image: this.image,
                 protions: this.portions,
+                //FIXME typo 'protions' -> 'portions'
                 content: this.content,
                 steps: this.stepData,
                 ingridients: $scope.ingridientData

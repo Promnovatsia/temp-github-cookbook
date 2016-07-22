@@ -1,0 +1,134 @@
+<section ng-controller="ShelfController" ng-init="findOne()">
+    <div class="page-header">
+        <h1>
+            {{shelf.id ? 'Edit Shelf' : 'New Shelf'}}
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <form name="shelfForm" class="form-horizontal" ng-submit="save(shelfForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    
+                    <pre>
+                        {{shelf | json}} <!--FIXME remove json shelf on delevopment-->
+                    </pre>
+                    
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                ng-model="selectedIngridient"
+                                data-animation="am-flip-x"
+                                bs-options="obj.id as obj.caption for obj in getIngridientList()"
+                                placeholder="Set ingridient"
+                                select-mode="true"
+                                bs-typeahead
+                            >
+                            <span class="input-group-addon" ng-click="setIngridient(selectedIngridient)">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </span> 
+                        </div> 
+                    </div>
+                    
+                    <pre>
+                        {{info | json}}
+                    </pre>
+                    
+                    <label for="stored">
+                        Stored    
+                    </label>
+                    <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+                        <span style="color:white; white-space:nowrap;"> 
+                            {{shelf.progressbar.text}}
+                        </span>
+                    </progressbar>
+                    <uib-progress>
+                        <uib-bar value="20" type="danger">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Дефицит
+                            </span>
+                        </uib-bar>
+                        <uib-bar value="30" type="warning">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Недостаточно
+                            </span>
+                        </uib-bar>
+                        <uib-bar value="30" type="success">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Достаточно
+                            </span>
+                        </uib-bar>
+                        <uib-bar value="20" type="info">
+                            <span style="color:white; white-space:nowrap;"> 
+                                Избыток
+                            </span>
+                        </uib-bar>
+                    </uib-progress>  
+                    
+                    <label for="deficit">
+                        Deficit amount    
+                    </label>
+                    <input name="deficit" type="number" ng-model="shelf.deficit" class="form-control">
+                    
+                    <label for="desired">
+                        Desired amount    
+                    </label>
+                    <input name="desired" type="number" ng-model="shelf.desired" class="form-control">
+                    
+                    <label for="max">
+                        Max amount    
+                    </label>
+                    <input name="max" type="number" ng-model="shelf.max" class="form-control">
+                    
+                    <label for="stored">
+                        STORED     
+                    </label>
+                    <input name="stored" type="number" ng-model="shelf.stored" class="form-control">
+                    
+                    <button ng-click="shelf.stored = shelf.stored +1; progressUpdate(shelf)">sto+1</button>
+                    <button ng-click="shelf.stored = shelf.stored -1; progressUpdate(shelf)">sto-1</button>
+                    
+                    <!--<label for="override">
+                        TODO override    
+                    </label>-->
+                    <!-- //TODO override UI-->
+                    <!-- <label for="fallback">
+                        TODO fallback    
+                    </label>-->
+                    <!-- //TODO fallback UI-->
+                    
+                    <label for="isSpoiled">
+                        isSpoiled
+                    </label> 
+                    <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">Well</label>
+                    <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">Spoiled!</label>                
+                    
+                    <!-- //TODO place UI-->  
+                    <!-- //TODO shelfQuery UI-->    
+                </div>
+                <div class="form-group" show-errors>
+                    <label class="control-label" for="title">
+                        Title {{valid}}
+                    </label>
+                    <input name="title" type="text" ng-model="shelf.title" id="title" class="form-control" placeholder="Title" required>
+                    <div ng-messages="shelfForm.title.$error" role="alert">
+                        <p class="help-block error-text" ng-message="required">
+                            Article title is required.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="content">
+                        Content
+                    </label>
+                    <textarea name="content" data-ng-model="shelf.content" id="content" class="form-control" cols="30" rows="10" placeholder="Content"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Update' : 'Create'}}">
+                </div>
+                <div ng-show="error" class="text-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>

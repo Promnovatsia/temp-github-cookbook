@@ -1,0 +1,49 @@
+<section ng-controller="ShelfController" ng-init="findOne()">
+    <div class="page-header">
+        <h1>
+            Просмотр полки: {{info.caption}}
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <label for="stored">
+            Хранится: {{info.measure}}    
+        </label>
+        <uib-progress>
+            <uib-bar value="20" type="danger">
+                <span style="color:white; white-space:nowrap;"> 
+                    Дефицит
+                </span>
+            </uib-bar>
+            <uib-bar value="30" type="warning">
+                <span style="color:white; white-space:nowrap;"> 
+                    Недостаточно
+                </span>
+            </uib-bar>
+            <uib-bar value="30" type="success">
+                <span style="color:white; white-space:nowrap;"> 
+                    Достаточно
+                </span>
+            </uib-bar>
+            <uib-bar value="20" type="info">
+                <span style="color:white; white-space:nowrap;"> 
+                    Избыток
+                </span>
+            </uib-bar>
+        </uib-progress>
+        <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+            <span style="color:white; white-space:nowrap;"> 
+                {{shelf.progressbar.text}}
+            </span>
+        </progressbar>
+        <div class="row">
+            <div class="col-md-2">
+                <span ng-if="info.image">
+                    <img ng-src="{{imageurl}}{{info.image}}" class="img-thumbnail user-profile-picture">
+                </span>
+            </div>
+            <div class="col-md-6">
+                <p class="lead" ng-bind="info.card"></p>
+            </div>
+        </div>
+    </div>
+</section>
