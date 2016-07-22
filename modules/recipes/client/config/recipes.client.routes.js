@@ -180,7 +180,7 @@ function routeConfig($stateProvider) {
         })
         .state('shelf.view', {
             url: '/:shelfId',
-            templateUrl: 'modules/recipes/client/views/shelf/shelf-form.client.view.html',
+            templateUrl: 'modules/recipes/client/views/shelf/shelf-read.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }

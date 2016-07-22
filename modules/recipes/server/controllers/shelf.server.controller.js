@@ -7,13 +7,11 @@ var path = require('path'),
     async = require('async'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-    Shelf = db.shelf,
-    Ingridient = db.ingridient
-    ;
+    Shelf = db.shelf;
 
 exports.create = function(req, res) {
 
-    //req.body.userId = req.user.id;
+    req.body.userId = req.user.id;
     
     Shelf.create(req.body).then(function(shelf) {
         if (!shelf) {
@@ -31,24 +29,23 @@ exports.create = function(req, res) {
 };
 
 exports.read = function(req, res) {
-    res.json(req.shelf);
+    var shelf = req.shelf;
+    shelf.isCurrentUserOwner = !!(req.user && shelf.userId && shelf.userId === req.user.id);
+    res.json(shelf);
 };
 
 exports.update = function(req, res) {
     
     Shelf.findById(req.body.id).then(function(shelf) {
         if (shelf) {
-            shelf.update(
-                {
-                    
-                }
-            ).then(function() {
+            shelf.update(req.body).then(function(shelf) {
                 return res.json(shelf);
             }).catch(function(err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
                 });
             });
+        return null;
         } else {
             return res.status(400).send({
                 message: 'Unable to find the shelf'

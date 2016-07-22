@@ -1,23 +1,36 @@
 <section ng-controller="ShelfController" ng-init="findOne()">
     <div class="page-header">
         <h1>
-            {{shelf.id ? 'Edit Shelf' : 'New Shelf'}} {{shelf.id}}
+            {{shelf.id ? 'Edit Shelf' : 'New Shelf'}}
         </h1>
     </div>
     <div class="col-md-12">
         <form name="shelfForm" class="form-horizontal" ng-submit="save(shelfForm.$valid)" novalidate>
             <fieldset>
                 <div class="form-group">
-                    <!--<label for="override">
-                        TODO override    
-                    </label>-->
-                    <!-- //TODO override UI-->
-                    <!-- <label for="fallback">
-                        TODO fallback    
-                    </label>-->
-                    <!-- //TODO fallback UI-->
+                    
                     <pre>
                         {{shelf | json}} <!--FIXME remove json shelf on delevopment-->
+                    </pre>
+                    
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                ng-model="selectedIngridient"
+                                data-animation="am-flip-x"
+                                bs-options="obj.id as obj.caption for obj in getIngridientList()"
+                                placeholder="Set ingridient"
+                                select-mode="true"
+                                bs-typeahead
+                            >
+                            <span class="input-group-addon" ng-click="setIngridient(selectedIngridient)">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </span> 
+                        </div> 
+                    </div>
+                    
+                    <pre>
+                        {{info | json}}
                     </pre>
                     
                     <label for="stored">
@@ -31,22 +44,22 @@
                     <uib-progress>
                         <uib-bar value="20" type="danger">
                             <span style="color:white; white-space:nowrap;"> 
-                                Deficit
+                                Дефицит
                             </span>
                         </uib-bar>
                         <uib-bar value="30" type="warning">
                             <span style="color:white; white-space:nowrap;"> 
-                                Less then desired
+                                Недостаточно
                             </span>
                         </uib-bar>
                         <uib-bar value="30" type="success">
                             <span style="color:white; white-space:nowrap;"> 
-                                Desired
+                                Достаточно
                             </span>
                         </uib-bar>
                         <uib-bar value="20" type="info">
                             <span style="color:white; white-space:nowrap;"> 
-                                Abundance
+                                Избыток
                             </span>
                         </uib-bar>
                     </uib-progress>  
@@ -74,37 +87,22 @@
                     <button ng-click="shelf.stored = shelf.stored +1; progressUpdate(shelf)">sto+1</button>
                     <button ng-click="shelf.stored = shelf.stored -1; progressUpdate(shelf)">sto-1</button>
                     
-                    <label for="spoilOpenedAt">
-                        spoilOpenedAt    
-                    </label>
-                    <input type="date" class="form-control" ng-model="shelf.spoilOpenedAt"/>
-                                      
-                    <label for="spoilSealedAt">
-                        spoilSealedAt    
-                    </label>
-                    <input type="date" class="form-control" ng-model="shelf.spoilSealedAt"/>
-                    
-                    <label for="unsealedAt">
-                        unsealedAt
-                    </label>
-                    <input type="date" class="form-control" ng-model="shelf.unsealedAt"/>                    
+                    <!--<label for="override">
+                        TODO override    
+                    </label>-->
+                    <!-- //TODO override UI-->
+                    <!-- <label for="fallback">
+                        TODO fallback    
+                    </label>-->
+                    <!-- //TODO fallback UI-->
                     
                     <label for="isSpoiled">
                         isSpoiled
                     </label> 
                     <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">Well</label>
-                    <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">Spoiled!</label>
-                    <!-- //TODO isSpoiled UI-->                 
-                    <!--<label for="isSealed">
-                        TODO isSealed    
-                    </label>-->
-                    <!-- //TODO isSealed UI-->   
-                    <!--<label for="place">
-                        TODO place    
-                    </label>-->
+                    <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">Spoiled!</label>                
+                    
                     <!-- //TODO place UI-->  
-                    <!-- //TODO ingridient UI-->
-                    <!-- //TODO measure UI-->
                     <!-- //TODO shelfQuery UI-->    
                 </div>
                 <div class="form-group" show-errors>
