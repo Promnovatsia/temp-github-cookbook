@@ -4,43 +4,7 @@
             Просмотр полки: {{info.caption}}
         </h1>
     </div>
-    <div class="col-md-12">
-        <label for="stored">
-            Хранится: {{info.measure}}    
-        </label>
-        <uib-progress>
-            <uib-bar value="10" type="default">
-                <span style="color:white; white-space:nowrap;"> 
-                    Пусто
-                </span>
-            </uib-bar>
-            <uib-bar value="10" type="danger">
-                <span style="color:white; white-space:nowrap;"> 
-                    Дефицит
-                </span>
-            </uib-bar>
-            <uib-bar value="30" type="warning">
-                <span style="color:white; white-space:nowrap;"> 
-                    Недостаточно
-                </span>
-            </uib-bar>
-            <uib-bar value="30" type="success">
-                <span style="color:white; white-space:nowrap;"> 
-                    Достаточно
-                </span>
-            </uib-bar>
-            <uib-bar value="20" type="info">
-                <span style="color:white; white-space:nowrap;"> 
-                    Избыток
-                </span>
-            </uib-bar>
-        </uib-progress>
-        <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
-            <span style="color:white; white-space:nowrap;"> 
-                {{shelf.progressbar.text}}
-            </span>
-        </progressbar>
-        <div class="row">
+    <div class="row">
             <div class="col-md-2">
                 <span ng-if="info.image">
                     <img ng-src="{{imageurl}}{{info.image}}" class="img-thumbnail user-profile-picture">
@@ -50,5 +14,58 @@
                 <p class="lead" ng-bind="info.card"></p>
             </div>
         </div>
+    <hr/>
+    <div class="row">
+        <div class="col-md-2">
+            <label for="stored">
+                Единица измерения: {{info.measure}}    
+            </label>    
+        </div>
+        <div class="col-md-8">
+            <uib-progress ng-show="legend">
+                <uib-bar value="10" type="default">
+                    <span style="color:white; white-space:nowrap;"> 
+                        Пусто
+                    </span>
+                </uib-bar>
+                <uib-bar value="10" type="danger">
+                    <span style="color:white; white-space:nowrap;"> 
+                        Дефицит
+                    </span>
+                </uib-bar>
+                <uib-bar value="30" type="warning">
+                    <span style="color:white; white-space:nowrap;"> 
+                        Недостаточно
+                    </span>
+                </uib-bar>
+                <uib-bar value="30" type="success">
+                    <span style="color:white; white-space:nowrap;"> 
+                        Достаточно
+                    </span>
+                </uib-bar>
+                <uib-bar value="20" type="info">
+                    <span style="color:white; white-space:nowrap;"> 
+                        Избыток
+                    </span>
+                </uib-bar>
+            </uib-progress>
+            <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+                <span style="color:white; white-space:nowrap;"> 
+                    {{shelf.progressbar.text}}
+                </span>
+            </progressbar>    
+        </div>
+        <div class="col-md-2">
+            <div class="btn-group">
+                <label class="btn btn-link" ng-click="legend = !legend">
+                    <snap class="glyphicon glyphicon-info-sign"></snap>
+                </label>
+                <label class="btn btn-link" ui-sref="shelf.edit({ shelfId: shelf.id })">
+                    <snap class="glyphicon glyphicon-cog"></snap>
+                </label>
+            </div>    
+        </div>  
     </div>
+    
+    
 </section>

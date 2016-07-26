@@ -26,6 +26,8 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     $scope.authentication = Authentication;
     $scope.error = null;
     $scope.info = {};
+    
+    $scope.legend = false;
     $scope.selectedIngridient = "";
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
     
@@ -108,6 +110,12 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     
     $scope.setIngridient = function (id) {
         
+        if(!id){
+            $scope.shelf.ingridientId = null;
+            $scope.info = {};
+            return;
+        }
+        
         Ingridients.get(
             {
                 ingridientId: id
@@ -144,7 +152,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         if (shelf.stored <= 0) { // 0%
             shelf.progressbar = {
                 type: 'default',
-                text: "Пусто",
+                text: shelf.stored,
                 value: pbLimitEmpty
             };    
         } else if (shelf.stored <= shelf.deficit) {
@@ -205,8 +213,10 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.clearSpoiled = function () {
-            
+    //TODO clearSpoiled        
     }
+    
+    $scope.settingsUpdate = {};
     
     $scope.remove = function () {
         if ($window.confirm('Are you sure you want to delete?')) {
