@@ -16,12 +16,22 @@
         </div>
     <hr/>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="stored">
                 Единица измерения: {{info.measure}}    
-            </label>    
+            </label>
+            <hr>
+            <label for="place" ng-show="shelf.place">
+                Место хранения: {{shelf.place}}
+            </label>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-7">
+            <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+                <span style="color:white; white-space:nowrap;"> 
+                    {{shelf.progressbar.text}}
+                </span>
+            </progressbar>
+            <hr>
             <uib-progress ng-show="legend">
                 <uib-bar value="10" type="default">
                     <span style="color:white; white-space:nowrap;"> 
@@ -49,11 +59,17 @@
                     </span>
                 </uib-bar>
             </uib-progress>
-            <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
-                <span style="color:white; white-space:nowrap;"> 
-                    {{shelf.progressbar.text}}
-                </span>
-            </progressbar>    
+            <div ng-show="legend">
+                <label for="deficit">
+                    Порог дефицита: {{shelf.deficit}} {{info.measure}}     
+                </label>
+                <label for="desired">
+                    Порог достаточности: {{shelf.desired}} {{info.measure}}    
+                </label>
+                <label for="max">
+                    Порог избытка: {{shelf.max}} {{info.measure}}    
+                </label>
+            </div>
         </div>
         <div class="col-md-2">
             <div class="btn-group">
@@ -66,6 +82,7 @@
             </div>    
         </div>  
     </div>
+    <hr>
     
     
 </section>

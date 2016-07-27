@@ -26,6 +26,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     $scope.authentication = Authentication;
     $scope.error = null;
     $scope.info = {};
+    $scope.form = {};
     
     $scope.legend = false;
     $scope.selectedIngridient = "";
@@ -92,7 +93,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             $scope.filterBar.desired = true;
             $scope.filterBar.max = true;
         }
-    }
+    };
     
     $scope.filterByProgress = function (item){
         return false ||
@@ -132,7 +133,11 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                     measureId: ingridient.measureDefault
                 }
             ).$promise.then(function (measure) {
-                $scope.info.measure = measure.caption;    
+                $scope.info.measure = measure.caption;
+                $scope.info.step = measure.step;
+                $scope.info.min = measure.min;
+                
+                $scope.settingsLoad();
             });
         });
     };
@@ -214,9 +219,112 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     
     $scope.clearSpoiled = function () {
     //TODO clearSpoiled        
-    }
+    };
     
-    $scope.settingsUpdate = {};
+    $scope.settingsLoad = function () {
+        
+        $scope.form.deficit = {
+            alert: false,
+            input: false,
+            value: $scope.shelf.deficit
+        };
+        $scope.form.desired = {
+            alert: false,
+            input: false,
+            value: $scope.shelf.desired
+        };
+        $scope.form.max = {
+            alert: false,
+            input: false,
+            value: $scope.shelf.max
+        };
+        
+        $scope.setDeficit(0,$scope.shelf.deficit);
+        $scope.setDesired(0,$scope.shelf.desired);
+        $scope.setMax(0,$scope.shelf.max);
+    };
+    
+    $scope.setDeficit = function (sign, value) {
+        var oldValue = $scope.shelf.deficit;
+        if (value !== 0) {
+            $scope.shelf.deficit = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelf.deficit = Number(($scope.shelf.deficit - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelf.deficit = Number(($scope.shelf.deficit + $scope.info.step).toFixed(3)); 
+        }
+        if (!$scope.settingsUpdate()){
+            $scope.shelf.deficit = oldValue;
+        } else {
+            $scope.form.deficit = {
+                alert: false,
+                input: false,
+                value: $scope.shelf.deficit
+            };
+        }
+    };
+    
+    $scope.setDesired = function (sign, value) {
+        var oldValue = $scope.shelf.desired;
+        if (value !== 0) {
+            $scope.shelf.desired = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelf.desired = Number(($scope.shelf.desired - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelf.desired = Number(($scope.shelf.desired + $scope.info.step).toFixed(3)); 
+        }
+        if (!$scope.settingsUpdate()){
+            $scope.shelf.desired = oldValue;
+        } else {
+            $scope.form.desired = {
+                alert: false,
+                input: false,
+                value: $scope.shelf.desired
+            };
+        }
+    };
+    
+    $scope.setMax = function (sign, value) {
+        var oldValue = $scope.shelf.max;
+        if (value !== 0) {
+            $scope.shelf.max = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelf.max = Number(($scope.shelf.max - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelf.max = Number(($scope.shelf.max + $scope.info.step).toFixed(3)); 
+        }
+        if (!$scope.settingsUpdate()){
+            $scope.shelf.max = oldValue;
+        } else {
+            $scope.form.max = {
+                alert: false,
+                input: false,
+                value: $scope.shelf.max
+            };
+        }
+    };
+    
+    $scope.settingsUpdate = function () {
+        
+        $scope.form.deficit.alert = false;
+        $scope.form.desired.alert = false;
+        $scope.form.max.alert = false;
+        
+        if ($scope.shelf.deficit < $scope.info.min) {
+            $scope.form.deficit.alert = true;
+            return false;
+        }
+        if ($scope.shelf.desired <= $scope.shelf.deficit) {
+            $scope.form.desired.alert = true;
+            return false;
+        }
+        if ($scope.shelf.max <= $scope.shelf.desired) {
+            $scope.form.max.alert = true;
+            return false;
+        }
+        $scope.progressUpdate($scope.shelf);
+        return true;
+    };
     
     $scope.remove = function () {
         if ($window.confirm('Are you sure you want to delete?')) {
