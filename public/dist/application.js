@@ -1112,7 +1112,23 @@ function routeConfig($stateProvider) {
             data: {
                 roles: ['user', 'admin']
             }
-        });
+        })
+    
+        .state('shelf.query', {
+            url: '/:shelfId/query',
+            templateUrl: 'modules/recipes/client/views/shelf/shelf-queries.client.view.html',
+            data: {
+                roles: ['user', 'admin']
+            }
+        })
+        .state('shelf.queryEdit', {
+            url: '/:shelfId/query/:queryId',
+            templateUrl: 'modules/recipes/client/views/shelf/shelf-query-edit.client.view.html',
+            data: {
+                roles: ['user', 'admin']
+            }
+        })
+    ;
 }
 'use strict';
 
@@ -1897,11 +1913,11 @@ angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
 
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'Ingridients', 'Measures'];
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'Ingridients', 'Measures'];
 
-function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, Ingridients, Measures) {
+function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, Ingridients, Measures) {
 
-    // const values in percent of bar
+    // progress bar settings
     const pbLimitEmpty = 10;
     const pbLimitDeficit = 20;
     const pbLengthDeficit = 20;
@@ -1911,16 +1927,18 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     const pbLenghtMax = 30;
     const pbMultyMax = 5;
     
+    // spoil button style settings
     const btnInactive = "btn btn-default";
     const btnGood = "btn btn-success";
     const btnBad = "btn btn-danger";
         
-    
     $scope.authentication = Authentication;
     $scope.error = null;
     $scope.info = {};
+    $scope.form = {};
+    
+    $scope.legend = false;
     $scope.selectedIngridient = "";
-    $scope.filterIndex = "";
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
     
     $scope.find = function () {
@@ -1955,35 +1973,62 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 }
             );
             $scope.spoilUpdate($scope.shelf.isSpoiled);
-        }
-        
+        } 
     };
     
-    $scope.filterByProgress = function (){
+    $scope.findForShelf = function () {
+        ShelfQueryService.query(
+            {
+                shelfId: $stateParams.shelfId
+            }
+        ).$promise.then(function (shelfQueries) {
+            $scope.shelfQueries = shelfQueries;
+            ShelfService.get(
+                {
+                    shelfId: $stateParams.shelfId
+                }
+            ).$promise.then(function (shelf) {
+                $scope.shelf = shelf;
+            });
+        });
+    };
+    
+    $scope.filterBar = {
+        spoiled: true,
+        empty: true,
+        deficit: true,
+        lsdesired: true,
+        desired: true,
+        max: true
+    };
+    
+    $scope.filterBarToggle = function () {
         
-        var lowerBound, upperBound;
-        if ($scope.filterIndex === 'empty') {
-            lowerBound = 0; //0%
-            upperBound = pbLimitEmpty;    
-        } else if ($scope.filterIndex === 'deficit') {
-            lowerBound = pbLimitEmpty;
-            upperBound = pbLimitDeficit;
-        } else if ($scope.filterIndex === 'lsdesired') {
-            lowerBound = pbLimitDeficit;
-            upperBound = pbLimitDesired;
-        } else if ($scope.filterIndex === 'desired') {
-            lowerBound = pbLimitDesired;
-            upperBound = pbLimitMax;
-        } else if ($scope.filterIndex === 'max') {
-            lowerBound = pbLimitMax;
-            upperBound = 100; //100%
-        } else { //drop filter
-            lowerBound = 0;
-            upperBound = 100;
+        if ($scope.filterBar.spoiled && $scope.filterBar.empty && $scope.filterBar.deficit && $scope.filterBar.lsdesired && $scope.filterBar.desired && $scope.filterBar.max) {
+            $scope.filterBar.spoiled = false;
+            $scope.filterBar.empty = false;
+            $scope.filterBar.deficit = false;
+            $scope.filterBar.lsdesired = false;
+            $scope.filterBar.desired = false;
+            $scope.filterBar.max = false;        
+        } else {
+            $scope.filterBar.spoiled = true;
+            $scope.filterBar.empty = true;
+            $scope.filterBar.deficit = true;
+            $scope.filterBar.lsdesired = true;
+            $scope.filterBar.desired = true;
+            $scope.filterBar.max = true;
         }
-        return function (item){
-            return (item.value >= lowerBound) && (item.value < upperBound);
-        };
+    };
+    
+    $scope.filterByProgress = function (item){
+        return false ||
+            ($scope.filterBar.spoiled && item.isSpoiled) ||
+            ($scope.filterBar.empty && !item.isSpoiled && item.progressbar.value <= pbLimitEmpty) ||
+            ($scope.filterBar.deficit && item.progressbar.value > pbLimitEmpty && item.progressbar.value <= pbLimitDeficit) ||
+            ($scope.filterBar.lsdesired && item.progressbar.value > pbLimitDeficit && item.progressbar.value <= pbLimitDesired) ||
+            ($scope.filterBar.desired && item.progressbar.value > pbLimitDesired && item.progressbar.value <= pbLimitMax) ||
+            ($scope.filterBar.max && item.progressbar.value > pbLimitMax && item.progressbar.value <= 100);
     };
     
     $scope.getIngridientList = function () {
@@ -1991,6 +2036,12 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.setIngridient = function (id) {
+        
+        if(!id){
+            $scope.shelf.ingridientId = null;
+            $scope.info = {};
+            return;
+        }
         
         Ingridients.get(
             {
@@ -2008,19 +2059,22 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                     measureId: ingridient.measureDefault
                 }
             ).$promise.then(function (measure) {
-                $scope.info.measure = measure.caption;    
+                $scope.info.measure = measure.caption;
+                $scope.info.step = measure.step;
+                $scope.info.min = measure.min;
+                
+                $scope.settingsLoad();
             });
         });
     };
     
     $scope.progressUpdate = function (shelf) {
         
-        
-        
         if(shelf.isSpoiled) {
             shelf.progressbar = {
                 type: 'danger',
-                text: "!!spoiled!!",
+                text: "Просрочено",
+                value: pbLimitEmpty,
                 class: "progress-striped active"
             };
             return;
@@ -2029,7 +2083,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         if (shelf.stored <= 0) { // 0%
             shelf.progressbar = {
                 type: 'default',
-                text: "Пусто",
+                text: shelf.stored,
                 value: pbLimitEmpty
             };    
         } else if (shelf.stored <= shelf.deficit) {
@@ -2072,8 +2126,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 shelf.progressbar.value = 100; // set to 100%
                 shelf.progressbar.class = "progress-striped active";
             }       
-        }
-               
+        }       
     };
     
     $scope.spoilUpdate = function (state) {
@@ -2090,6 +2143,115 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         $scope.progressUpdate($scope.shelf); 
     };
     
+    $scope.clearSpoiled = function () {
+    //TODO clearSpoiled        
+    };
+    
+    $scope.settingsLoad = function () {
+        
+        $scope.form.deficit = {
+            alert: false,
+            input: false,
+            value: $scope.shelf.deficit
+        };
+        $scope.form.desired = {
+            alert: false,
+            input: false,
+            value: $scope.shelf.desired
+        };
+        $scope.form.max = {
+            alert: false,
+            input: false,
+            value: $scope.shelf.max
+        };
+        
+        $scope.setDeficit(0,$scope.shelf.deficit);
+        $scope.setDesired(0,$scope.shelf.desired);
+        $scope.setMax(0,$scope.shelf.max);
+    };
+    
+    $scope.setDeficit = function (sign, value) {
+        var oldValue = $scope.shelf.deficit;
+        if (value !== 0) {
+            $scope.shelf.deficit = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelf.deficit = Number(($scope.shelf.deficit - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelf.deficit = Number(($scope.shelf.deficit + $scope.info.step).toFixed(3)); 
+        }
+        if (!$scope.settingsUpdate()){
+            $scope.shelf.deficit = oldValue;
+        } else {
+            $scope.form.deficit = {
+                alert: false,
+                input: false,
+                value: $scope.shelf.deficit
+            };
+        }
+    };
+    
+    $scope.setDesired = function (sign, value) {
+        var oldValue = $scope.shelf.desired;
+        if (value !== 0) {
+            $scope.shelf.desired = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelf.desired = Number(($scope.shelf.desired - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelf.desired = Number(($scope.shelf.desired + $scope.info.step).toFixed(3)); 
+        }
+        if (!$scope.settingsUpdate()){
+            $scope.shelf.desired = oldValue;
+        } else {
+            $scope.form.desired = {
+                alert: false,
+                input: false,
+                value: $scope.shelf.desired
+            };
+        }
+    };
+    
+    $scope.setMax = function (sign, value) {
+        var oldValue = $scope.shelf.max;
+        if (value !== 0) {
+            $scope.shelf.max = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelf.max = Number(($scope.shelf.max - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelf.max = Number(($scope.shelf.max + $scope.info.step).toFixed(3)); 
+        }
+        if (!$scope.settingsUpdate()){
+            $scope.shelf.max = oldValue;
+        } else {
+            $scope.form.max = {
+                alert: false,
+                input: false,
+                value: $scope.shelf.max
+            };
+        }
+    };
+    
+    $scope.settingsUpdate = function () {
+        
+        $scope.form.deficit.alert = false;
+        $scope.form.desired.alert = false;
+        $scope.form.max.alert = false;
+        
+        if ($scope.shelf.deficit < $scope.info.min) {
+            $scope.form.deficit.alert = true;
+            return false;
+        }
+        if ($scope.shelf.desired <= $scope.shelf.deficit) {
+            $scope.form.desired.alert = true;
+            return false;
+        }
+        if ($scope.shelf.max <= $scope.shelf.desired) {
+            $scope.form.max.alert = true;
+            return false;
+        }
+        $scope.progressUpdate($scope.shelf);
+        return true;
+    };
+    
     $scope.remove = function () {
         if ($window.confirm('Are you sure you want to delete?')) {
             $scope.shelf.$remove();
@@ -2103,6 +2265,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             $scope.$broadcast('show-errors-check-validity', 'shelfForm');
             return false;
         }
+        
         $scope.shelf.caption = $scope.info.caption;
         $scope.shelf.measureCaption = $scope.info.measure;
         $scope.shelf.createOrUpdate()
@@ -2111,6 +2274,216 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
 
         function successCallback(res) {
             $location.path('shelf/' + $scope.shelf.id);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+}
+'use strict';
+
+angular
+    .module('recipes')
+    .controller('ShelfQueryController', ShelfQueryController);
+
+ShelfQueryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfQueryService', 'Ingridients', 'Measures'];
+
+function ShelfQueryController($scope, $stateParams, $location, $window, Authentication, ShelfQueryService, Ingridients, Measures) {
+        
+    $scope.authentication = Authentication;
+    $scope.error = null;
+    $scope.info = {};
+    $scope.form = {};
+
+    $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
+    
+    $scope.find = function () {
+        ShelfQueryService.query().$promise.then(function (shelfQueries) {
+            /*shelfQueries.forEach(function (shelfQuery, i, arr) {
+                $scope.progressUpdate(shelf);    
+            });*/
+            $scope.shelfQueries = shelfQueries;
+        });
+    };
+    
+    $scope.findOne = function () {
+        if ($stateParams.shelfId && $stateParams.queryId) {
+            ShelfQueryService.get(
+                {
+                    shelfId: $stateParams.shelfId,
+                    queryId: $stateParams.queryId
+                }
+            ).$promise.then(function (shelfQuery) {
+                Measures.get(
+                    {
+                        measureId: shelfQuery.measureId
+                    }
+                ).$promise.then(function (measure) {
+                    $scope.info.measure = measure.caption;
+                    $scope.info.step = measure.step;
+                    $scope.info.min = measure.min;
+                });
+                $scope.shelfQuery = shelfQuery;
+                $scope.settingsLoad();
+            });    
+        } else {
+            //TODO new query from other then shelf    
+        } 
+    };
+    
+    $scope.settingsLoad = function () {
+        
+        $scope.form.buy = {
+            alert: false,
+            input: false,
+            value: $scope.shelfQuery.buy
+        };
+        $scope.form.bought = {
+            alert: false,
+            input: false,
+            value: $scope.shelfQuery.bought
+        };
+        $scope.form.use = {
+            alert: false,
+            input: false,
+            value: $scope.shelfQuery.use
+        };
+        $scope.form.used = {
+            alert: false,
+            input: false,
+            value: $scope.shelfQuery.used
+        };
+        $scope.form.spoil = {
+            alert: false,
+            input: false,
+            value: $scope.shelfQuery.spoil
+        };
+        
+    };
+    
+    $scope.setBuy = function (sign, value) {
+        var oldValue = $scope.shelfQuery.buy;
+        if (value !== 0) {
+            $scope.shelfQuery.buy = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelfQuery.buy = Number(($scope.shelfQuery.buy - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelfQuery.buy = Number(($scope.shelfQuery.buy + $scope.info.step).toFixed(3)); 
+        }
+        if (1!==1){
+            $scope.shelfQuery.buy = oldValue;
+        } else {
+            $scope.form.buy = {
+                alert: false,
+                input: false,
+                value: $scope.shelfQuery.buy
+            };
+        }
+    };
+    
+    $scope.setBought = function (sign, value) {
+        var oldValue = $scope.shelfQuery.bought;
+        if (value !== 0) {
+            $scope.shelfQuery.bought = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelfQuery.bought = Number(($scope.shelfQuery.bought - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelfQuery.bought = Number(($scope.shelfQuery.bought + $scope.info.step).toFixed(3)); 
+        }
+        if (1!==1){
+            $scope.shelfQuery.bought = oldValue;
+        } else {
+            $scope.form.bought = {
+                alert: false,
+                input: false,
+                value: $scope.shelfQuery.bought
+            };
+        }
+    };
+    
+    $scope.setUse = function (sign, value) {
+        var oldValue = $scope.shelfQuery.use;
+        if (value !== 0) {
+            $scope.shelfQuery.use = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelfQuery.use = Number(($scope.shelfQuery.use - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelfQuery.use = Number(($scope.shelfQuery.use + $scope.info.step).toFixed(3)); 
+        }
+        if (1!==1){
+            $scope.shelfQuery.use = oldValue;
+        } else {
+            $scope.form.use = {
+                alert: false,
+                input: false,
+                value: $scope.shelfQuery.use
+            };
+        }
+    };
+    
+    $scope.setUsed = function (sign, value) {
+        var oldValue = $scope.shelfQuery.used;
+        if (value !== 0) {
+            $scope.shelfQuery.used = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelfQuery.used = Number(($scope.shelfQuery.used - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelfQuery.used = Number(($scope.shelfQuery.used + $scope.info.step).toFixed(3)); 
+        }
+        if (1!==1){
+            $scope.shelfQuery.used = oldValue;
+        } else {
+            $scope.form.used = {
+                alert: false,
+                input: false,
+                value: $scope.shelfQuery.used
+            };
+        }
+    };
+    
+    $scope.setSpoil = function (sign, value) {
+        var oldValue = $scope.shelfQuery.spoil;
+        if (value !== 0) {
+            $scope.shelfQuery.spoil = Number((value).toFixed(3));
+        } else if (sign < 0) {
+            $scope.shelfQuery.spoil = Number(($scope.shelfQuery.spoil - $scope.info.step).toFixed(3));    
+        } else {
+            $scope.shelfQuery.spoil = Number(($scope.shelfQuery.spoil + $scope.info.step).toFixed(3)); 
+        }
+        if (1!==1){
+            $scope.shelfQuery.spoil = oldValue;
+        } else {
+            $scope.form.spoil = {
+                alert: false,
+                input: false,
+                value: $scope.shelfQuery.spoil
+            };
+        }
+    };
+    
+    $scope.remove = function () {
+        if ($window.confirm('Are you sure you want to delete?')) {
+            $scope.shelfQuery.$remove();
+            $location.path('shelfQuery');    
+        }
+    };
+
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'shelfQueryForm');
+            return false;
+        }
+        
+        /*console.log($scope.shelfQuery);
+        $scope.shelfQuery.id = $scope.shelfQuery.number; */
+        $scope.shelfQuery.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('shelf/' + $scope.shelfQuery.shelfId + '/query');
         }
 
         function errorCallback(res) {
@@ -10188,6 +10561,58 @@ function ShelfService($resource) {
     }
     
     function onSuccess(shelf) {
+        // Any required internal processing from inside the service, goes here.    
+    }
+    
+    // Handle error response
+    function onError(errorResponse) {
+        var error = errorResponse.data;
+        // Handle error internally
+        handleError(error);
+    }
+
+    function handleError(error) {
+        // Log error
+        console.log(error);
+    }
+}
+'use strict';
+
+//Shelf service used for communicating with the shelf REST endpoints
+angular
+    .module('recipes')
+    .factory('ShelfQueryService', ShelfQueryService);
+
+ShelfQueryService.$inject = ['$resource'];
+
+function ShelfQueryService($resource) {
+    var ShelfQuery = $resource('api/shelf/:shelfId/query/:queryId', {
+        shelfId: '@shelfId',
+        queryId: '@number'
+    }, {
+        update: {
+            method: 'PUT'
+        }
+    });
+    
+    angular.extend(ShelfQuery.prototype, {
+        createOrUpdate: function () {
+            var shelfQuery = this;
+            return createOrUpdate(shelfQuery);
+        }
+    });
+    
+    return ShelfQuery;
+    
+    function createOrUpdate(shelfQuery) {
+        if (shelfQuery.id) {
+            return shelfQuery.$update(onSuccess, onError);
+        } else {
+            return shelfQuery.$save(onSuccess, onError);
+        }
+    }
+    
+    function onSuccess(shelfQuery) {
         // Any required internal processing from inside the service, goes here.    
     }
     
