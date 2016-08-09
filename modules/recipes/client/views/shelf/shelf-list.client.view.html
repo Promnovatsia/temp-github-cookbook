@@ -49,7 +49,7 @@
                     <p class="list-group-item-heading" ng-bind="shelf.measureCaption"></p>
                 </div>
                 <a ui-sref="shelf.view({ shelfId: shelf.id })">
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
                             <span style="color:white; white-space:nowrap;"> 
                                 {{shelf.progressbar.text}}
@@ -57,10 +57,13 @@
                         </progressbar>
                     </div>
                 </a>
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <div class="btn-group">
                         <label class="btn btn-link" ui-sref="shelf.edit({ shelfId: shelf.id })">
                             <snap class="glyphicon glyphicon-cog"></snap>
+                        </label>
+                        <label class="btn btn-link" ui-sref="shelf.query({ shelfId: shelf.id })">
+                            <snap class="glyphicon glyphicon-shopping-cart"></snap>
                         </label>
                     </div>    
                 </div>

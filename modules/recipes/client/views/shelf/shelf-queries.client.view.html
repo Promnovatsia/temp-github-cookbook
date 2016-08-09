@@ -1,0 +1,41 @@
+<section ng-controller="ShelfController" ng-init="findForShelf()">
+    <div class="page-header">
+        <h1>
+            Запросы по полке {{shelf.caption}}
+        </h1>
+    </div>
+    
+    <div class="list-group">
+        <div ng-repeat="query in shelfQueries" class="list-group-item">
+            <div class="row">
+                <div class="col-md-1">
+                    <h4 class="list-group-item-heading" ng-bind="query.number"></h4>
+                </div>
+                <div class="col-md-2">
+                    <div ng-show="query.isClosed">
+                        <snap class="glyphicon glyphicon-ok-circle"></snap>
+                        Выполнен
+                    </div>
+                    <div ng-hide="query.isClosed">
+                        <snap class="glyphicon glyphicon-record"></snap>
+                        В процессе
+                    </div>
+                </div>
+                <a ui-sref="shelf.queryEdit({ shelfId: query.shelfId, queryId: query.number })"><!--//TODO shelf number-->
+                    <div class="col-md-3">
+                        <snap class="glyphicon glyphicon-shopping-cart"></snap>
+                        {{query.buy}} / {{query.bought}} @ {{buyDate}}
+                    </div>
+                    <div class="col-md-3">
+                        <snap class="glyphicon glyphicon-cutlery"></snap>
+                        {{query.use}} / {{query.used}} @ {{useDate}}
+                    </div>
+                    <div class="col-md-3">
+                        <snap class="glyphicon glyphicon-trash"></snap>
+                        {{query.spoil}} @ {{spoilDate}}
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

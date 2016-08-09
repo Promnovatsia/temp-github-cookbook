@@ -1,5 +1,4 @@
 'use strict';
-//FUTURE shelf feature
 /**
  * Module dependencies.
  */
@@ -12,7 +11,8 @@ var path = require('path'),
 
 exports.create = function(req, res) {
 
-    req.body.userId = req.user.id;
+    req.body.userId = req.user.id; 
+    req.body.shelfId = req.shelf.id;
     
     ShelfQuery.create(req.body).then(function(shelfQuery) {
         if (!shelfQuery) {
@@ -35,8 +35,15 @@ exports.read = function(req, res) {
 
 exports.update = function(req, res) {
     
-    console.log(req.body);
-    req.shelfQuery.findById(req.body.id).then(function(shelfQuery) {
+    //TODO if(!req.shelf) error
+    ShelfQuery.findOne(
+        {
+            where: { 
+                number: req.body.number,
+                shelfId: req.shelf.id //TODO change shelfId to shelfNumber and userId
+            }
+        }
+    ).then(function(shelfQuery) {
         if (shelfQuery) {
             shelfQuery.update(req.body).then(function(shelfQuery) {
                 return res.json(shelfQuery);

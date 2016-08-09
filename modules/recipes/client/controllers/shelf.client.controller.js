@@ -4,9 +4,9 @@ angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
 
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'Ingridients', 'Measures'];
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'Ingridients', 'Measures'];
 
-function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, Ingridients, Measures) {
+function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, Ingridients, Measures) {
 
     // progress bar settings
     const pbLimitEmpty = 10;
@@ -65,6 +65,23 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             );
             $scope.spoilUpdate($scope.shelf.isSpoiled);
         } 
+    };
+    
+    $scope.findForShelf = function () {
+        ShelfQueryService.query(
+            {
+                shelfId: $stateParams.shelfId
+            }
+        ).$promise.then(function (shelfQueries) {
+            $scope.shelfQueries = shelfQueries;
+            ShelfService.get(
+                {
+                    shelfId: $stateParams.shelfId
+                }
+            ).$promise.then(function (shelf) {
+                $scope.shelf = shelf;
+            });
+        });
     };
     
     $scope.filterBar = {

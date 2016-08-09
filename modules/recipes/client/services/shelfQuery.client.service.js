@@ -10,7 +10,7 @@ ShelfQueryService.$inject = ['$resource'];
 function ShelfQueryService($resource) {
     var ShelfQuery = $resource('api/shelf/:shelfId/query/:queryId', {
         shelfId: '@shelfId',
-        queryId: '@queryId'
+        queryId: '@number'
     }, {
         update: {
             method: 'PUT'

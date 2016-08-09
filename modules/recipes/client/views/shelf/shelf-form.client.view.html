@@ -56,8 +56,8 @@
                     </div><hr/>  
                     <div ng-show="info.caption" class="row">
                         <div class="col-md-2">
-                             <label for="info.measure">
-                            Измеряется в: {{info.measure}}
+                            <label for="info.measure">
+                                Измеряется в: {{info.measure}}
                             </label>
                             <br/><br/>
                             <label for="stored">
@@ -233,12 +233,10 @@
                         <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">
                             Испорченое
                         </label> 
-                    </div>               
-                    
-                    <!-- //TODO shelfQuery UI-->    
+                    </div>                   
                 </div>
                 <div class="form-group">
-                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Update' : 'Create'}}">
+                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Обновить' : 'Сохранить'}}">
                 </div>
                 <div ng-show="error" class="text-danger">
                     <strong ng-bind="error"></strong>
