@@ -36,7 +36,7 @@ exports.read = function(req, res) {
 
 exports.update = function(req, res) {
     
-    Shelf.findById(req.body.id).then(function(shelf) {
+    Shelf.findById(req.body.id).then(function(shelf) { //TODO find by number and user id
         if (shelf) {
             shelf.update(req.body).then(function(shelf) {
                 return res.json(shelf);
@@ -60,7 +60,9 @@ exports.update = function(req, res) {
 
 exports.list = function(req, res) {
     Shelf.findAll(
-        {}
+        {
+            //FIXME where usedId=req.user.id
+        }
     ).then(function(shelves) {
         if (!shelves) {
             return res.status(404).send({
@@ -86,6 +88,7 @@ exports.shelfByID = function(req, res, next, id) {
         {
             where: {
                 id: id
+                //TODO userID and shelf.number
             }
         }
     ).then(function(shelf) {
