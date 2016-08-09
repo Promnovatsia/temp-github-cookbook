@@ -184,5 +184,21 @@ function routeConfig($stateProvider) {
             data: {
                 roles: ['user', 'admin']
             }
-        });
+        })
+    
+        .state('shelf.query', {
+            url: '/:shelfId/query',
+            templateUrl: 'modules/recipes/client/views/shelf/shelf-queries.client.view.html',
+            data: {
+                roles: ['user', 'admin']
+            }
+        })
+        .state('shelf.queryEdit', {
+            url: '/:shelfId/query/:queryId',
+            templateUrl: 'modules/recipes/client/views/shelf/shelf-query-edit.client.view.html',
+            data: {
+                roles: ['user', 'admin']
+            }
+        })
+    ;
 }

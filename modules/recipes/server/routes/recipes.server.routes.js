@@ -10,7 +10,8 @@ var path = require('path'),
     measures = require(path.resolve('./modules/recipes/server/controllers/measures.server.controller')),
     products = require(path.resolve('./modules/recipes/server/controllers/products.server.controller')),
     menus = require(path.resolve('./modules/recipes/server/controllers/menus.server.controller')),
-    shelf = require(path.resolve('./modules/recipes/server/controllers/shelf.server.controller'));
+    shelf = require(path.resolve('./modules/recipes/server/controllers/shelf.server.controller')),
+    shelfQuery = require(path.resolve('./modules/recipes/server/controllers/shelfQuery.server.controller'));
 
 module.exports = function(app) {
 
@@ -86,6 +87,16 @@ module.exports = function(app) {
         .get(shelf.read)
         .put(shelf.update)
     ;
+    app.route('/api/shelf/:shelfId/query')
+        .all(recipesPolicy.isAllowed)
+        .get(shelfQuery.list)
+        .post(shelfQuery.create)
+    ;
+    app.route('/api/shelf/:shelfId/query/:queryId')
+        .all(recipesPolicy.isAllowed)
+        .get(shelfQuery.read)
+        .put(shelfQuery.update)
+    ;
 
     // Finish by binding the recipe middleware
     app.param('recipeId', recipes.recipeByID);
@@ -94,4 +105,5 @@ module.exports = function(app) {
     app.param('productId', products.productByID);
     app.param('menuId', menus.menuByID);
     app.param('shelfId', shelf.shelfByID);
+    app.param('queryId', shelfQuery.queryByID);
 };
