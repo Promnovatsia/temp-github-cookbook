@@ -3,6 +3,9 @@
 module.exports = function (sequelize, DataTypes) {
     
     var ShelfQuery = sequelize.define('shelfQuery', {
+        number: {
+            type: DataTypes.INTEGER
+        },
         isClosed: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
@@ -37,14 +40,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         comment: {
             type: DataTypes.TEXT
-        },
-        menu: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: "menus",
-                key: "id"
-            }
-        } 
+        }
     }, {
         paranoid: true,
         createdAt: false,
@@ -52,6 +48,7 @@ module.exports = function (sequelize, DataTypes) {
             ShelfQuery.belongsTo(models.user);
             ShelfQuery.belongsTo(models.measure);
             ShelfQuery.belongsTo(models.shelf);
+            ShelfQuery.belongsTo(models.menu);
         }
     });
 

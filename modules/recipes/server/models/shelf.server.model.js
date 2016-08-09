@@ -4,6 +4,9 @@ module.exports = function (sequelize, DataTypes) {
 
     var Shelf = sequelize.define('shelf', {
         
+        number: {
+            type: DataTypes.INTEGER    
+        },
         caption: {
             type: DataTypes.STRING        
         },
@@ -29,6 +32,11 @@ module.exports = function (sequelize, DataTypes) {
         },
         place: {
             type: DataTypes.STRING
+        },
+        lastQuery: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
         },
         override: {
             type: DataTypes.INTEGER,

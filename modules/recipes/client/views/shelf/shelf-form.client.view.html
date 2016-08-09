@@ -1,134 +1,242 @@
 <section ng-controller="ShelfController" ng-init="findOne()">
     <div class="page-header">
-        <h1>
-            {{shelf.id ? 'Edit Shelf' : 'New Shelf'}}
+        <h1 ng-show="shelf.id">
+            Настройка полки: {{info.caption}}
+        </h1>
+        <h1 ng-hide="shelf.id">
+            Новая полка
         </h1>
     </div>
     <div class="col-md-12">
         <form name="shelfForm" class="form-horizontal" ng-submit="save(shelfForm.$valid)" novalidate>
             <fieldset>
                 <div class="form-group">
-                    
-                    <pre>
-                        {{shelf | json}} <!--FIXME remove json shelf on delevopment-->
-                    </pre>
-                    
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input type="text" class="form-control"
-                                ng-model="selectedIngridient"
-                                data-animation="am-flip-x"
-                                bs-options="obj.id as obj.caption for obj in getIngridientList()"
-                                placeholder="Set ingridient"
-                                select-mode="true"
-                                bs-typeahead
-                            >
-                            <span class="input-group-addon" ng-click="setIngridient(selectedIngridient)">
-                                <span class="glyphicon glyphicon-ok"></span>
-                            </span> 
-                        </div> 
+                    <div class="row">
+                        <div class="col-md-8" ng-hide="info.caption">
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                    ng-model="selectedIngridient"
+                                    data-animation="am-flip-x"
+                                    bs-options="obj.id as obj.caption for obj in getIngridientList()"
+                                    placeholder="Выберите ингредиент"
+                                    select-mode="true"
+                                    bs-typeahead
+                                >
+                                <span class="input-group-addon" ng-click="setIngridient(selectedIngridient)">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                </span> 
+                            </div>
+                        </div>
+                        <div ng-show="info.caption">
+                            <div class="col-md-2">
+                                <span ng-if="info.image">
+                                    <img ng-src="{{imageurl}}{{info.image}}" class="img-thumbnail user-profile-picture">
+                                </span>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="lead" ng-bind="info.card"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="btn btn-danger" ng-click="setIngridient(false)">
+                                    <snap class="glyphicon glyphicon-remove-sign"></snap>
+                                    Отвязать ингредиент
+                                </label>
+                                <br/>
+                                <label class="btn btn-link">
+                                    <snap class="glyphicon glyphicon-transfer"></snap>
+                                    Замена для {{shelf.override}} <!-- //FUTURE override UI-->
+                                </label>
+                                <br/>
+                                <label class="btn btn-link">
+                                    <snap class="glyphicon glyphicon-transfer"></snap>
+                                    Заменимо на {{shelf.fallback}} <!-- //FUTURE fallback UI-->
+                                </label>
+                            </div>
+                        </div>
+                    </div><hr/>  
+                    <div ng-show="info.caption" class="row">
+                        <div class="col-md-2">
+                            <label for="info.measure">
+                                Измеряется в: {{info.measure}}
+                            </label>
+                            <br/><br/>
+                            <label for="stored">
+                                В наличии
+                            </label>
+                        </div>
+                        <div class="col-md-9">
+                            <uib-progress>
+                                <uib-bar value="10" type="default">
+                                    <span style="color:white; white-space:nowrap;"> 
+                                        Пусто
+                                    </span>
+                                </uib-bar>
+                                <uib-bar value="10" type="danger">
+                                    <span style="color:white; white-space:nowrap;"> 
+                                        Дефицит
+                                    </span>
+                                </uib-bar>
+                                <uib-bar value="30" type="warning">
+                                    <span style="color:white; white-space:nowrap;"> 
+                                        Недостаточно
+                                    </span>
+                                </uib-bar>
+                                <uib-bar value="30" type="success">
+                                    <span style="color:white; white-space:nowrap;"> 
+                                        Достаточно
+                                    </span>
+                                </uib-bar>
+                                <uib-bar value="20" type="info">
+                                    <span style="color:white; white-space:nowrap;"> 
+                                        Избыток
+                                    </span>
+                                </uib-bar>
+                            </uib-progress>
+                            <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+                                <span style="color:white; white-space:nowrap;"> 
+                                    {{shelf.progressbar.text}}
+                                </span>
+                            </progressbar>
+                                
+                        </div>
+                    </div><hr/>                    
+                    <div ng-show="info.caption" class="col-md-7">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="deficit">
+                                    Порог дефицита    
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <div ng-hide="form.deficit.input">
+                                    <div class="btn-group">
+                                        <label class="btn btn-default" ng-click="setDeficit(-1,0)">
+                                            <snap class="glyphicon glyphicon-minus"></snap>
+                                        </label>
+                                        <label class="btn btn-default" ng-click="form.deficit.input = true">
+                                            {{shelf.deficit}} {{info.measure}}
+                                        </label>
+                                        <label class="btn btn-default" ng-click="setDeficit(1,0)">
+                                            <snap class="glyphicon glyphicon-plus"></snap>
+                                        </label>
+                                    </div> 
+                                </div>
+                                <div ng-show="form.deficit.input">
+                                    <div class="input-group">
+                                        <label class="input-group-addon">
+                                            {{info.measure}}
+                                        </label>
+                                        <input name="deficit" type="number" ng-model="form.deficit.value" class="form-control">
+                                        <label class="input-group-addon" ng-click="setDeficit(0,form.deficit.value)">
+                                            OK
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div uib-alert ng-show="form.deficit.alert">
+                                    Порог дефицита должен быть не меньше предела единицы измерения и меньше порога достаточности
+                                </div>
+                            </div>
+                        </div><hr/>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="desired">
+                                    Порог достаточного    
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <div ng-hide="form.desired.input">
+                                    <div class="btn-group">
+                                        <label class="btn btn-default" ng-click="setDesired(-1,0)">
+                                            <snap class="glyphicon glyphicon-minus"></snap>
+                                        </label>
+                                        <label class="btn btn-default" ng-click="form.desired.input = true">
+                                            {{shelf.desired}} {{info.measure}}
+                                        </label>
+                                        <label class="btn btn-default" ng-click="setDesired(1,0)">
+                                            <snap class="glyphicon glyphicon-plus"></snap>
+                                        </label>
+                                    </div> 
+                                </div>
+                                <div ng-show="form.desired.input">
+                                    <div class="input-group">
+                                        <label class="input-group-addon">
+                                            {{info.measure}}
+                                        </label>
+                                        <input name="desired" type="number" ng-model="form.desired.value" class="form-control">
+                                        <label class="input-group-addon" ng-click="setDesired(0,form.desired.value)">
+                                            OK
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div uib-alert ng-show="form.desired.alert">
+                                    Порог достаточности должен быть не меньше порога дефицита и меньше порога избытка
+                                </div>
+                            </div>
+                        </div><hr/>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="max">
+                                    Порог избытка    
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <div ng-hide="form.max.input">
+                                    <div class="btn-group">
+                                        <label class="btn btn-default" ng-click="setMax(-1,0)">
+                                            <snap class="glyphicon glyphicon-minus"></snap>
+                                        </label>
+                                        <label class="btn btn-default" ng-click="form.max.input = true">
+                                            {{shelf.max}} {{info.measure}}
+                                        </label>
+                                        <label class="btn btn-default" ng-click="setMax(1,0)">
+                                            <snap class="glyphicon glyphicon-plus"></snap>
+                                        </label>
+                                    </div> 
+                                </div>
+                                <div ng-show="form.max.input">
+                                    <div class="input-group">
+                                        <label class="input-group-addon">
+                                            {{info.measure}}
+                                        </label>
+                                        <input name="deficit" type="number" ng-model="form.max.value" class="form-control">
+                                        <label class="input-group-addon" ng-click="setMax(0,form.max.value)">
+                                            OK
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div uib-alert ng-show="form.max.alert">
+                                    Порог избытка должен быть не меньше порога достаточности
+                                </div>
+                            </div>
+                        </div><hr/>   
                     </div>
                     
-                    <pre>
-                        {{info | json}}
-                    </pre>
-                    
-                    <label for="stored">
-                        Stored    
-                    </label>
-                    <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
-                        <span style="color:white; white-space:nowrap;"> 
-                            {{shelf.progressbar.text}}
-                        </span>
-                    </progressbar>
-                    <uib-progress>
-                        <uib-bar value="10" type="default">
-                            <span style="color:white; white-space:nowrap;"> 
-                                Пусто
-                            </span>
-                        </uib-bar>
-                        <uib-bar value="10" type="danger">
-                            <span style="color:white; white-space:nowrap;"> 
-                                Дефицит
-                            </span>
-                        </uib-bar>
-                        <uib-bar value="30" type="warning">
-                            <span style="color:white; white-space:nowrap;"> 
-                                Недостаточно
-                            </span>
-                        </uib-bar>
-                        <uib-bar value="30" type="success">
-                            <span style="color:white; white-space:nowrap;"> 
-                                Достаточно
-                            </span>
-                        </uib-bar>
-                        <uib-bar value="20" type="info">
-                            <span style="color:white; white-space:nowrap;"> 
-                                Избыток
-                            </span>
-                        </uib-bar>
-                    </uib-progress>  
-                    
-                    <label for="deficit">
-                        Deficit amount    
-                    </label>
-                    <input name="deficit" type="number" ng-model="shelf.deficit" class="form-control">
-                    
-                    <label for="desired">
-                        Desired amount    
-                    </label>
-                    <input name="desired" type="number" ng-model="shelf.desired" class="form-control">
-                    
-                    <label for="max">
-                        Max amount    
-                    </label>
-                    <input name="max" type="number" ng-model="shelf.max" class="form-control">
-                    
-                    <label for="stored">
-                        STORED     
-                    </label>
-                    <input name="stored" type="number" ng-model="shelf.stored" class="form-control">
-                    
-                    <button ng-click="shelf.stored = shelf.stored +1; progressUpdate(shelf)">sto+1</button>
-                    <button ng-click="shelf.stored = shelf.stored -1; progressUpdate(shelf)">sto-1</button>
-                    
-                    <!--<label for="override">
-                        TODO override    
-                    </label>-->
-                    <!-- //TODO override UI-->
-                    <!-- <label for="fallback">
-                        TODO fallback    
-                    </label>-->
-                    <!-- //TODO fallback UI-->
-                    
-                    <label for="isSpoiled">
-                        isSpoiled
-                    </label> 
-                    <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">Well</label>
-                    <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">Spoiled!</label>                
-                    
-                    <!-- //TODO place UI-->  
-                    <!-- //TODO shelfQuery UI-->    
-                </div>
-                <div class="form-group" show-errors>
-                    <label class="control-label" for="title">
-                        Title {{valid}}
-                    </label>
-                    <input name="title" type="text" ng-model="shelf.title" id="title" class="form-control" placeholder="Title" required>
-                    <div ng-messages="shelfForm.title.$error" role="alert">
-                        <p class="help-block error-text" ng-message="required">
-                            Article title is required.
-                        </p>
-                    </div>
+                    <div class="col-md-5">
+                        <label for="place">
+                            Место хранения
+                        </label>
+                        <input name="deficit" type="text" ng-model="shelf.place" class="form-control">
+                        <hr/>
+                        <label for="isSpoiled">
+                            Переопределение свежести
+                        </label>
+                        <br/>
+                        <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">
+                            Свежее
+                        </label>
+                        <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">
+                            Испорченое
+                        </label> 
+                    </div>                   
                 </div>
                 <div class="form-group">
-                    <label class="control-label" for="content">
-                        Content
-                    </label>
-                    <textarea name="content" data-ng-model="shelf.content" id="content" class="form-control" cols="30" rows="10" placeholder="Content"></textarea>
-                </div>
-                <div class="form-group">
-                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Update' : 'Create'}}">
+                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Обновить' : 'Сохранить'}}">
                 </div>
                 <div ng-show="error" class="text-danger">
                     <strong ng-bind="error"></strong>

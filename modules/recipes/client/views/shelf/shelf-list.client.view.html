@@ -4,60 +4,70 @@
             Полки
         </h1>
     </div>
-    <div class="row">
-        <div class="col-md-3">
-            <!--offset-->
-        </div>
-        <div class="col-md-7">
-            <uib-progress>
-                <uib-bar value="10" type="default">
-                    <span style="color:white; white-space:nowrap;"> 
-                        Пусто
-                    </span>
-                </uib-bar>
-                <uib-bar value="10" type="danger">
-                    <span style="color:white; white-space:nowrap;"> 
-                        Дефицит
-                    </span>
-                </uib-bar>
-                <uib-bar value="30" type="warning">
-                    <span style="color:white; white-space:nowrap;"> 
-                        Недостаточно
-                    </span>
-                </uib-bar>
-                <uib-bar value="30" type="success">
-                    <span style="color:white; white-space:nowrap;"> 
-                        Достаточно
-                    </span>
-                </uib-bar>
-                <uib-bar value="20" type="info">
-                    <span style="color:white; white-space:nowrap;"> 
-                        Избыток
-                    </span>
-                </uib-bar>
-            </uib-progress>     
-        </div>
-    </div>
+    
     <div class="list-group">
-        <a ng-repeat="shelf in shelves" ui-sref="shelf.view({ shelfId: shelf.id })" class="list-group-item">
+        <div class="row list-group-item">
+            <div class="col-md-3">
+                <label class="btn btn-primary" ui-sref="shelf.create">
+                    <snap class="glyphicon glyphicon-plus">
+                        Добавить полку
+                    </snap>
+                </label>    
+            </div>
+            <div class="col-md-8">
+                <div class="btn-group btn-group-justified">
+
+                    <label ng-show="filterBar.empty" class="btn btn-primary" ng-click="filterBar.empty = false">Пусто</label>
+                    <label ng-hide="filterBar.empty" class="btn btn-default" ng-click="filterBar.empty = true">Пусто</label>
+                    
+                    <label ng-show="filterBar.spoiled" class="btn btn-danger" ng-click="filterBar.spoiled = false">Просрочено</label>
+                    <label ng-hide="filterBar.spoiled" class="btn btn-default" ng-click="filterBar.spoiled = true">Просрочено</label>
+
+                    <label ng-show="filterBar.deficit" class="btn btn-danger" ng-click="filterBar.deficit = false">Дефицит</label>
+                    <label ng-hide="filterBar.deficit" class="btn btn-default" ng-click="filterBar.deficit = true">Дефицит</label>
+
+                    <label ng-show="filterBar.lsdesired" class="btn btn-warning" ng-click="filterBar.lsdesired = false">Недостаточно</label>
+                    <label ng-hide="filterBar.lsdesired" class="btn btn-default" ng-click="filterBar.lsdesired = true">Недостаточно</label>
+
+                    <label ng-show="filterBar.desired" class="btn btn-success" ng-click="filterBar.desired = false">Достаточно</label>
+                    <label ng-hide="filterBar.desired" class="btn btn-default" ng-click="filterBar.desired = true">Достаточно</label>
+
+                    <label ng-show="filterBar.max" class="btn btn-info" ng-click="filterBar.max = false">Избыток</label>
+                    <label ng-hide="filterBar.max" class="btn btn-default" ng-click="filterBar.max = true">Избыток</label>
+
+                    <label class="btn btn-default" ng-click="filterBarToggle()">Все</label>
+                </div>
+            </div>
+        </div>
+        <div ng-repeat="shelf in shelves | filter: filterByProgress | orderBy: 'progressbar.value'" class="list-group-item">
             <div class="row">
                 <div class="col-md-2">
+
                     <h4 class="list-group-item-heading" ng-bind="shelf.caption"></h4>
                 </div>
                 <div class="col-md-1">
                     <p class="list-group-item-heading" ng-bind="shelf.measureCaption"></p>
                 </div>
-                <div class="col-md-7">
-                    <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
-                        <span style="color:white; white-space:nowrap;"> 
-                            {{shelf.progressbar.text}}
-                        </span>
-                    </progressbar>
+                <a ui-sref="shelf.view({ shelfId: shelf.id })">
+                    <div class="col-md-7">
+                        <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
+                            <span style="color:white; white-space:nowrap;"> 
+                                {{shelf.progressbar.text}}
+                            </span>
+                        </progressbar>
+                    </div>
+                </a>
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <label class="btn btn-link" ui-sref="shelf.edit({ shelfId: shelf.id })">
+                            <snap class="glyphicon glyphicon-cog"></snap>
+                        </label>
+                        <label class="btn btn-link" ui-sref="shelf.query({ shelfId: shelf.id })">
+                            <snap class="glyphicon glyphicon-shopping-cart"></snap>
+                        </label>
+                    </div>    
                 </div>
             </div>
-        </a>
-    </div>
-    <div class="alert alert-warning text-center" ><!-- //FIXME ng-if="!shelves.length"-->
-        Почему бы не заполнить еще одну <a ui-sref="shelf.create">новую полку</a>?
+        </div>
     </div>
 </section>

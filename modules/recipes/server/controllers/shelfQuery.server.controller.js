@@ -1,5 +1,4 @@
 'use strict';
-//FUTURE shelf feature
 /**
  * Module dependencies.
  */
@@ -7,19 +6,21 @@ var path = require('path'),
     async = require('async'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-    Shelf = db.shelf;
+    Shelf = db.shelf,
+    ShelfQuery = db.shelfQuery;
 
 exports.create = function(req, res) {
 
-    req.body.userId = req.user.id;
+    req.body.userId = req.user.id; 
+    req.body.shelfId = req.shelf.id;
     
-    Shelf.create(req.body).then(function(shelf) {
-        if (!shelf) {
+    ShelfQuery.create(req.body).then(function(shelfQuery) {
+        if (!shelfQuery) {
             return res.send('users/signup', {
-                errors: 'Could not create the shelf'
+                errors: 'Could not create the shelf query'
             });
         } else {
-            return res.json(shelf);
+            return res.json(shelfQuery);
         }
     }).catch(function(err) {
         return res.status(400).send({
@@ -29,17 +30,23 @@ exports.create = function(req, res) {
 };
 
 exports.read = function(req, res) {
-    var shelf = req.shelf;
-    shelf.isCurrentUserOwner = !!(req.user && shelf.userId && shelf.userId === req.user.id);
-    res.json(shelf);
+    res.json(req.shelfQuery);
 };
 
 exports.update = function(req, res) {
     
-    Shelf.findById(req.body.id).then(function(shelf) { //TODO find by number and user id
-        if (shelf) {
-            shelf.update(req.body).then(function(shelf) {
-                return res.json(shelf);
+    //TODO if(!req.shelf) error
+    ShelfQuery.findOne(
+        {
+            where: { 
+                number: req.body.number,
+                shelfId: req.shelf.id //TODO change shelfId to shelfNumber and userId
+            }
+        }
+    ).then(function(shelfQuery) {
+        if (shelfQuery) {
+            shelfQuery.update(req.body).then(function(shelfQuery) {
+                return res.json(shelfQuery);
             }).catch(function(err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
@@ -48,7 +55,7 @@ exports.update = function(req, res) {
         return null;
         } else {
             return res.status(400).send({
-                message: 'Unable to find the shelf'
+                message: 'Unable to find the shelf query'
             });
         }
     }).catch(function(err) {
@@ -59,45 +66,50 @@ exports.update = function(req, res) {
 };    
 
 exports.list = function(req, res) {
-    Shelf.findAll(
+    //TODO if(!req.shelf) error
+    ShelfQuery.findAll(
         {
-            //FIXME where usedId=req.user.id
+            where: { 
+                shelfId: req.shelf.id
+            }
         }
-    ).then(function(shelves) {
-        if (!shelves) {
+    ).then(function(shelfQueries) {
+        if (!shelfQueries) {
             return res.status(404).send({
-                message: 'No shelves found'
+                message: 'No shelf queries found'
             });
         } else {
-            return res.json(shelves);
+            return res.json(shelfQueries);
         }
     }).catch(function(err) {
         res.jsonp(err);
     });
 };
 
-exports.shelfByID = function(req, res, next, id) {
+exports.queryByID = function(req, res, next, id) {
 
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
-            message: 'Shelf is invalid'
+            message: 'Shelf query is invalid'
         });
     }
+    
+    //TODO if(!req.shelf) error
   
-    Shelf.findOne(
+    ShelfQuery.findOne(
         {
-            where: {
-                id: id
-                //TODO userID and shelf.number
+            where: { 
+                number: id,
+                shelfId: req.shelf.id
             }
         }
-    ).then(function(shelf) {
-        if (!shelf) {
+    ).then(function(shelfQuery) {
+        if (!shelfQuery) {
             return res.status(404).send({
-                message: 'No shelf with that identifier has been found'
+                message: 'No shelf query with that identifier has been found'
             });
         } else {
-            req.shelf = shelf;
+            req.shelfQuery = shelfQuery;
             next();
             return null;
         }
