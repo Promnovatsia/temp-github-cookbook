@@ -67,6 +67,12 @@ exports.invokeRolesPolicies = function() {
                 }, {
                     resources: '/api/shelf/:shelfId',
                     permissions: '*'
+                }, {
+                    resources: '/api/shelf/:shelfId/query',
+                    permissions: '*'
+                }, {
+                    resources: '/api/shelf/:shelfId/query/:queryId',
+                    permissions: '*'
                 }
             ]
         }, {

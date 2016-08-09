@@ -4,9 +4,9 @@ angular
     .module('recipes')
     .controller('ShelfQueryController', ShelfQueryController);
 
-ShelfQueryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'Ingridients', 'Measures'];
+ShelfQueryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfQueryService', 'Ingridients', 'Measures'];
 
-function ShelfQueryController($scope, $stateParams, $location, $window, Authentication, ShelfService, Ingridients, Measures) {
+function ShelfQueryController($scope, $stateParams, $location, $window, Authentication, ShelfQueryService, Ingridients, Measures) {
         
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -14,26 +14,26 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
     
     $scope.find = function () {
-        ShelfService.query().$promise.then(function (shelves) {
-            shelves.forEach(function (shelf, i, arr) {
+        ShelfQueryService.query().$promise.then(function (shelfQueries) {
+            /*shelfQueries.forEach(function (shelfQuery, i, arr) {
                 $scope.progressUpdate(shelf);    
-            });
-            $scope.shelves = shelves;
+            });*/
+            $scope.shelfQueries = shelfQueries;
         });
     };
     
     $scope.findOne = function () {
-        if ($stateParams.shelfId) {
-            ShelfService.get(
+        if ($stateParams.shelfQueryId) {
+            ShelfQueryService.get(
                 {
-                    shelfId: $stateParams.shelfId
+                    shelfQueryId: $stateParams.shelfQueryId
                 }
-            ).$promise.then(function (shelf) {
-                $scope.shelf = shelf;
-                $scope.spoilUpdate(shelf.isSpoiled);
+            ).$promise.then(function (shelfQuery) {
+                $scope.shelfQuery = shelfQuery;
+                /*$scope.spoilUpdate(shelf.isSpoiled);
                 if (shelf.ingridientId) {
                     $scope.setIngridient(shelf.ingridientId);        
-                }
+                }*/
             });    
         } else {
             
@@ -42,26 +42,26 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
     
     $scope.remove = function () {
         if ($window.confirm('Are you sure you want to delete?')) {
-            $scope.shelf.$remove();
-            $location.path('shelf');    
+            $scope.shelfQuery.$remove();
+            $location.path('shelfQuery');    
         }
     };
 
     $scope.save = function (isValid) {
         
         if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'shelfForm');
+            $scope.$broadcast('show-errors-check-validity', 'shelfQueryForm');
             return false;
         }
         
-        $scope.shelf.caption = $scope.info.caption;
-        $scope.shelf.measureCaption = $scope.info.measure;
-        $scope.shelf.createOrUpdate()
+        /*$scope.shelf.caption = $scope.info.caption;
+        $scope.shelf.measureCaption = $scope.info.measure;*/
+        $scope.shelfQuery.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
 
         function successCallback(res) {
-            $location.path('shelf/' + $scope.shelf.id);
+            $location.path('shelfQuery/' + $scope.shelfQuery.id);
         }
 
         function errorCallback(res) {

@@ -8,8 +8,9 @@ angular
 ShelfQueryService.$inject = ['$resource'];
 
 function ShelfQueryService($resource) {
-    var ShelfQuery = $resource('api/shelfQuery/:shelfQueryId', {
-        shelfQueryId: '@id'
+    var ShelfQuery = $resource('api/shelf/:shelfId/query/:queryId', {
+        shelfId: '@shelfId',
+        queryId: '@queryId'
     }, {
         update: {
             method: 'PUT'
@@ -18,22 +19,22 @@ function ShelfQueryService($resource) {
     
     angular.extend(ShelfQuery.prototype, {
         createOrUpdate: function () {
-            var shelf = this;
-            return createOrUpdate(shelf);
+            var shelfQuery = this;
+            return createOrUpdate(shelfQuery);
         }
     });
     
     return ShelfQuery;
     
-    function createOrUpdate(shelf) {
-        if (shelf.id) {
-            return shelf.$update(onSuccess, onError);
+    function createOrUpdate(shelfQuery) {
+        if (shelfQuery.id) {
+            return shelfQuery.$update(onSuccess, onError);
         } else {
-            return shelf.$save(onSuccess, onError);
+            return shelfQuery.$save(onSuccess, onError);
         }
     }
     
-    function onSuccess(shelf) {
+    function onSuccess(shelfQuery) {
         // Any required internal processing from inside the service, goes here.    
     }
     
