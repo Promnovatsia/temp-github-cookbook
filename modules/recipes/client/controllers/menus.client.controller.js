@@ -4,77 +4,79 @@
 angular
     .module('recipes')
     .controller('MenusController', MenusController);
-MenusController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Menu', 'Recipes', 'Ingridients', 'Measures'];
+MenusController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'ShelfQueryService'];
 
-function MenusController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
-
+function MenusController($scope, $stateParams, $location, $window, Authentication, MenuService, ShelfQueryService) {
+    
     $scope.authentication = Authentication;
-
-    $scope.sort = function (a, b) {
-        return a.index - b.index;
-    };
-
-// Find a list of Recipes
+    $scope.error = null;
+    $scope.info = {};
+    $scope.form = {};
+    
     $scope.find = function () {
-        $scope.recipes = Recipes.query();
-    };
-
-// Find existing Recipe
-    $scope.findOne = function () {
-        Recipes.get(
-            {
-                recipeId: $stateParams.recipeId
-            }
-        ).$promise.then(function (recipe) {
-            if (recipe.ingridients.length > 0) {
-                recipe.ingridients.forEach(function (item, i, arr) {
-                    Measures.get(
-                        {
-                            measureId: item.ingridientAmount.measureId
-                        }
-                    ).$promise.then(function (measure) {
-                        item.measure = measure;
-                        item.index = item.ingridientAmount.index;
-                        item.amount = item.ingridientAmount.amount;
-                        item.measureCaption = measure.caption;
-                    });
-                });
-            }
-            recipe.ingridients.sort($scope.sort);
-            $scope.recipe = recipe;
-            $scope.ingridientData = $scope.recipe.ingridients;
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
         });
     };
+    
+    $scope.findOne = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.menu = menu;
+            });    
+        } else {
+            $scope.menu = new MenuService(
+                {
+                    startDate: Date.now(),
+                    types: [
+                        {
+                            caption: "dinner",
+                            serve: 19 * 60 + 30 //19:30
+                        }
+                    ]
+                }
+            );
+        } 
+    };
+    
+    $scope.findQueryForMenu = function () {
+        ShelfQueryService.query(
+            {
+                menuId: $stateParams.menuId
+            }
+        ).$promise.then(function (shelfQueries) {
+            $scope.shelfQueries = shelfQueries;
+        });
+    };
+    
+    $scope.remove = function () {
+        if ($window.confirm('Are you sure you want to delete?')) {
+            $scope.menu.$remove();
+            $location.path('menu');    
+        }
+    };
 
-// Update existing Recipe
-    $scope.update = function (isValid) {
-        $scope.error = null;
-
+    $scope.save = function (isValid) {
+        
         if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'recipeForm');
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
             return false;
         }
+        
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
 
-        var recipe = $scope.recipe;
-        recipe.ingridients = $scope.ingridientData;
-        recipe.steps = $scope.stepData;
-        recipe.$update(function () {
-            $location.path('recipes/' + recipe.id);
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
-    };
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number);
+        }
 
-    // Remove existing Recipe
-    $scope.remove = function (recipe) {
-        if (recipe) {
-            recipe.$remove();
-            $location.path('recipes');
-        } else {
-            $scope.recipe.$remove(function () {
-                $location.path('recipes');
-            });
+        function errorCallback(res) {
+            $scope.error = res.data.message;
         }
     };
-
 }

@@ -1,0 +1,41 @@
+<section ng-controller="MenusController" ng-init="findOne()">
+    <div class="page-header">
+        <h1 ng-show="menu.id">
+            Меню
+        </h1>
+        <h1 ng-hide="shelf.id">
+            Новое меню
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <label for="place">
+                            Место хранения
+                        </label>
+                        <input name="deficit" type="text" ng-model="shelf.place" class="form-control">
+                        <hr/>
+                        <label for="isSpoiled">
+                            Переопределение свежести
+                        </label>
+                        <br/>
+                        <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">
+                            Свежее
+                        </label>
+                        <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">
+                            Испорченое
+                        </label> 
+                    </div>                   
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Обновить' : 'Сохранить'}}">
+                </div>
+                <div ng-show="error" class="text-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>

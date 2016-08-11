@@ -3,11 +3,28 @@
 module.exports = function (sequelize, DataTypes) {
     
     var Menu = sequelize.define('menu', {
-        week: {
+        number: {
             type: DataTypes.INTEGER
         },
+        startDate: {
+            type: DataTypes.DATE  
+        },
+        isPurchased: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        isDone: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        weekDayMask: {
+            type: DataTypes.ARRAY(DataTypes.BOOLEAN),
+            defaultValue: [true, true, true, true, true, true, false]
+        },
         types: {
-            type: DataTypes.JSONB
+            type: DataTypes.ARRAY(DataTypes.JSONB)
             /*{
                 caption: {
                     type: DataTypes.STRING
@@ -16,15 +33,6 @@ module.exports = function (sequelize, DataTypes) {
                     type: DataTypes.INTEGER
                 }
             }*/
-        },
-        weekDayMask: {
-            type: DataTypes.ARRAY(DataTypes.BOOLEAN),
-            defaultValue: [true, true, true, true, true, true, false]
-        },
-        isDone: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
         }
     }, {
         timestamps: false,

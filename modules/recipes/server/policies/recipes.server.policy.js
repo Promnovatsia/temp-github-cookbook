@@ -119,7 +119,14 @@ exports.invokeRolesPolicies = function() {
                 }, {
                     resources: '/api/ingridients/:ingridientId',
                     permissions: ['get']
-                }
+                },//FIXME remove after testing
+                {
+                    resources: '/api/menu',
+                    permissions: '*'
+                }, {
+                    resources: '/api/menu/:menuId',
+                    permissions: '*'
+                },
             ]
         }
     ]);
