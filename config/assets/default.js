@@ -9,6 +9,7 @@ module.exports = {
       ],
       js: [
         'public/lib/angular/angular.js',
+        'public/lib/bower-angular-i18n-master/angular-locale_ru-ru.js',
         'public/lib/angular-resource/angular-resource.js',
         'public/lib/angular-animate/angular-animate.js',
         'public/lib/angular-messages/angular-messages.js',
