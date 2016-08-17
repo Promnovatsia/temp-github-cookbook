@@ -153,7 +153,7 @@ function routeConfig($stateProvider) {
         })
         .state('menu.view', {
             url: '/:menuId',
-            templateUrl: 'modules/recipes/client/views/menus/menu-form.client.view.html',
+            templateUrl: 'modules/recipes/client/views/menus/menu-read.client.view.html',
             data: {
                 roles: ['admin']
             }

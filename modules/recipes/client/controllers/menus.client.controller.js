@@ -12,9 +12,11 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
     $scope.error = null;
     $scope.info = {};
     $scope.form = {};
+    $scope.mytime = Date.now();
     
+    $scope.weekDays = [];
     $scope.weekDayMask = [true, true, true, true, true, true, false];
-    $scope.weekDayCaptions = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];//TODO replace with week const from Date
+    $scope.weekDayExamples = [new Date('2016-08-15'), new Date('2016-08-16'), new Date('2016-08-17'), new Date('2016-08-18'), new Date('2016-08-19'), new Date('2016-08-20'), new Date('2016-08-21')]; //Mon-Sun
     $scope.meals = [
         {   
             type: 'Обед',
@@ -71,6 +73,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                     menuId: $stateParams.menuId
                 }
             ).$promise.then(function (menu) {
+                $scope.menuInitByDays(menu);
                 $scope.menu = menu;
             });    
         } else {
@@ -80,18 +83,17 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                     types: [
                         {
                             caption: "Завтрак",
-                            serve: "7:15"
+                            serve: new Date('2016-08-15 7:30')
                         },
                         {
                             caption: "Обед",
-                            serve: "19:30"
+                            serve: new Date('2016-08-15 19:30')
                         }
-                    ],
-                    weekDays: []
+                    ]
                 }
             );
-        } 
-        $scope.menuInitByDays();
+            $scope.menuInitByDays($scope.menu);
+        }
     };
     
     $scope.findQueryForMenu = function () {
@@ -104,43 +106,56 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
         });
     };
     
-    $scope.menuInitByDays = function () {
-        $scope.menu.weekDays = [];
+    $scope.menuInitByDays = function (menu) {
+        menu.weekDays = [];
         $scope.weekDayMask.forEach(function (weekDay, i, arr) {
             if (!weekDay) {
-                $scope.menu.weekDays.push(
+                menu.weekDays.push(
                     {
                         index: i,
                         isActive: false,
-                        caption: $scope.weekDayCaptions[i]
+                        caption: $scope.weekDayExamples[i]
                     }
                 );
             } else {
-                $scope.menu.weekDays.push(
+                menu.weekDays.push(
                     {
                         index: i,
                         isActive: true,
-                        caption: $scope.weekDayCaptions[i]
+                        caption: $scope.weekDayExamples[i]
                     }
                 );
-                $scope.menu.weekDays[i].types = [];
-                $scope.menu.types.forEach(function (type, j, arr) {
-                    $scope.menu.weekDays[i].types.push(
+                menu.weekDays[i].types = [];
+                menu.types.forEach(function (type, j, arr) {
+                    menu.weekDays[i].types.push(
                         {
                             index: j,
                             caption: type.caption,
                             serveTime: type.serve
                         }
                     );
-                    $scope.menu.weekDays[i].types[j].meals = [];
+                    menu.weekDays[i].types[j].meals = [];
                     $scope.meals.forEach(function (meal, k, arr) {
-                        if (meal.weekday === i && meal.type === $scope.menu.weekDays[i].types[j].caption) {
-                            $scope.menu.weekDays[i].types[j].meals.push(meal);    
+                        if (meal.weekday === i && meal.type === menu.weekDays[i].types[j].caption) {
+                            menu.weekDays[i].types[j].meals.push(meal);    
                         }    
                     });
                 });
             }
         });    
+    };
+    
+    $scope.addType = function () {
+        $scope.menu.types.push(
+            {
+                caption: "Новый прием пищи",
+                serve: new Date('2016-08-15 12:00')    
+            }
+        );        
+    };
+    
+    $scope.removeType = function (type) {
+        $scope.menu.types.splice($scope.menu.types.indexOf(type), 1);    
     };
     
     $scope.remove = function () {

@@ -14,17 +14,33 @@ exports.create = function (req, res) {
 
     req.body.userId = req.user.id;
     
-    Menu.create(req.body).then(function (menu) {
-        if (!menu) {
-            return res.send('users/signup', {
-                errors: 'Could not create the menu'
-            });
-        } else {
-            return res.json(menu);
+    Menu.findOne(
+        {
+            where: {
+                userId: req.user.id
+            },
+            order: [
+                ['number','ASC']
+            ]
         }
-    }).catch(function (err) {
-        return res.status(400).send({
-            message: errorHandler.getErrorMessage(err)
+    ).then(function (menu) {
+        if (menu) {
+            req.body.number = menu.number + 1;    
+        } else {
+            req.body.number = 1;     
+        }
+        Menu.create(req.body).then(function (menu) {
+            if (!menu) {
+                return res.send('users/signup', {
+                    errors: 'Could not create the menu'
+                });
+            } else {
+                return res.json(menu);
+            }
+        }).catch(function (err) {
+            return res.status(400).send({
+                message: errorHandler.getErrorMessage(err)
+            });
         });
     });
 };
@@ -63,6 +79,7 @@ exports.update = function (req, res) {
                 message: 'Unable to find the menu'
             });
         }
+        return null;
     }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
@@ -74,7 +91,7 @@ exports.list = function (req, res) {
     Menu.findAll(
         {
             where: {
-                usedId: req.user.id
+                userId: req.user.id
             }
         }
     ).then(function (menus) {

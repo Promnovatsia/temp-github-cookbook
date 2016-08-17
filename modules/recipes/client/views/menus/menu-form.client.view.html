@@ -1,9 +1,9 @@
 <section ng-controller="MenusController" ng-init="findOne()">
     <div class="page-header">
-        <h1 ng-show="menu.id">
-            Меню
+        <h1 ng-show="menu.number">
+            Меню №{{menu.number}} от {{menu.startDate | date}}
         </h1>
-        <h1 ng-hide="menu.id">
+        <h1 ng-hide="menu.number">
             Новое меню
         </h1>
     </div>
@@ -12,23 +12,41 @@
             Расписание
         </label>
         <div class="list-group">
+            <div class="list-group-item">
+                <a class="btn btn-success btn-xs" ng-click="addType()">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Добавить новый тип
+                </a>
+            </div>
             <div ng-repeat="type in menu.types" class="list-group-item">
-                <h4 class="list-group-item-heading">
-                    <snap class="glyphicon glyphicon-time"></snap>    
-                    {{type.serve}} - {{type.caption}}
-                </h4>
+                <div class="list-group-item-heading">
+                    <div class='row'>
+                        <a class="pull-right btn btn-danger btn-xs" ng-click="removeType(this)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                        <div class="col-md-3 col-sm-5">
+                            <timepicker ng-model="type.serve" show-meridian="false"></timepicker>
+                        </div>
+                        <div class="col-md-4 col-sm-6">
+                            <label for="type.caption">
+                                Прием пищи
+                            </label>
+                            <input type="text" ng-model="type.caption" class="form-control" required placeholder="Название приема пищи">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <div class="row">
         <div ng-repeat="weekday in menu.weekDays">
             <button ng-hide="weekday.isActive" type="button" class="btn btn-secondary btn-block" ng-click="weekday.isActive=true">
-                {{weekday.caption}}
+                {{weekday.caption | date : 'EEEE'}}
             </button>
             <div ng-show="weekday.isActive" class="panel panel-primary">
                 <div class="panel-heading" ng-click="weekday.isActive=false">
                     <button type="button" class="btn btn-primary btn-block">
-                        {{weekday.caption}}
+                        {{weekday.caption | date : 'EEEE'}}
                     </button>
                 </div>
                 <div class="panel-body">
@@ -40,7 +58,7 @@
                                         {{type.caption}}
                                         <div class="pull-right">
                                             <snap class="glyphicon glyphicon-time"></snap>
-                                            {{type.serveTime}}
+                                            {{type.serveTime | date:'HH:mm'}}
                                         </div>
                                     </div>
                                     <div class="panel-body">
@@ -65,23 +83,7 @@
         <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
             <fieldset>
                 <div class="form-group">
-                    <div class="col-md-5">
-                        <label for="place">
-                            Место хранения
-                        </label>
-                        <input name="deficit" type="text" ng-model="shelf.place" class="form-control">
-                        <hr/>
-                        <label for="isSpoiled">
-                            Переопределение свежести
-                        </label>
-                        <br/>
-                        <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">
-                            Свежее
-                        </label>
-                        <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">
-                            Испорченое
-                        </label> 
-                    </div>                   
+                                    
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Обновить' : 'Сохранить'}}">
