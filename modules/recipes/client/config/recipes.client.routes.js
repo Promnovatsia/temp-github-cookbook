@@ -139,7 +139,21 @@ function routeConfig($stateProvider) {
         })
         .state('menu.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/menus/menu-form.client.view.html',
+            templateUrl: 'modules/recipes/client/views/menus/menu-init.client.view.html',
+            data: {
+                roles: ['admin']
+            }
+        })
+        .state('menu.init', {
+            url: '/:menuId/init',
+            templateUrl: 'modules/recipes/client/views/menus/menu-init.client.view.html',
+            data: {
+                roles: ['admin']
+            }
+        })
+        .state('menu.recipes', {
+            url: '/:menuId/recipes',
+            templateUrl: 'modules/recipes/client/views/menus/menu-recipes.client.view.html',
             data: {
                 roles: ['admin']
             }

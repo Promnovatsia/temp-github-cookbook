@@ -76,6 +76,55 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
         });
     };
     
+    $scope.findOneInit = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        } else {
+            $scope.menu = new MenuService(
+                {
+                    startDate: new Date(Date.now()),
+                    types: [
+                        {
+                            index: 0,
+                            caption: "Завтрак",
+                            serve: new Date('2016-08-15 7:30')
+                        },
+                        {
+                            index: 1,
+                            caption: "Обед",
+                            serve: new Date('2016-08-15 19:30')
+                        }
+                    ]
+                }
+            );
+        }
+    };
+    
+    $scope.findOneRecipes = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                if (menu.meals) {
+                    menu.meals.forEach(function (item, i, arr) {
+                        item.recipe = $scope.getRecipe(item.recipeId);    
+                    });
+                }
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        }
+    };
+    
     $scope.findOne = function () {
         if ($stateParams.menuId) {
             MenuService.get(
@@ -199,7 +248,6 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                 startTime: 17 * 60 + 30 //17:30
             } 
         );
-        $scope.menuInitByDays($scope.menu);
     };
     
     $scope.mealMoveType = function (oldType, meal, direction) {
@@ -250,7 +298,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
         });
     };
     
-    $scope.addRecipe = function (id) {
+    $scope.getRecipe = function (id) {
         Recipes.get(
             {
                 recipeId: id
@@ -270,7 +318,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                     });
                 });
             }
-            $scope.recipe = recipe;
+            return recipe;
         });
     };
     
@@ -300,6 +348,26 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
 
         function successCallback(res) {
             $location.path('menu/' + $scope.menu.number);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+    
+    $scope.saveInit = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number + '/meals');
         }
 
         function errorCallback(res) {
