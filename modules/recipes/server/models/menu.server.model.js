@@ -39,9 +39,7 @@ module.exports = function (sequelize, DataTypes) {
         associate: function (models) {
             Menu.belongsTo(models.user);
             Menu.hasMany(models.shelfQuery);
-            Menu.belongsToMany(models.recipe, {
-                through: models.meal
-            });
+            Menu.hasMany(models.meal);
         }
     });
 

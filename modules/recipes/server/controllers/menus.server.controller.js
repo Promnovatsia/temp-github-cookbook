@@ -7,7 +7,9 @@ var path = require('path'),
     async = require('async'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-        Menu = db.menu
+        Menu = db.menu,
+        Recipe = db.recipe,
+        Meal = db.meal
     ;
 
 exports.create = function (req, res) {
@@ -25,11 +27,13 @@ exports.create = function (req, res) {
         }
     ).then(function (menu) {
         if (menu) {
-            req.body.number = menu.number + 1;    
+            req.body.number = menu.number + 1;
         } else {
-            req.body.number = 1;     
+            req.body.number = 1;
         }
-        Menu.create(req.body).then(function (menu) {
+        Menu.create(req.body, {
+            include: [Meal]
+        }).then(function (menu) {
             if (!menu) {
                 return res.send('users/signup', {
                     errors: 'Could not create the menu'
@@ -51,6 +55,7 @@ exports.read = function (req, res) {
 
 exports.update = function (req, res) {
     
+    console.log(req.menu.meals);
     Menu.findOne(
         {
             where: {
@@ -62,18 +67,21 @@ exports.update = function (req, res) {
         if (menu) {
             menu.update(
                 {
-                    number: req.body.number,
-                    types: req.body.types,
+                    isPurchased: req.body.isPurchased,
+                    isDone: req.body.isDone,
                     weekDayMask: req.body.weekDayMask,
-                    isDone: req.body.isDone
+                    types: req.body.types,
+                    meals: req.body.meals
+                }, {
+                    include: [Meal]
                 }
-            ).then(function () {
-                return res.json(menu);
-            }).catch(function (err) {
-                return res.status(400).send({
-                    message: errorHandler.getErrorMessage(err)
+            ).then(function (menu) {
+                    return res.json(menu);
+                }).catch(function (err) {
+                    return res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
+                    });
                 });
-            });
         } else {
             return res.status(400).send({
                 message: 'Unable to find the menu'
@@ -120,7 +128,8 @@ exports.menuByID = function (req, res, next, id) {
             where: {
                 number: id,
                 userId: req.user.id
-            }
+            },
+            include: [Meal]
         }
     ).then(function (menu) {
         if (!menu) {

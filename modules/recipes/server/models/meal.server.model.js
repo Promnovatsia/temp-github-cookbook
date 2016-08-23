@@ -4,7 +4,7 @@ module.exports = function (sequelize, DataTypes) {
     
     var Meal = sequelize.define('meal', {
         type: {
-            type: DataTypes.STRING
+            type: DataTypes.INTEGER
         },
         weekday: {
             type: DataTypes.INTEGER
@@ -31,7 +31,11 @@ module.exports = function (sequelize, DataTypes) {
         timestamps: true,
         paranoid: true,
         createdAt: false
-    });
+    }, {
+        associate: function (models) {
+            Meal.belongsTo(models.recipe);
+            Meal.belongsTo(models.menu);
+        }});
 
     return Meal;
 };

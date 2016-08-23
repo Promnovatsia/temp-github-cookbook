@@ -4,7 +4,7 @@
 angular
     .module('recipes')
     .controller('MenusController', MenusController);
-MenusController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'ShelfQueryService', 'Recipes','Measures'];
+MenusController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'ShelfQueryService', 'Recipes', 'Measures'];
 
 function MenusController($scope, $stateParams, $location, $window, Authentication, MenuService, ShelfQueryService, Recipes, Measures) {
     
@@ -19,6 +19,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
     $scope.weekDayExamples = [new Date('2016-08-15'), new Date('2016-08-16'), new Date('2016-08-17'), new Date('2016-08-18'), new Date('2016-08-19'), new Date('2016-08-20'), new Date('2016-08-21')]; //Mon-Sun
     $scope.meals = [
         {
+            recipeId: 1,
             index: 0,
             type: 0,
             weekday: 0,
@@ -28,8 +29,9 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             startTime: 16 * 60 //16:00
         },
         {   
+            recipeId: 1,
             index: 1,
-            type: 1,
+            type: 0,
             weekday: 2,
             portions: 2.5,
             comment: 'test meal 2',
@@ -37,6 +39,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             startTime: 17 * 60 + 30 //17:30
         },
         {   
+            recipeId: 1,
             index: 2,
             type: 1,
             weekday: 2,
@@ -46,6 +49,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             startTime: 17 * 60 + 30 //17:30
         },
         {   
+            recipeId: 1,
             index: 3,
             type: 0,
             weekday: 2,
@@ -55,6 +59,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             startTime: 17 * 60 + 30 //17:30
         },
         {   
+            recipeId: 1,
             index: 4,
             type: 1,
             weekday: 3,
@@ -78,8 +83,10 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                     menuId: $stateParams.menuId
                 }
             ).$promise.then(function (menu) {
+                $scope.meals = menu.meals;
                 $scope.menuInitByDays(menu);
                 $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
             });    
         } else {
             $scope.menu = new MenuService(
@@ -114,10 +121,10 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.menuInitByDays = function (menu) {
-        menu.weekDays = [];
+        $scope.weekDays = [];
         $scope.weekDayMask.forEach(function (weekDay, i, arr) {
             if (!weekDay) {
-                menu.weekDays.push(
+                $scope.weekDays.push(
                     {
                         index: i,
                         isActive: false,
@@ -125,31 +132,31 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                     }
                 );
             } else {
-                menu.weekDays.push(
+                $scope.weekDays.push(
                     {
                         index: i,
                         isActive: true,
                         caption: $scope.weekDayExamples[i]
                     }
                 );
-                menu.weekDays[i].types = [];
-                menu.types.forEach(function (type, j, arr) {
-                    menu.weekDays[i].types.push(
-                        {
-                            index: j,
-                            caption: type.caption,
-                            serve: type.serve
-                        }
-                    );
-                    menu.weekDays[i].types[j].meals = [];
-                    $scope.meals.forEach(function (meal, k, arr) {
-                        if (meal.weekday === i && meal.type === menu.weekDays[i].types[j].index) {
-                            menu.weekDays[i].types[j].meals.push(meal);
-                        }
-                        
-                    });
-                });
             }
+            $scope.weekDays[i].types = [];
+            menu.types.forEach(function (type, j, arr) {
+                $scope.weekDays[i].types.push(
+                    {
+                        index: j,
+                        caption: type.caption,
+                        serve: type.serve
+                    }
+                );
+                $scope.weekDays[i].types[j].meals = [];
+                $scope.meals.forEach(function (meal, k, arr) {
+                    if (meal.weekday === i && meal.type === $scope.weekDays[i].types[j].index) {
+                        $scope.weekDays[i].types[j].meals.push(meal);
+                        $scope.weekDays[i].types[j].meals[$scope.weekDays[i].types[j].meals.length - 1].index = k;
+                    }
+                });
+            });
         });
         $scope.form.newType = {
             isShown: false,
@@ -179,10 +186,26 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
         $scope.menuInitByDays($scope.menu);
     };
     
+    $scope.addMeal = function (weekday, typeIndex) {
+        $scope.meals.push(
+            { 
+                recipeId: 1,
+                index: $scope.meals.length,
+                type: typeIndex,
+                weekday: weekday,
+                portions: 2.5,
+                comment: 'test meal 2',
+                isDone: false,
+                startTime: 17 * 60 + 30 //17:30
+            } 
+        );
+        $scope.menuInitByDays($scope.menu);
+    };
+    
     $scope.mealMoveType = function (oldType, meal, direction) {
         
         var targetIndex = -1;
-        $scope.menu.weekDays[meal.weekday].types.some(function (type) {
+        $scope.weekDays[meal.weekday].types.some(function (type) {
             if (direction < 0) {
                 if (type.serve >= oldType.serve)
                     return true;
@@ -196,7 +219,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
         });
         if (targetIndex === -1) return;
         
-        $scope.meals[meal.index].type = $scope.menu.weekDays[meal.weekday].types[targetIndex].index;
+        $scope.meals[meal.index].type = $scope.weekDays[meal.weekday].types[targetIndex].index;
         $scope.menuInitByDays($scope.menu);
     };
     
@@ -265,6 +288,12 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             return false;
         }
         
+        console.log($scope.menu.meals);
+        $scope.menu.meals = [];
+        $scope.meals.forEach(function (meal, k, arr) {
+             $scope.menu.meals.push(meal);    
+        });
+        console.log($scope.menu);
         $scope.menu.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);

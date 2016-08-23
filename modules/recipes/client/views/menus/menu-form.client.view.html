@@ -8,6 +8,14 @@
         </h1>
     </div>
     <div class="row">
+        <div class="col-xs-6">
+            <label for="menu.startDate">
+                Выводимая дата меню
+            </label>
+            <input type="date" ng-model="menu.startDate" class="form-control" required>
+        </div>
+    </div>
+    <div class="row">
         <label for="types">
             Расписание
         </label>
@@ -33,6 +41,10 @@
             <div class="list-group-item">
                 <div class="list-group-item-heading">
                     <div class='row'>
+                        <a class="btn btn-success pull-right" ng-click="addType()">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            Добавить новый тип
+                        </a>
                         <div class="col-md-3 col-sm-5">
                             <timepicker ng-model="form.newType.serve" show-meridian="false"></timepicker>
                         </div>
@@ -42,17 +54,19 @@
                             </label>
                             <input type="text" ng-model="form.newType.caption" class="form-control" required placeholder="Название приема пищи">
                         </div>
-                        <a class="btn btn-success" ng-click="addType()">
-                            <span class="glyphicon glyphicon-plus"></span>
-                            Добавить новый тип
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
-        <div ng-repeat="weekday in menu.weekDays">
+        <a class="center btn btn-success" ng-click="addMeal(0,0)">
+            <span class="glyphicon glyphicon-plus"></span>
+            Добавить новое блюдо
+        </a>
+    </div>
+    <div class="row">
+        <div ng-repeat="weekday in weekDays">
             <button ng-hide="weekday.isActive" type="button" class="btn btn-secondary btn-block" ng-click="weekday.isActive=true">
                 {{weekday.caption | date : 'EEEE'}}
             </button>
@@ -63,7 +77,7 @@
                     </button>
                 </div>
                 <div class="panel-body">
-                     <div class="row">
+                    <div class="row">
                         <div ng-repeat="type in menu.types | orderBy:'serve' track by $index">
                             <div class="col-md-3 col-sm-6">
                                 <div class="panel panel-default">
@@ -93,8 +107,6 @@
                                                         <h4 class="list-group-item-heading" ng-bind="meal.comment"></h4>
                                                         <p class="list-group-item-text">
                                                             Порций: {{meal.portions}}
-                                                            index: {{meal.index}}
-                                                            type: {{type.index}}
                                                         </p>   
                                                     </div>
                                                     <div class="col-xs-1">
@@ -109,12 +121,6 @@
                                                     </div>
                                                 </div>
                                             </div> 
-                                        </div>
-                                        <div class="list-group-item">
-                                            <a class="btn btn-success btn-xs" ng-click="addMeal()">
-                                                <span class="glyphicon glyphicon-plus"></span>
-                                                Добавить новое блюдо
-                                            </a>
                                         </div>
                                     </div>
                                 </div>

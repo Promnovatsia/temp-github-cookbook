@@ -72,9 +72,7 @@ module.exports = function (sequelize, DataTypes) {
             Recipe.belongsToMany(models.ingridient, {
                 through: models.ingridientAmount
             });
-            Recipe.belongsToMany(models.menu, {
-                through: models.meal
-            });
+            Recipe.hasMany(models.meal);
         }
     });
 
