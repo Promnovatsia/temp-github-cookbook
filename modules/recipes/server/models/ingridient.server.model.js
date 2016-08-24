@@ -25,6 +25,10 @@ module.exports = function(sequelize, DataTypes) {
             Ingridient.belongsToMany(models.recipe, {
                 through: models.ingridientAmount
             });
+            Ingridient.belongsToMany(models.measure, {
+                through: models.ingridientAmount
+            });
+            Ingridient.hasMany(models.shelf);
         },
         timestamps: false
     });

@@ -9,7 +9,8 @@ var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
     Recipe = db.recipe,
-    Ingridient = db.ingridient;
+    Ingridient = db.ingridient,
+    Measure = db.measure;
 
 /**
  * Create a recipe
@@ -172,7 +173,7 @@ exports.list = function (req, res) {
             where: getNonPrivateAndOwned,
             include: [
                 {model: db.user, attributes: ['id', 'username']},
-                {model: db.ingridient}
+                {model: db.ingridient, include: []}
             ]
         }
     ).then(function (recipes) {
@@ -225,8 +226,32 @@ exports.recipeByID = function (req, res, next, id) {
         {
             where: getNonPrivateAndOwned,
             include: [
-                {model: db.user, attributes: ['id', 'username']},
-                {model: db.ingridient}
+                {
+                    model: db.user,
+                    attributes: ['id', 'username']
+                }, {
+                    model: Ingridient,
+                    include: 
+                        [
+                            {
+                                model: db.measure,
+                                attributes: ['id', 'min', 'step', 'converter']
+                            },
+                            {
+                                model: db.shelf,
+                                where: {
+                                    userId: req.user.id
+                                },
+                                include: [
+                                    {
+                                        model: db.measure,
+                                        attributes: ['id', 'min', 'step', 'converter','caption']
+                                    }    
+                                ]
+                            }
+                            
+                        ]
+                }
             ]
         }
     ).then(function (recipe) {

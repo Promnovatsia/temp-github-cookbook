@@ -8,14 +8,15 @@
         </h1>
     </div>
     <hr>
+    <pre>{{menu.meals | json}}</pre>
     <div class="row">
         <div class="list-group">
             <div ng-repeat="meal in menu.meals" class="list-group-item">
                 <div class="list-group-item-heading">
-                    {{meal.recipe.caption}}
+                    {{meal.recipe.title}}
                 </div>
                 <div class="list-group-item-text">
-                    <div class="col-md-4">
+                    <div class="row">
                         <label for="portions">
                             Количество порций
                         </label>
@@ -34,9 +35,6 @@
                         </div>
                         <div ng-show="form.portions.input">
                             <div class="input-group">
-                                <label class="input-group-addon">
-                                    {{info.measure}}
-                                </label>
                                 <input name="portions" type="number" ng-model="form.portions.value" class="form-control">
                                 <label class="input-group-addon" ng-click="setPortions(0,form.portions.value)">
                                     OK

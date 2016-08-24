@@ -243,7 +243,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                 type: typeIndex,
                 weekday: weekday,
                 portions: 2.5,
-                comment: 'test meal 2',
+                comment: '',
                 isDone: false,
                 startTime: 17 * 60 + 30 //17:30
             } 
@@ -299,27 +299,43 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.getRecipe = function (id) {
+        return Recipes.get(
+            {
+                recipeId: id
+            }
+        );
+    };
+    
+    $scope.getRecipeIngredients = function (recipe) {
+        if (recipe.ingridients.length > 0) {
+            recipe.ingridients.forEach(function (item, i, arr) {
+                Measures.get(
+                    {
+                        measureId: item.ingridientAmount.measureId
+                    }
+                ).$promise.then(function (measure) {
+                    item.measure = measure;
+                });
+            });
+        }
+    };
+    
+    $scope.addRecipe = function (id) {
         Recipes.get(
             {
                 recipeId: id
             }
         ).$promise.then(function (recipe) {
-            if (recipe.ingridients.length > 0) {
-                recipe.ingridients.forEach(function (item, i, arr) {
-                    Measures.get(
-                        {
-                            measureId: item.ingridientAmount.measureId
-                        }
-                    ).$promise.then(function (measure) {
-                        item.measure = measure;
-                        item.index = item.ingridientAmount.index;
-                        item.amount = item.ingridientAmount.amount;
-                        item.measureCaption = measure.caption;
-                    });
-                });
-            }
-            return recipe;
-        });
+            $scope.menu.meals.push(
+                { 
+                    recipeId: recipe.id,
+                    recipe: recipe,
+                    index: $scope.meals.length,
+                    portions: recipe.portions
+                }
+            );
+            $scope.getRecipeIngredients(recipe);
+        });                                                
     };
     
     $scope.remove = function () {
