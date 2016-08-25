@@ -33,28 +33,7 @@
                         <label for="portions">
                             Количество порций
                         </label>
-                        <div class="input-group">
-                            <span class="input-group-addon" ng-hide="portions == 1 || portionsEdit">
-                                <a class="btn btn-link btn-xs" data-nodrag ng-click="portions = portions - 1">
-                                    <span class="glyphicon glyphicon-minus"></span>
-                                </a>
-                            </span>
-                            <a class="btn btn-default btn-block" ng-click="portionsEdit = true" ng-hide="portionsEdit">
-                                {{portions}}
-                            </a>
-                            <input class="form-control" type="number" ng-model="portions" ng-show="portionsEdit"
-                                placeholder="Количество" >
-                            <span class="input-group-addon" ng-show="portionsEdit">
-                                <a class="btn btn-link btn-xs" data-nodrag ng-click="portionsEdit = false">
-                                    <span class="glyphicon glyphicon-random"></span>
-                                </a>
-                            </span>
-                            <span class="input-group-addon" ng-hide="portionsEdit">
-                                <a class="btn btn-link btn-xs" data-nodrag ng-click="portions = portions + 1">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </a>
-                            </span>
-                        </div>
+                        <updowninput ng-model="portions" min="1">
                     </div>
                     <div class="form-group col-md-1"></div>
                     <div class="form-group col-md-8">
@@ -185,6 +164,7 @@
                                                         </a>
                                                     </span>
                                                 </div>
+                                                <updowninput ng-model="ingridient.amount" min="ingridient.measure.min" step="ingridient.measure.step" measure="ingridient.measure.caption" convertable="ingridient.measure">
                                             </div>
                                         </div>
                                     </td>
