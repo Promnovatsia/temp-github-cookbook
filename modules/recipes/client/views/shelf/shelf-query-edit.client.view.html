@@ -14,65 +14,19 @@
                                 Измеряется в: {{info.measure}}
                             </label>
                         </div>
-                    </div>                    
+                    </div>
                     <div class="row">
                         <div class="col-md-4">
                             <label for="buy">
                                 Запланировано купить
                             </label>
-                            <div ng-hide="form.buy.input">
-                                <div class="btn-group">
-                                    <label class="btn btn-default" ng-click="setBuy(-1,0)">
-                                        <snap class="glyphicon glyphicon-minus"></snap>
-                                    </label>
-                                    <label class="btn btn-default" ng-click="form.buy.input = true">
-                                        {{shelfQuery.buy}} {{info.measure}}
-                                    </label>
-                                    <label class="btn btn-default" ng-click="setBuy(1,0)">
-                                        <snap class="glyphicon glyphicon-plus"></snap>
-                                    </label>
-                                </div> 
-                            </div>
-                            <div ng-show="form.buy.input">
-                                <div class="input-group">
-                                    <label class="input-group-addon">
-                                        {{info.measure}}
-                                    </label>
-                                    <input name="buy" type="number" ng-model="form.buy.value" class="form-control">
-                                    <label class="input-group-addon" ng-click="setBuy(0,form.buy.value)">
-                                        OK
-                                    </label>
-                                </div>
-                            </div>
+                            <updowninput ng-model="shelfQuery.buy" min="info.min" step="info.step" measure="info.measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="bought">
                                 Куплено в итоге
                             </label>
-                            <div ng-hide="form.bought.input">
-                                <div class="btn-group">
-                                    <label class="btn btn-default" ng-click="setBought(-1,0)">
-                                        <snap class="glyphicon glyphicon-minus"></snap>
-                                    </label>
-                                    <label class="btn btn-default" ng-click="form.bought.input = true">
-                                        {{shelfQuery.bought}} {{info.measure}}
-                                    </label>
-                                    <label class="btn btn-default" ng-click="setBought(1,0)">
-                                        <snap class="glyphicon glyphicon-plus"></snap>
-                                    </label>
-                                </div> 
-                            </div>
-                            <div ng-show="form.bought.input">
-                                <div class="input-group">
-                                    <label class="input-group-addon">
-                                        {{info.measure}}
-                                    </label>
-                                    <input name="bought" type="number" ng-model="form.bought.value" class="form-control">
-                                    <label class="input-group-addon" ng-click="setBought(0,form.bought.value)">
-                                        OK
-                                    </label>
-                                </div>
-                            </div>
+                            <updowninput ng-model="shelfQuery.bought" min="info.min" step="info.step" measure="info.measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="buyDate">
@@ -91,59 +45,13 @@
                             <label for="use">
                                 Запланировано использовать
                             </label>
-                            <div ng-hide="form.use.input">
-                                <div class="btn-group">
-                                    <label class="btn btn-default" ng-click="setUse(-1,0)">
-                                        <snap class="glyphicon glyphicon-minus"></snap>
-                                    </label>
-                                    <label class="btn btn-default" ng-click="form.use.input = true">
-                                        {{shelfQuery.use}} {{info.measure}}
-                                    </label>
-                                    <label class="btn btn-default" ng-click="setUse(1,0)">
-                                        <snap class="glyphicon glyphicon-plus"></snap>
-                                    </label>
-                                </div> 
-                            </div>
-                            <div ng-show="form.use.input">
-                                <div class="input-group">
-                                    <label class="input-group-addon">
-                                        {{info.measure}}
-                                    </label>
-                                    <input name="use" type="number" ng-model="form.use.value" class="form-control">
-                                    <label class="input-group-addon" ng-click="setUse(0,form.use.value)">
-                                        OK
-                                    </label>
-                                </div>
-                            </div>
+                            <updowninput ng-model="shelfQuery.use" min="info.min" step="info.step" measure="info.measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="used">
                                 Использовано в итоге
                             </label>
-                            <div ng-hide="form.used.input">
-                                <div class="btn-group">
-                                    <label class="btn btn-default" ng-click="setUsed(-1,0)">
-                                        <snap class="glyphicon glyphicon-minus"></snap>
-                                    </label>
-                                    <label class="btn btn-default" ng-click="form.used.input = true">
-                                        {{shelfQuery.used}} {{info.measure}}
-                                    </label>
-                                    <label class="btn btn-default" ng-click="setUsed(1,0)">
-                                        <snap class="glyphicon glyphicon-plus"></snap>
-                                    </label>
-                                </div> 
-                            </div>
-                            <div ng-show="form.used.input">
-                                <div class="input-group">
-                                    <label class="input-group-addon">
-                                        {{info.measure}}
-                                    </label>
-                                    <input name="used" type="number" ng-model="form.used.value" class="form-control">
-                                    <label class="input-group-addon" ng-click="setUsed(0,form.used.value)">
-                                        OK
-                                    </label>
-                                </div>
-                            </div>
+                            <updowninput ng-model="shelfQuery.used" min="info.min" step="info.step" measure="info.measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="useDate">
@@ -163,30 +71,7 @@
                             <label for="spoil">
                                 Иcпортилось
                             </label>
-                            <div ng-hide="form.spoil.input">
-                                <div class="btn-group">
-                                    <label class="btn btn-default" ng-click="setSpoil(-1,0)">
-                                        <snap class="glyphicon glyphicon-minus"></snap>
-                                    </label>
-                                    <label class="btn btn-default" ng-click="form.spoil.input = true">
-                                        {{shelfQuery.spoil}} {{info.measure}}
-                                    </label>
-                                    <label class="btn btn-default" ng-click="setSpoil(1,0)">
-                                        <snap class="glyphicon glyphicon-plus"></snap>
-                                    </label>
-                                </div> 
-                            </div>
-                            <div ng-show="form.spoil.input">
-                                <div class="input-group">
-                                    <label class="input-group-addon">
-                                        {{info.measure}}
-                                    </label>
-                                    <input name="spoil" type="number" ng-model="form.spoil.value" class="form-control">
-                                    <label class="input-group-addon" ng-click="setSpoil(0,form.spoil.value)">
-                                        OK
-                                    </label>
-                                </div>
-                            </div>
+                            <updowninput ng-model="shelfQuery.spoil" min="info.min" step="info.step" measure="info.measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="spoilDate">
