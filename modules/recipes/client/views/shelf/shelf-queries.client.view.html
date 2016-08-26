@@ -4,7 +4,42 @@
             Запросы по полке {{shelf.caption}}
         </h1>
     </div>
-    
+    <div class="row">
+        <div ng-repeat="query in shelfQueries">
+            <div class="col-md-3 col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div ng-show="query.isClosed">
+                            {{query.number}}:
+                            <snap class="glyphicon glyphicon-ok-circle"></snap>
+                            Выполнен
+                        </div>
+                        <div ng-hide="query.isClosed">
+                            {{query.number}}:
+                            <snap class="glyphicon glyphicon-record"></snap>
+                            В процессе
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <a ui-sref="shelf.queryEdit({ shelfId: query.shelfId, queryId: query.number })"><!--//TODO shelf number-->
+                            <div class="row">
+                                <snap class="glyphicon glyphicon-shopping-cart"></snap>
+                                {{query.buy}} / {{query.bought}} @ {{buyDate}}
+                            </div>
+                            <div class="row">
+                                <snap class="glyphicon glyphicon-cutlery"></snap>
+                                {{query.use}} / {{query.used}} @ {{useDate}}
+                            </div>
+                            <div class="row">
+                                <snap class="glyphicon glyphicon-trash"></snap>
+                                {{query.spoil}} @ {{spoilDate}}
+                            </div>
+                        </a>    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="list-group">
         <div ng-repeat="query in shelfQueries" class="list-group-item">
             <div class="row">
