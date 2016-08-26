@@ -3,33 +3,33 @@
 //Shelf service used for communicating with the shelf REST endpoints
 angular
     .module('recipes')
-    .factory('MenuService', MenuService);
+    .factory('MealService', MealService);
 
-MenuService.$inject = ['$resource'];
+MealService.$inject = ['$resource'];
 
-function MenuService($resource) {
-    var Menu = $resource('api/menu/:menuId', {
-        menuId: '@number'
+function MealService($resource) {
+    var Meal = $resource('api/meal/:mealId', {
+        mealId: '@number'
     }, {
         update: {
             method: 'PUT'
         }
     });
     
-    angular.extend(Menu.prototype, {
+    angular.extend(Meal.prototype, {
         createOrUpdate: function () {
-            var menu = this;
-            return createOrUpdate(menu);
+            var meal = this;
+            return createOrUpdate(meal);
         }
     });
     
-    return Menu;
+    return Meal;
     
-    function createOrUpdate(menu) {
-        if (menu.id) {
-            return menu.$update(onSuccess, onError);
+    function createOrUpdate(meal) {
+        if (meal.id) {
+            return meal.$update(onSuccess, onError);
         } else {
-            return menu.$save(onSuccess, onError);
+            return meal.$save(onSuccess, onError);
         }
     }
     

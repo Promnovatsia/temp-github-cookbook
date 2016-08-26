@@ -1,0 +1,66 @@
+<section ng-controller="MenusController" ng-init="findOne()">
+    <div class="page-header">
+        <h1 ng-show="menu.number">
+            Меню №{{menu.number}} от {{menu.startDate | date}}
+        </h1>
+    </div>
+    <div class="pull-right">
+        <label class="btn btn-link" ui-sref="menu.edit({ menuId: menu.number })">
+            <snap class="glyphicon glyphicon-edit"></snap>
+        </label>
+    </div>
+    <div class="row">
+        <label for="types">
+            Расписание
+        </label>
+        <div class="list-group">
+            <div ng-repeat="type in menu.types" class="list-group-item">
+                <h4 class="list-group-item-heading">
+                    <snap class="glyphicon glyphicon-time"></snap>    
+                    {{type.serve | date:'HH:mm'}} - {{type.caption}}
+                </h4>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div ng-repeat="weekday in weekDays">
+            <button ng-hide="weekday.isActive" type="button" class="btn btn-secondary btn-block" ng-click="weekday.isActive=true">
+                {{weekday.caption | date : 'EEEE'}}
+            </button>
+            <div ng-show="weekday.isActive" class="panel panel-primary">
+                <div class="panel-heading" ng-click="weekday.isActive=false">
+                    <button type="button" class="btn btn-primary btn-block">
+                        {{weekday.caption | date : 'EEEE'}}
+                    </button>
+                </div>
+                <div class="panel-body">
+                     <div class="row">
+                        <div ng-repeat="type in weekday.types">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        {{type.caption}}
+                                        <div class="pull-right">
+                                            <snap class="glyphicon glyphicon-time"></snap>
+                                            {{type.serve | date:'HH:mm'}}
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="list-group">
+                                            <div ng-repeat="meal in type.meals" class="list-group-item">
+                                                <h4 class="list-group-item-heading" ng-bind="meal.comment"></h4>
+                                                <p class="list-group-item-text">
+                                                    Порций: {{meal.portions}}
+                                                </p>
+                                            </div> 
+                                        </div>   
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

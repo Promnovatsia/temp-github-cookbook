@@ -1,0 +1,81 @@
+<section ng-controller="MenusController" ng-init="findOneRecipes()">
+    <div class="page-header">
+        <h1 ng-show="menu.number">
+            Меню №{{menu.number}} от {{menu.startDate | date}}
+        </h1>
+        <h1 ng-hide="menu.number">
+            Новое меню
+        </h1>
+    </div>
+    <hr>
+    <pre>{{menu.meals | json}}</pre>
+    <div class="row">
+        <div class="list-group">
+            <div ng-repeat="meal in menu.meals" class="list-group-item">
+                <div class="list-group-item-heading">
+                    {{meal.recipe.title}}
+                </div>
+                <div class="list-group-item-text">
+                    <div class="row">
+                        <label for="portions">
+                            Количество порций
+                        </label>
+                        <div ng-hide="form.portions.input">
+                            <div class="btn-group">
+                                <label class="btn btn-default" ng-click="setPortions(-1,0)">
+                                    <snap class="glyphicon glyphicon-minus"></snap>
+                                </label>
+                                <label class="btn btn-default" ng-click="form.portions.input = true">
+                                    {{meal.portions}}
+                                </label>
+                                <label class="btn btn-default" ng-click="setPortions(1,0)">
+                                    <snap class="glyphicon glyphicon-plus"></snap>
+                                </label>
+                            </div> 
+                        </div>
+                        <div ng-show="form.portions.input">
+                            <div class="input-group">
+                                <input name="portions" type="number" ng-model="form.portions.value" class="form-control">
+                                <label class="input-group-addon" ng-click="setPortions(0,form.portions.value)">
+                                    OK
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <pre>Model: {{asyncSelected | json}}</pre>
+                    <label for="asyncSelected">
+                        Поиск рецептов
+                    </label>
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </div>
+                        <input type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="recipe as recipe.caption for recipe in getLocation($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                        <div ng-show="noResults">
+                            <i class="glyphicon glyphicon-remove"></i>
+                            Нет результатов
+                        </div>
+                    </div>
+                </div>
+                <a class="btn btn-success btn-xs" ng-click="addRecipe(asyncSelected.id)">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Назначить рецепт
+                </a>
+                <pre>Recipe: {{recipe | json}}</pre>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Обновить' : 'Сохранить'}}">
+                </div>
+                <div ng-show="error" class="text-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>

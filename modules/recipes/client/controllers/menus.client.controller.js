@@ -4,77 +4,390 @@
 angular
     .module('recipes')
     .controller('MenusController', MenusController);
-MenusController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Menu', 'Recipes', 'Ingridients', 'Measures'];
+MenusController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'ShelfQueryService', 'Recipes', 'Measures'];
 
-function MenusController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
-
+function MenusController($scope, $stateParams, $location, $window, Authentication, MenuService, ShelfQueryService, Recipes, Measures) {
+    
     $scope.authentication = Authentication;
-
-    $scope.sort = function (a, b) {
-        return a.index - b.index;
-    };
-
-// Find a list of Recipes
-    $scope.find = function () {
-        $scope.recipes = Recipes.query();
-    };
-
-// Find existing Recipe
-    $scope.findOne = function () {
-        Recipes.get(
-            {
-                recipeId: $stateParams.recipeId
-            }
-        ).$promise.then(function (recipe) {
-            if (recipe.ingridients.length > 0) {
-                recipe.ingridients.forEach(function (item, i, arr) {
-                    Measures.get(
-                        {
-                            measureId: item.ingridientAmount.measureId
-                        }
-                    ).$promise.then(function (measure) {
-                        item.measure = measure;
-                        item.index = item.ingridientAmount.index;
-                        item.amount = item.ingridientAmount.amount;
-                        item.measureCaption = measure.caption;
-                    });
-                });
-            }
-            recipe.ingridients.sort($scope.sort);
-            $scope.recipe = recipe;
-            $scope.ingridientData = $scope.recipe.ingridients;
-        });
-    };
-
-// Update existing Recipe
-    $scope.update = function (isValid) {
-        $scope.error = null;
-
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'recipeForm');
-            return false;
+    $scope.error = null;
+    $scope.info = {};
+    $scope.form = {};
+    $scope.mytime = Date.now();
+    
+    $scope.weekDays = [];
+    $scope.weekDayMask = [true, true, true, true, true, true, false];
+    $scope.weekDayExamples = [new Date('2016-08-15'), new Date('2016-08-16'), new Date('2016-08-17'), new Date('2016-08-18'), new Date('2016-08-19'), new Date('2016-08-20'), new Date('2016-08-21')]; //Mon-Sun
+    $scope.meals = [
+        {
+            recipeId: 1,
+            index: 0,
+            type: 0,
+            weekday: 0,
+            portions: 2,
+            comment: 'test meal 1',
+            isDone: false,
+            startTime: 16 * 60 //16:00
+        },
+        {   
+            recipeId: 1,
+            index: 1,
+            type: 0,
+            weekday: 2,
+            portions: 2.5,
+            comment: 'test meal 2',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
+        },
+        {   
+            recipeId: 1,
+            index: 2,
+            type: 1,
+            weekday: 2,
+            portions: 2.5,
+            comment: 'test meal 2 - double',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
+        },
+        {   
+            recipeId: 1,
+            index: 3,
+            type: 0,
+            weekday: 2,
+            portions: 2.5,
+            comment: 'test meal 3',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
+        },
+        {   
+            recipeId: 1,
+            index: 4,
+            type: 1,
+            weekday: 3,
+            portions: 2.5,
+            comment: 'test meal 2',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
         }
-
-        var recipe = $scope.recipe;
-        recipe.ingridients = $scope.ingridientData;
-        recipe.steps = $scope.stepData;
-        recipe.$update(function () {
-            $location.path('recipes/' + recipe.id);
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
+    ];
+    
+    $scope.find = function () {
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
         });
     };
-
-    // Remove existing Recipe
-    $scope.remove = function (recipe) {
-        if (recipe) {
-            recipe.$remove();
-            $location.path('recipes');
+    
+    $scope.findOneInit = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
         } else {
-            $scope.recipe.$remove(function () {
-                $location.path('recipes');
+            $scope.menu = new MenuService(
+                {
+                    startDate: new Date(Date.now()),
+                    types: [
+                        {
+                            index: 0,
+                            caption: "Завтрак",
+                            serve: new Date('2016-08-15 7:30')
+                        },
+                        {
+                            index: 1,
+                            caption: "Обед",
+                            serve: new Date('2016-08-15 19:30')
+                        }
+                    ]
+                }
+            );
+        }
+    };
+    
+    $scope.findOneRecipes = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                if (menu.meals) {
+                    menu.meals.forEach(function (item, i, arr) {
+                        item.recipe = $scope.getRecipe(item.recipeId);    
+                    });
+                }
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        }
+    };
+    
+    $scope.findOne = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.meals = menu.meals;
+                $scope.menuInitByDays(menu);
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        } else {
+            $scope.menu = new MenuService(
+                {
+                    startDate: Date.now(),
+                    types: [
+                        {
+                            index: 0,
+                            caption: "Завтрак",
+                            serve: new Date('2016-08-15 7:30')
+                        },
+                        {
+                            index: 1,
+                            caption: "Обед",
+                            serve: new Date('2016-08-15 19:30')
+                        }
+                    ]
+                }
+            );
+            $scope.menuInitByDays($scope.menu);
+        }
+    };
+    
+    $scope.findQueryForMenu = function () {
+        ShelfQueryService.query(
+            {
+                menuId: $stateParams.menuId
+            }
+        ).$promise.then(function (shelfQueries) {
+            $scope.shelfQueries = shelfQueries;
+        });
+    };
+    
+    $scope.menuInitByDays = function (menu) {
+        $scope.weekDays = [];
+        $scope.weekDayMask.forEach(function (weekDay, i, arr) {
+            if (!weekDay) {
+                $scope.weekDays.push(
+                    {
+                        index: i,
+                        isActive: false,
+                        caption: $scope.weekDayExamples[i]
+                    }
+                );
+            } else {
+                $scope.weekDays.push(
+                    {
+                        index: i,
+                        isActive: true,
+                        caption: $scope.weekDayExamples[i]
+                    }
+                );
+            }
+            $scope.weekDays[i].types = [];
+            menu.types.forEach(function (type, j, arr) {
+                $scope.weekDays[i].types.push(
+                    {
+                        index: j,
+                        caption: type.caption,
+                        serve: type.serve
+                    }
+                );
+                $scope.weekDays[i].types[j].meals = [];
+                $scope.meals.forEach(function (meal, k, arr) {
+                    if (meal.weekday === i && meal.type === $scope.weekDays[i].types[j].index) {
+                        $scope.weekDays[i].types[j].meals.push(meal);
+                        $scope.weekDays[i].types[j].meals[$scope.weekDays[i].types[j].meals.length - 1].index = k;
+                    }
+                });
+            });
+        });
+        $scope.form.newType = {
+            isShown: false,
+            caption: null,
+            serve: menu.types[menu.types.length - 1].serve
+        };
+    };
+    
+    $scope.addType = function () {
+        $scope.menu.types.push(
+            {
+                index: $scope.menu.types[$scope.menu.types.length - 1].index + 1, 
+                caption: $scope.form.newType.caption,
+                serve: $scope.form.newType.serve
+            }
+        );
+        $scope.form.newType = {
+            isShown: false,
+            caption: null,
+            serve: $scope.menu.types[$scope.menu.types.length - 1].serve
+        };
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.removeType = function (typeIndex) {
+        $scope.menu.types.splice(typeIndex, 1);
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.addMeal = function (weekday, typeIndex) {
+        $scope.meals.push(
+            { 
+                recipeId: 1,
+                index: $scope.meals.length,
+                type: typeIndex,
+                weekday: weekday,
+                portions: 2.5,
+                comment: '',
+                isDone: false,
+                startTime: 17 * 60 + 30 //17:30
+            } 
+        );
+    };
+    
+    $scope.mealMoveType = function (oldType, meal, direction) {
+        
+        var targetIndex = -1;
+        $scope.weekDays[meal.weekday].types.some(function (type) {
+            if (direction < 0) {
+                if (type.serve >= oldType.serve)
+                    return true;
+                targetIndex = type.index;
+            } else {
+                targetIndex = type.index;
+                if (type.serve > oldType.serve)
+                    return true;    
+            }
+            return false;
+        });
+        if (targetIndex === -1) return;
+        
+        $scope.meals[meal.index].type = $scope.weekDays[meal.weekday].types[targetIndex].index;
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.mealMoveDay = function (meal, direction) {
+        if (direction < 0) {
+            if (meal.weekday > 0)
+                meal.weekday = meal.weekday - 1;
+            else 
+                return;
+        } else {
+            if (meal.weekday < 6)
+                meal.weekday = meal.weekday + 1;
+            else 
+                return;
+        }
+        $scope.meals[meal.index].weekday = meal.weekday;
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.getLocation = function (val) {
+        return Recipes.query().$promise.then(function (results) {
+            return results.map(function (item) {
+                return {
+                    id: item.id,
+                    caption: item.title
+                };
+            });
+        });
+    };
+    
+    $scope.getRecipe = function (id) {
+        return Recipes.get(
+            {
+                recipeId: id
+            }
+        );
+    };
+    
+    $scope.getRecipeIngredients = function (recipe) {
+        if (recipe.ingridients.length > 0) {
+            recipe.ingridients.forEach(function (item, i, arr) {
+                Measures.get(
+                    {
+                        measureId: item.ingridientAmount.measureId
+                    }
+                ).$promise.then(function (measure) {
+                    item.measure = measure;
+                });
             });
         }
     };
+    
+    $scope.addRecipe = function (id) {
+        Recipes.get(
+            {
+                recipeId: id
+            }
+        ).$promise.then(function (recipe) {
+            $scope.menu.meals.push(
+                { 
+                    recipeId: recipe.id,
+                    recipe: recipe,
+                    index: $scope.meals.length,
+                    portions: recipe.portions
+                }
+            );
+            $scope.getRecipeIngredients(recipe);
+        });                                                
+    };
+    
+    $scope.remove = function () {
+        if ($window.confirm('Are you sure you want to delete?')) {
+            $scope.menu.$remove();
+            $location.path('menu');    
+        }
+    };
 
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        console.log($scope.menu.meals);
+        $scope.menu.meals = [];
+        $scope.meals.forEach(function (meal, k, arr) {
+             $scope.menu.meals.push(meal);    
+        });
+        console.log($scope.menu);
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+    
+    $scope.saveInit = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number + '/meals');
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
 }

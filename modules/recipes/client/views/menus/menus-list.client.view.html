@@ -1,37 +1,21 @@
 <section ng-controller="MenusController" ng-init="find()">
     <div class="page-header">
         <h1>
-            Menu
+            Меню
         </h1>
     </div>
     <form>
         <div class="form-group">
-            <div class="input-group">
-                <div class="input-group-addon">
-                    <i class="glyphicon glyphicon-search"></i>
-                </div>
-                <input type="text" class="form-control" placeholder="Search products" ng-model="filterProducts">
-            </div>
         </div>
     </form>
     <div class="list-group">
-        <a ng-repeat="product in products | filter:filterProducts"
-           ui-sref="products.view({productId: product.id})" 
-           class="list-group-item">
+        <a ng-repeat="menu in menus" ui-sref="menu.view({menuId: menu.number})" class="list-group-item">
             <div class="row">
-                <div class="col-md-2">
-                    <span ng-if="product.image">
-                        <img ng-src="./uploads/products/pictures/{{ingridient.image}}" class="img-thumbnail user-profile-picture">
-                    </span>
-                </div>
-                <div class="col-md-6">
-                    <h4 class="list-group-item-heading" ng-bind="product.caption"></h4>
-                    <p class="list-group-item-text" ng-bind="product.infoCard"></p>
-                </div>
+                {{menu.number}}
             </div>           
         </a>
     </div>
-    <div class="alert alert-warning text-center" ng-if="!products.length">
-        No ingridients yet, why don't you <a ui-sref="products.create">create one</a>?
+    <div class="alert alert-warning text-center" ng-if="!menus.length">
+        Нет меню, <a ui-sref="menu.create">создать</a>?
     </div>
 </section>

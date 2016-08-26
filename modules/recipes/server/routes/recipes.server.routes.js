@@ -70,12 +70,13 @@ module.exports = function(app) {
     app.route('/api/menu')
         .all(recipesPolicy.isAllowed)
         .get(menus.list)
+        .post(menus.create)
     ;
     app.route('/api/menu/:menuId')
         .all(recipesPolicy.isAllowed)
-        .get(menus.create) //FIXME post
+        .get(menus.read)
+        .put(menus.update)
     ;
-    //FUTURE доступ к меню по неделям /api/menu/week/:weekId
     
     app.route('/api/shelf')
         .all(recipesPolicy.isAllowed)
