@@ -92,12 +92,7 @@
                                     </span>
                                 </uib-bar>
                             </uib-progress>
-                            <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
-                                <span style="color:white; white-space:nowrap;"> 
-                                    {{shelf.progressbar.text}}
-                                </span>
-                            </progressbar>
-                                
+                            <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
                         </div>
                     </div><hr/>                    
                     <div ng-show="info.caption" class="col-md-7">
@@ -224,14 +219,14 @@
                         <input name="deficit" type="text" ng-model="shelf.place" class="form-control">
                         <hr/>
                         <label for="isSpoiled">
-                            Переопределение свежести
+                            Статус ревизии
                         </label>
                         <br/>
                         <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">
-                            Свежее
+                            Выполнено
                         </label>
                         <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">
-                            Испорченое
+                            Требуется
                         </label> 
                     </div>                   
                 </div>

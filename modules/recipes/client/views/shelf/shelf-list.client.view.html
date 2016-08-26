@@ -50,11 +50,7 @@
                 </div>
                 <a ui-sref="shelf.view({ shelfId: shelf.id })">
                     <div class="col-md-7">
-                        <progressbar class="{{shelf.progressbar.class}}" value="shelf.progressbar.value" type="{{shelf.progressbar.type}}" max="100">
-                            <span style="color:white; white-space:nowrap;"> 
-                                {{shelf.progressbar.text}}
-                            </span>
-                        </progressbar>
+                        <shelfstatusbar ng-model="shelf" handle="shelf.progressbar"></shelfstatusbar>
                     </div>
                 </a>
                 <div class="col-md-2">
