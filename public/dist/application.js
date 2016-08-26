@@ -1067,14 +1067,35 @@ function routeConfig($stateProvider) {
         })
         .state('menu.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/products/product-create.client.view.html',
+            templateUrl: 'modules/recipes/client/views/menus/menu-init.client.view.html',
+            data: {
+                roles: ['admin']
+            }
+        })
+        .state('menu.init', {
+            url: '/:menuId/init',
+            templateUrl: 'modules/recipes/client/views/menus/menu-init.client.view.html',
+            data: {
+                roles: ['admin']
+            }
+        })
+        .state('menu.recipes', {
+            url: '/:menuId/recipes',
+            templateUrl: 'modules/recipes/client/views/menus/menu-recipes.client.view.html',
             data: {
                 roles: ['admin']
             }
         })
         .state('menu.edit', {
-            url: '/:productId',
-            templateUrl: 'modules/recipes/client/views/products/product-edit.client.view.html',
+            url: '/:menuId/edit',
+            templateUrl: 'modules/recipes/client/views/menus/menu-form.client.view.html',
+            data: {
+                roles: ['admin']
+            }
+        })
+        .state('menu.view', {
+            url: '/:menuId',
+            templateUrl: 'modules/recipes/client/views/menus/menu-read.client.view.html',
             data: {
                 roles: ['admin']
             }
@@ -1422,80 +1443,498 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Rec
 // Recipes controller
 angular
     .module('recipes')
-    .controller('MenusController', MenusController);
-MenusController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Menu', 'Recipes', 'Ingridients', 'Measures'];
+    .controller('MenuRecipesController', MenuRecipesController);
+MenuRecipesController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'ShelfQueryService', 'Recipes', 'Measures'];
 
-function MenusController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
-
+function MenuRecipesController($scope, $stateParams, $location, $window, Authentication, MenuService, ShelfQueryService, Recipes, Measures) {
+    
     $scope.authentication = Authentication;
-
-    $scope.sort = function (a, b) {
-        return a.index - b.index;
-    };
-
-// Find a list of Recipes
+    $scope.error = null;
+    $scope.info = {};
+    $scope.form = {};
+    
     $scope.find = function () {
-        $scope.recipes = Recipes.query();
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
+        });
     };
-
-// Find existing Recipe
+    
     $scope.findOne = function () {
-        Recipes.get(
-            {
-                recipeId: $stateParams.recipeId
-            }
-        ).$promise.then(function (recipe) {
-            if (recipe.ingridients.length > 0) {
-                recipe.ingridients.forEach(function (item, i, arr) {
-                    Measures.get(
-                        {
-                            measureId: item.ingridientAmount.measureId
-                        }
-                    ).$promise.then(function (measure) {
-                        item.measure = measure;
-                        item.index = item.ingridientAmount.index;
-                        item.amount = item.ingridientAmount.amount;
-                        item.measureCaption = measure.caption;
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                if (menu.meals) {
+                    menu.meals.forEach(function (item, i, arr) {
+                        item.recipe = $scope.getRecipe(item.recipeId);
                     });
-                });
-            }
-            recipe.ingridients.sort($scope.sort);
-            $scope.recipe = recipe;
-            $scope.ingridientData = $scope.recipe.ingridients;
-        });
-    };
-
-// Update existing Recipe
-    $scope.update = function (isValid) {
-        $scope.error = null;
-
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'recipeForm');
-            return false;
-        }
-
-        var recipe = $scope.recipe;
-        recipe.ingridients = $scope.ingridientData;
-        recipe.steps = $scope.stepData;
-        recipe.$update(function () {
-            $location.path('recipes/' + recipe.id);
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
-    };
-
-    // Remove existing Recipe
-    $scope.remove = function (recipe) {
-        if (recipe) {
-            recipe.$remove();
-            $location.path('recipes');
-        } else {
-            $scope.recipe.$remove(function () {
-                $location.path('recipes');
+                }
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
             });
         }
     };
+    
+    $scope.getRecipe = function (id) {
+        return Recipes.get(
+            {
+                recipeId: id
+            }
+        );
+    };
+    
+    $scope.getMeasures = function (recipe) {
+        if (recipe.ingridients.length > 0) {
+            recipe.ingridients.forEach(function (item, i, arr) {
+                Measures.get(
+                    {
+                        measureId: item.ingridientAmount.measureId
+                    }
+                ).$promise.then(function (measure) {
+                    item.measure = measure;
+                });
+            });
+        }
+    };
+    
+    $scope.addRecipe = function (id) {
+        Recipes.get(
+            {
+                recipeId: id
+            }
+        ).$promise.then(function (recipe) {
+            $scope.menu.meals.push(
+                {
+                    recipeId: recipe.id,
+                    recipe: recipe,
+                    index: $scope.meals.length,
+                    portions: recipe.portions
+                }
+            );
+        });
+    };
+    
+    $scope.remove = function () {
+        if ($window.confirm('Are you sure you want to delete?')) {
+            $scope.menu.$remove();
+            $location.path('menu');
+        }
+    };
 
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('MenusController', MenusController);
+MenusController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'ShelfQueryService', 'Recipes', 'Measures'];
+
+function MenusController($scope, $stateParams, $location, $window, Authentication, MenuService, ShelfQueryService, Recipes, Measures) {
+    
+    $scope.authentication = Authentication;
+    $scope.error = null;
+    $scope.info = {};
+    $scope.form = {};
+    $scope.mytime = Date.now();
+    
+    $scope.weekDays = [];
+    $scope.weekDayMask = [true, true, true, true, true, true, false];
+    $scope.weekDayExamples = [new Date('2016-08-15'), new Date('2016-08-16'), new Date('2016-08-17'), new Date('2016-08-18'), new Date('2016-08-19'), new Date('2016-08-20'), new Date('2016-08-21')]; //Mon-Sun
+    $scope.meals = [
+        {
+            recipeId: 1,
+            index: 0,
+            type: 0,
+            weekday: 0,
+            portions: 2,
+            comment: 'test meal 1',
+            isDone: false,
+            startTime: 16 * 60 //16:00
+        },
+        {   
+            recipeId: 1,
+            index: 1,
+            type: 0,
+            weekday: 2,
+            portions: 2.5,
+            comment: 'test meal 2',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
+        },
+        {   
+            recipeId: 1,
+            index: 2,
+            type: 1,
+            weekday: 2,
+            portions: 2.5,
+            comment: 'test meal 2 - double',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
+        },
+        {   
+            recipeId: 1,
+            index: 3,
+            type: 0,
+            weekday: 2,
+            portions: 2.5,
+            comment: 'test meal 3',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
+        },
+        {   
+            recipeId: 1,
+            index: 4,
+            type: 1,
+            weekday: 3,
+            portions: 2.5,
+            comment: 'test meal 2',
+            isDone: true,
+            startTime: 17 * 60 + 30 //17:30
+        }
+    ];
+    
+    $scope.find = function () {
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
+        });
+    };
+    
+    $scope.findOneInit = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        } else {
+            $scope.menu = new MenuService(
+                {
+                    startDate: new Date(Date.now()),
+                    types: [
+                        {
+                            index: 0,
+                            caption: "Завтрак",
+                            serve: new Date('2016-08-15 7:30')
+                        },
+                        {
+                            index: 1,
+                            caption: "Обед",
+                            serve: new Date('2016-08-15 19:30')
+                        }
+                    ]
+                }
+            );
+        }
+    };
+    
+    $scope.findOneRecipes = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                if (menu.meals) {
+                    menu.meals.forEach(function (item, i, arr) {
+                        item.recipe = $scope.getRecipe(item.recipeId);    
+                    });
+                }
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        }
+    };
+    
+    $scope.findOne = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.meals = menu.meals;
+                $scope.menuInitByDays(menu);
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        } else {
+            $scope.menu = new MenuService(
+                {
+                    startDate: Date.now(),
+                    types: [
+                        {
+                            index: 0,
+                            caption: "Завтрак",
+                            serve: new Date('2016-08-15 7:30')
+                        },
+                        {
+                            index: 1,
+                            caption: "Обед",
+                            serve: new Date('2016-08-15 19:30')
+                        }
+                    ]
+                }
+            );
+            $scope.menuInitByDays($scope.menu);
+        }
+    };
+    
+    $scope.findQueryForMenu = function () {
+        ShelfQueryService.query(
+            {
+                menuId: $stateParams.menuId
+            }
+        ).$promise.then(function (shelfQueries) {
+            $scope.shelfQueries = shelfQueries;
+        });
+    };
+    
+    $scope.menuInitByDays = function (menu) {
+        $scope.weekDays = [];
+        $scope.weekDayMask.forEach(function (weekDay, i, arr) {
+            if (!weekDay) {
+                $scope.weekDays.push(
+                    {
+                        index: i,
+                        isActive: false,
+                        caption: $scope.weekDayExamples[i]
+                    }
+                );
+            } else {
+                $scope.weekDays.push(
+                    {
+                        index: i,
+                        isActive: true,
+                        caption: $scope.weekDayExamples[i]
+                    }
+                );
+            }
+            $scope.weekDays[i].types = [];
+            menu.types.forEach(function (type, j, arr) {
+                $scope.weekDays[i].types.push(
+                    {
+                        index: j,
+                        caption: type.caption,
+                        serve: type.serve
+                    }
+                );
+                $scope.weekDays[i].types[j].meals = [];
+                $scope.meals.forEach(function (meal, k, arr) {
+                    if (meal.weekday === i && meal.type === $scope.weekDays[i].types[j].index) {
+                        $scope.weekDays[i].types[j].meals.push(meal);
+                        $scope.weekDays[i].types[j].meals[$scope.weekDays[i].types[j].meals.length - 1].index = k;
+                    }
+                });
+            });
+        });
+        $scope.form.newType = {
+            isShown: false,
+            caption: null,
+            serve: menu.types[menu.types.length - 1].serve
+        };
+    };
+    
+    $scope.addType = function () {
+        $scope.menu.types.push(
+            {
+                index: $scope.menu.types[$scope.menu.types.length - 1].index + 1, 
+                caption: $scope.form.newType.caption,
+                serve: $scope.form.newType.serve
+            }
+        );
+        $scope.form.newType = {
+            isShown: false,
+            caption: null,
+            serve: $scope.menu.types[$scope.menu.types.length - 1].serve
+        };
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.removeType = function (typeIndex) {
+        $scope.menu.types.splice(typeIndex, 1);
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.addMeal = function (weekday, typeIndex) {
+        $scope.meals.push(
+            { 
+                recipeId: 1,
+                index: $scope.meals.length,
+                type: typeIndex,
+                weekday: weekday,
+                portions: 2.5,
+                comment: '',
+                isDone: false,
+                startTime: 17 * 60 + 30 //17:30
+            } 
+        );
+    };
+    
+    $scope.mealMoveType = function (oldType, meal, direction) {
+        
+        var targetIndex = -1;
+        $scope.weekDays[meal.weekday].types.some(function (type) {
+            if (direction < 0) {
+                if (type.serve >= oldType.serve)
+                    return true;
+                targetIndex = type.index;
+            } else {
+                targetIndex = type.index;
+                if (type.serve > oldType.serve)
+                    return true;    
+            }
+            return false;
+        });
+        if (targetIndex === -1) return;
+        
+        $scope.meals[meal.index].type = $scope.weekDays[meal.weekday].types[targetIndex].index;
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.mealMoveDay = function (meal, direction) {
+        if (direction < 0) {
+            if (meal.weekday > 0)
+                meal.weekday = meal.weekday - 1;
+            else 
+                return;
+        } else {
+            if (meal.weekday < 6)
+                meal.weekday = meal.weekday + 1;
+            else 
+                return;
+        }
+        $scope.meals[meal.index].weekday = meal.weekday;
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.getLocation = function (val) {
+        return Recipes.query().$promise.then(function (results) {
+            return results.map(function (item) {
+                return {
+                    id: item.id,
+                    caption: item.title
+                };
+            });
+        });
+    };
+    
+    $scope.getRecipe = function (id) {
+        return Recipes.get(
+            {
+                recipeId: id
+            }
+        );
+    };
+    
+    $scope.getRecipeIngredients = function (recipe) {
+        if (recipe.ingridients.length > 0) {
+            recipe.ingridients.forEach(function (item, i, arr) {
+                Measures.get(
+                    {
+                        measureId: item.ingridientAmount.measureId
+                    }
+                ).$promise.then(function (measure) {
+                    item.measure = measure;
+                });
+            });
+        }
+    };
+    
+    $scope.addRecipe = function (id) {
+        Recipes.get(
+            {
+                recipeId: id
+            }
+        ).$promise.then(function (recipe) {
+            $scope.menu.meals.push(
+                { 
+                    recipeId: recipe.id,
+                    recipe: recipe,
+                    index: $scope.meals.length,
+                    portions: recipe.portions
+                }
+            );
+            $scope.getRecipeIngredients(recipe);
+        });                                                
+    };
+    
+    $scope.remove = function () {
+        if ($window.confirm('Are you sure you want to delete?')) {
+            $scope.menu.$remove();
+            $location.path('menu');    
+        }
+    };
+
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        console.log($scope.menu.meals);
+        $scope.menu.meals = [];
+        $scope.meals.forEach(function (meal, k, arr) {
+             $scope.menu.meals.push(meal);    
+        });
+        console.log($scope.menu);
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+    
+    $scope.saveInit = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number + '/meals');
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
 }
 'use strict';
 
@@ -1937,15 +2376,13 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     $scope.info = {};
     $scope.form = {};
     
+    $scope.handle = true;
     $scope.legend = false;
     $scope.selectedIngridient = "";
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
     
     $scope.find = function () {
         ShelfService.query().$promise.then(function (shelves) {
-            shelves.forEach(function (shelf, i, arr) {
-                $scope.progressUpdate(shelf);    
-            });
             $scope.shelves = shelves;
         });
     };
@@ -2022,6 +2459,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.filterByProgress = function (item){
+        if (!item.progressbar) return true;
         return false ||
             ($scope.filterBar.spoiled && item.isSpoiled) ||
             ($scope.filterBar.empty && !item.isSpoiled && item.progressbar.value <= pbLimitEmpty) ||
@@ -2068,67 +2506,6 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         });
     };
     
-    $scope.progressUpdate = function (shelf) {
-        
-        if(shelf.isSpoiled) {
-            shelf.progressbar = {
-                type: 'danger',
-                text: "Просрочено",
-                value: pbLimitEmpty,
-                class: "progress-striped active"
-            };
-            return;
-        }
-        
-        if (shelf.stored <= 0) { // 0%
-            shelf.progressbar = {
-                type: 'default',
-                text: shelf.stored,
-                value: pbLimitEmpty
-            };    
-        } else if (shelf.stored <= shelf.deficit) {
-            shelf.progressbar = 
-                {
-                    type: 'danger',
-                    text: "! " + shelf.stored + " < " + shelf.deficit + " !", 
-                    value: pbLimitDeficit - pbLengthDeficit + 
-                        ((shelf.stored / shelf.deficit) * pbLengthDeficit)
-                };
-            if (shelf.progressbar.value < pbLimitEmpty) {
-                shelf.progressbar.value = pbLimitEmpty;
-                shelf.progressbar.class = "progress-striped active";
-            }    
-        } else if (shelf.stored < shelf.desired) {
-            shelf.progressbar = 
-                {
-                    type: 'warning',
-                    text: shelf.stored,
-                    value: pbLimitDesired - pbLengthDesired + 
-                        ((shelf.stored - shelf.deficit) / (shelf.desired - shelf.deficit) * pbLengthDesired)
-                };   
-        } else if (shelf.stored <= shelf.max) {
-            shelf.progressbar = 
-                {
-                    type: 'success',
-                    text: shelf.stored,
-                    value: pbLimitMax - pbLenghtMax + 
-                        ((shelf.stored - shelf.desired) / (shelf.max - shelf.desired) * pbLenghtMax)
-                };  
-        } else {
-            shelf.progressbar = 
-                {
-                    type: 'info',
-                    text: shelf.stored + " > " + shelf.max,
-                    value: pbLimitMax - pbMultyMax + 
-                        (shelf.stored / shelf.max) * pbMultyMax
-                };
-            if (shelf.progressbar.value > 100) { // 100%
-                shelf.progressbar.value = 100; // set to 100%
-                shelf.progressbar.class = "progress-striped active";
-            }       
-        }       
-    };
-    
     $scope.spoilUpdate = function (state) {
         
         if (state) {
@@ -2140,7 +2517,6 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             $scope.btnIsSpoiledTrue = btnGood;
             $scope.btnIsSpoiledFalse = btnInactive;
         }
-        $scope.progressUpdate($scope.shelf); 
     };
     
     $scope.clearSpoiled = function () {
@@ -2248,7 +2624,6 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             $scope.form.max.alert = true;
             return false;
         }
-        $scope.progressUpdate($scope.shelf);
         return true;
     };
     
@@ -2325,141 +2700,10 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
                     $scope.info.min = measure.min;
                 });
                 $scope.shelfQuery = shelfQuery;
-                $scope.settingsLoad();
             });    
         } else {
             //TODO new query from other then shelf    
         } 
-    };
-    
-    $scope.settingsLoad = function () {
-        
-        $scope.form.buy = {
-            alert: false,
-            input: false,
-            value: $scope.shelfQuery.buy
-        };
-        $scope.form.bought = {
-            alert: false,
-            input: false,
-            value: $scope.shelfQuery.bought
-        };
-        $scope.form.use = {
-            alert: false,
-            input: false,
-            value: $scope.shelfQuery.use
-        };
-        $scope.form.used = {
-            alert: false,
-            input: false,
-            value: $scope.shelfQuery.used
-        };
-        $scope.form.spoil = {
-            alert: false,
-            input: false,
-            value: $scope.shelfQuery.spoil
-        };
-        
-    };
-    
-    $scope.setBuy = function (sign, value) {
-        var oldValue = $scope.shelfQuery.buy;
-        if (value !== 0) {
-            $scope.shelfQuery.buy = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelfQuery.buy = Number(($scope.shelfQuery.buy - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelfQuery.buy = Number(($scope.shelfQuery.buy + $scope.info.step).toFixed(3)); 
-        }
-        if (1!==1){
-            $scope.shelfQuery.buy = oldValue;
-        } else {
-            $scope.form.buy = {
-                alert: false,
-                input: false,
-                value: $scope.shelfQuery.buy
-            };
-        }
-    };
-    
-    $scope.setBought = function (sign, value) {
-        var oldValue = $scope.shelfQuery.bought;
-        if (value !== 0) {
-            $scope.shelfQuery.bought = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelfQuery.bought = Number(($scope.shelfQuery.bought - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelfQuery.bought = Number(($scope.shelfQuery.bought + $scope.info.step).toFixed(3)); 
-        }
-        if (1!==1){
-            $scope.shelfQuery.bought = oldValue;
-        } else {
-            $scope.form.bought = {
-                alert: false,
-                input: false,
-                value: $scope.shelfQuery.bought
-            };
-        }
-    };
-    
-    $scope.setUse = function (sign, value) {
-        var oldValue = $scope.shelfQuery.use;
-        if (value !== 0) {
-            $scope.shelfQuery.use = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelfQuery.use = Number(($scope.shelfQuery.use - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelfQuery.use = Number(($scope.shelfQuery.use + $scope.info.step).toFixed(3)); 
-        }
-        if (1!==1){
-            $scope.shelfQuery.use = oldValue;
-        } else {
-            $scope.form.use = {
-                alert: false,
-                input: false,
-                value: $scope.shelfQuery.use
-            };
-        }
-    };
-    
-    $scope.setUsed = function (sign, value) {
-        var oldValue = $scope.shelfQuery.used;
-        if (value !== 0) {
-            $scope.shelfQuery.used = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelfQuery.used = Number(($scope.shelfQuery.used - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelfQuery.used = Number(($scope.shelfQuery.used + $scope.info.step).toFixed(3)); 
-        }
-        if (1!==1){
-            $scope.shelfQuery.used = oldValue;
-        } else {
-            $scope.form.used = {
-                alert: false,
-                input: false,
-                value: $scope.shelfQuery.used
-            };
-        }
-    };
-    
-    $scope.setSpoil = function (sign, value) {
-        var oldValue = $scope.shelfQuery.spoil;
-        if (value !== 0) {
-            $scope.shelfQuery.spoil = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelfQuery.spoil = Number(($scope.shelfQuery.spoil - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelfQuery.spoil = Number(($scope.shelfQuery.spoil + $scope.info.step).toFixed(3)); 
-        }
-        if (1!==1){
-            $scope.shelfQuery.spoil = oldValue;
-        } else {
-            $scope.form.spoil = {
-                alert: false,
-                input: false,
-                value: $scope.shelfQuery.spoil
-            };
-        }
     };
     
     $scope.remove = function () {
@@ -8442,6 +8686,142 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 
 })();
 
+angular.module('recipes').directive('updowninput', function () {
+    'use strict';
+    return {
+        restrict: 'AE',
+        scope: {
+            value: '=ngModel',
+            min: '=',
+            max: '=',
+            step: '=',
+            precision: '=',
+            measure: '=',
+            convertable: '=',
+            validator: '&'
+        },
+        require: 'ngModel',
+        template: 
+            '<div ng-hide="form.converting">' +
+                '<div ng-hide="step > 0 || !step">' +
+                    '<label class="btn btn-default" ng-click="form.converting=true">' +
+                       '{{measure}}' +
+                    '</label>' +
+               '</div>' +
+                '<div ng-show="(step > 0) || !step">' +
+                    '<div ng-hide="form.input">' +
+                        '<div class="btn-group">' +
+                            '<label ng-show="measure && convertable" class="btn btn-default" ng-click="form.converting=true">' +
+                                '{{measure}}' +
+                            '</label>' +
+                            '<label class="btn btn-default" ng-click="set(-1)">' +
+                                '<i class="glyphicon glyphicon-minus"></i>' +
+                            '</label>' +
+                            '<label class="btn btn-default" ng-click="form.input = true">' +
+                                '<div ng-show="!measure || (measure && convertable)">' +
+                                    '{{value}}' +
+                               '</div>' +
+                                '<div ng-show="measure && !convertable">' +
+                                    '{{value}} {{measure}}' +
+                               '</div>' +
+                            '</label>' +
+                            '<label class="btn btn-default" ng-click="set(1)">' +
+                                '<i class="glyphicon glyphicon-plus"></i>' +
+                            '</label>' +
+                       '</div>' +
+                   '</div>' +
+                    '<div ng-show="form.input">' +
+                        '<div class="input-group">' +
+                            '<label ng-show="measure" class="input-group-addon">' +
+                                '{{measure}}' +
+                            '</label>' +
+                            '<input name="input" type="number" ng-model="form.value" class="form-control">' +
+                            '<label ng-show="form.alert" class="input-group-addon">' +
+                                '{{form.alertText}}' +
+                            '</label>' +
+                            '<label class="input-group-addon" ng-click="set(0,form.value)">' +
+                                'OK' +
+                            '</label>' +
+                       '</div>' +
+                   '</div>' +
+               '</div>' +
+            '</div>' +
+            '<div ng-show="form.converting">' +
+                '<div class="btn-group">' +
+                    '<label class="btn btn-default" ng-click="form.converting=false">' +
+                        '<div ng-hide="step > 0">' +
+                            '<i class="glyphicon glyphicon-menu-left"></i>{{value}}' +
+                       '</div>' +
+                        '<div ng-show="step > 0">' +
+                            '<i class="glyphicon glyphicon-menu-left"></i>{{value}} {{measure}}' +
+                       '</div>' +
+                    '</label>' +
+                    '<div class="btn-group" dropdown>' +
+                        '<label class="btn btn-default">' +
+                            '<div ng-hide="step > 0">' +
+                                '<i class="glyphicon glyphicon-retweet"></i>{{newmeasure}}' +
+                           '</div>' +
+                            '<div ng-show="step > 0">' +
+                                '<i class="glyphicon glyphicon-retweet"></i>{{newvalue}} {{newmeasure}}' +
+                           '</div>' +
+                        '</label>' +
+                        '<label class="btn btn-default" dropdown-toggle>' +
+                            '<span class="caret"></span>' +
+                        '</label>' +
+                        '<ul class="dropdown-menu" role="menu">' +
+                            '<li role="menuitem"><a href="#">Action</a></li>' +
+                            '<li role="menuitem"><a href="#">Another action</a></li>' +
+                            '<li role="menuitem"><a href="#">Something else here</a></li>' +
+                            '<li class="divider"></li>' +
+                            '<li role="menuitem"><a href="#">Separated link</a></li>' +
+                        '</ul>' +
+                   '</div>' +
+               '</div>' +
+            '</div>',
+        link: function (scope, iElement, iAttrs, ngModelController) {
+            var min = scope.min || 0,
+                max = scope.max || Number.MAX_VALUE,
+                step = scope.step || 1,
+                precision = scope.precision || 3,
+                oldValue = scope.value;
+            
+            ngModelController.$render = function () {
+                scope.form = {
+                    alert: false,
+                    alertText : '',
+                    value: scope.value
+                };
+            };
+            
+            scope.set = function (sign, value) {
+                scope.form = {
+                    alert: false,
+                    alertText : '',
+                    value: scope.value
+                };
+                if (value) {
+                    scope.value = Number((value).toFixed(precision));
+                } else if (sign < 0) {
+                    scope.value = Number((scope.value - step).toFixed(precision));
+                } else {
+                    scope.value = Number((scope.value + step).toFixed(precision));
+                }
+                if (scope.value < min) {
+                    scope.value = oldValue;
+                    scope.form.alert = true;
+                    scope.form.alertText = '>=' + min + '!';
+                } else {
+                    scope.form = {
+                        alert: false,
+                        alertText : '',
+                        input: false,
+                        value: scope.value
+                    };
+                }
+            };
+        }
+    };
+});
 /* jshint ignore:start */
 
 'use strict';
@@ -10455,6 +10835,94 @@ angular
   return module;
 }));
 
+angular.module('recipes').directive('shelfstatusbar', function () {
+    'use strict';
+    // progress bar settings
+    const pbLimitEmpty = 10;
+    const pbLimitDeficit = 20;
+    const pbLengthDeficit = 20;
+    const pbLimitDesired = 50;
+    const pbLengthDesired = 30;
+    const pbLimitMax = 80;
+    const pbLenghtMax = 30;
+    const pbMultyMax = 5;
+    return {
+        restrict: 'AE',
+        scope: {
+            progressbar: '=handle'
+        },
+        require: 'ngModel',
+        template:
+            '<div>' +
+                '<div ng-show="progressbar">' +
+                    '<progressbar class="{{progressbar.class}}" value="progressbar.value" type="{{progressbar.type}}" max="100">' +
+                        '<span style="color:white; white-space:nowrap;">' + 
+                            '{{progressbar.text}}' +
+                        '</span>' +
+                    '</progressbar>' +
+                '</div>' +
+                '<div ng-hide="progressbar">' +
+                    '' +
+                '</div>' +
+            '</div>',
+        link: function (scope, iElement, iAttrs, ngModelController) {
+            ngModelController.$render = function () {
+                scope.shelf = ngModelController.$viewValue;
+                scope.progressUpdate();    
+            };
+            scope.$watch(function () {
+                return ngModelController.$modelValue;
+            }, function(newValue) {
+                scope.progressUpdate();
+            }, true);
+            scope.progressUpdate = function() {
+                if (!scope.shelf) return;
+                if (scope.shelf.stored <= scope.shelf.deficit) {
+                    scope.progressbar = 
+                        {
+                            type: 'danger',
+                            text: "! " + scope.shelf.stored + " < " + scope.shelf.deficit + " !", 
+                            value: pbLimitDeficit - pbLengthDeficit + 
+                                ((scope.shelf.stored / scope.shelf.deficit) * pbLengthDeficit)
+                        };
+                    if (scope.progressbar.value < pbLimitEmpty) {
+                        scope.progressbar.value = pbLimitEmpty;
+                    }    
+                } else if (scope.shelf.stored < scope.shelf.desired) {
+                    scope.progressbar = 
+                        {
+                            type: 'warning',
+                            text: scope.shelf.stored,
+                            value: pbLimitDesired - pbLengthDesired + 
+                                ((scope.shelf.stored - scope.shelf.deficit) / (scope.shelf.desired - scope.shelf.deficit) * pbLengthDesired)
+                        };   
+                } else if (scope.shelf.stored <= scope.shelf.max) {
+                    scope.progressbar = 
+                        {
+                            type: 'success',
+                            text: scope.shelf.stored,
+                            value: pbLimitMax - pbLenghtMax + 
+                                ((scope.shelf.stored - scope.shelf.desired) / (scope.shelf.max - scope.shelf.desired) * pbLenghtMax)
+                        };  
+                } else {
+                    scope.progressbar = 
+                        {
+                            type: 'info',
+                            text: scope.shelf.stored + " > " + scope.shelf.max,
+                            value: pbLimitMax - pbMultyMax + 
+                                (scope.shelf.stored / scope.shelf.max) * pbMultyMax
+                        };
+                    if (scope.progressbar.value > 100) { // 100%
+                        scope.progressbar.value = 100; // set to 100%
+                    }       
+                }
+                if(scope.shelf.isSpoiled) {
+                    scope.progressbar.class = "progress-striped active";
+                }   
+            };
+        }
+    };
+});
 'use strict';
 
 //Ingridients service used for communicating with the ingridients REST endpoints
@@ -10471,6 +10939,57 @@ angular.module('recipes').factory('Ingridients', ['$resource',
 ]);
 'use strict';
 
+//Shelf service used for communicating with the shelf REST endpoints
+angular
+    .module('recipes')
+    .factory('MealService', MealService);
+
+MealService.$inject = ['$resource'];
+
+function MealService($resource) {
+    var Meal = $resource('api/meal/:mealId', {
+        mealId: '@number'
+    }, {
+        update: {
+            method: 'PUT'
+        }
+    });
+    
+    angular.extend(Meal.prototype, {
+        createOrUpdate: function () {
+            var meal = this;
+            return createOrUpdate(meal);
+        }
+    });
+    
+    return Meal;
+    
+    function createOrUpdate(meal) {
+        if (meal.id) {
+            return meal.$update(onSuccess, onError);
+        } else {
+            return meal.$save(onSuccess, onError);
+        }
+    }
+    
+    function onSuccess(menu) {
+        // Any required internal processing from inside the service, goes here.    
+    }
+    
+    // Handle error response
+    function onError(errorResponse) {
+        var error = errorResponse.data;
+        // Handle error internally
+        handleError(error);
+    }
+
+    function handleError(error) {
+        // Log error
+        console.log(error);
+    }
+}
+'use strict';
+
 //Measures service used for communicating with the measures REST endpoints
 angular.module('recipes').factory('Measures', ['$resource',
     function($resource) {
@@ -10485,18 +11004,55 @@ angular.module('recipes').factory('Measures', ['$resource',
 ]);
 'use strict';
 
-//Recipes service used for communicating with the recipes REST endpoints
-angular.module('recipes').factory('Menu', ['$resource',
-  function($resource) {
-    return $resource('api/menu/:menuId', {
-      recipeId: '@id'
+//Shelf service used for communicating with the shelf REST endpoints
+angular
+    .module('recipes')
+    .factory('MenuService', MenuService);
+
+MenuService.$inject = ['$resource'];
+
+function MenuService($resource) {
+    var Menu = $resource('api/menu/:menuId', {
+        menuId: '@number'
     }, {
-      update: {
-        method: 'PUT'
-      }
+        update: {
+            method: 'PUT'
+        }
     });
-  }
-]);
+    
+    angular.extend(Menu.prototype, {
+        createOrUpdate: function () {
+            var menu = this;
+            return createOrUpdate(menu);
+        }
+    });
+    
+    return Menu;
+    
+    function createOrUpdate(menu) {
+        if (menu.id) {
+            return menu.$update(onSuccess, onError);
+        } else {
+            return menu.$save(onSuccess, onError);
+        }
+    }
+    
+    function onSuccess(menu) {
+        // Any required internal processing from inside the service, goes here.    
+    }
+    
+    // Handle error response
+    function onError(errorResponse) {
+        var error = errorResponse.data;
+        // Handle error internally
+        handleError(error);
+    }
+
+    function handleError(error) {
+        // Log error
+        console.log(error);
+    }
+}
 'use strict';
 
 //Products service used for communicating with the products REST endpoints
