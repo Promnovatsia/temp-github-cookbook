@@ -4,13 +4,15 @@ angular.module('recipes').directive('updowninput', function () {
         restrict: 'AE',
         scope: {
             value: '=ngModel',
-            min: '=min',
-            max: '=max',
-            step: '=step',
-            precision: '=precision',
-            measure: '=measure',
-            convertable: '=convertable'
+            min: '=',
+            max: '=',
+            step: '=',
+            precision: '=',
+            measure: '=',
+            convertable: '=',
+            validator: '&'
         },
+        require: 'ngModel',
         template: 
             '<div ng-hide="form.converting">' +
                 '<div ng-hide="step > 0 || !step">' +
@@ -27,7 +29,7 @@ angular.module('recipes').directive('updowninput', function () {
                             '<label class="btn btn-default" ng-click="set(-1)">' +
                                 '<i class="glyphicon glyphicon-minus"></i>' +
                             '</label>' +
-                            '<label class="btn btn-default" ng-click="form.value=value;form.input = true">' +
+                            '<label class="btn btn-default" ng-click="form.input = true">' +
                                 '<div ng-show="!measure || (measure && convertable)">' +
                                     '{{value}}' +
                                '</div>' +
@@ -88,13 +90,22 @@ angular.module('recipes').directive('updowninput', function () {
                    '</div>' +
                '</div>' +
             '</div>',
-        link: function (scope, iElement, iAttrs) {
+        link: function (scope, iElement, iAttrs, ngModelController) {
+            var min = scope.min || 0,
+                max = scope.max || Number.MAX_VALUE,
+                step = scope.step || 1,
+                precision = scope.precision || 3,
+                oldValue = scope.value;
+            
+            ngModelController.$render = function () {
+                scope.form = {
+                    alert: false,
+                    alertText : '',
+                    value: scope.value
+                };
+            };
+            
             scope.set = function (sign, value) {
-                var min = scope.min || 0,
-                    max = scope.max || Number.MAX_VALUE,
-                    step = scope.step || 1,
-                    precision = scope.precision || 3,
-                    oldValue = scope.value;
                 scope.form = {
                     alert: false,
                     alertText : '',
