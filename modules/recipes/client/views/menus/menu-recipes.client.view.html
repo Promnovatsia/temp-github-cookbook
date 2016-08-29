@@ -20,27 +20,7 @@
                         <label for="portions">
                             Количество порций
                         </label>
-                        <div ng-hide="form.portions.input">
-                            <div class="btn-group">
-                                <label class="btn btn-default" ng-click="setPortions(-1,0)">
-                                    <snap class="glyphicon glyphicon-minus"></snap>
-                                </label>
-                                <label class="btn btn-default" ng-click="form.portions.input = true">
-                                    {{meal.portions}}
-                                </label>
-                                <label class="btn btn-default" ng-click="setPortions(1,0)">
-                                    <snap class="glyphicon glyphicon-plus"></snap>
-                                </label>
-                            </div> 
-                        </div>
-                        <div ng-show="form.portions.input">
-                            <div class="input-group">
-                                <input name="portions" type="number" ng-model="form.portions.value" class="form-control">
-                                <label class="input-group-addon" ng-click="setPortions(0,form.portions.value)">
-                                    OK
-                                </label>
-                            </div>
-                        </div>
+                        <updowninput ng-model="meal.portions" min="0.5" step="0.5" precision="1"><updowninput>
                     </div>
                 </div>
             </div>
