@@ -85,14 +85,14 @@ function routeConfig($stateProvider) {
         })
         .state('measures.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/measures/measure-create.client.view.html',
+            templateUrl: 'modules/recipes/client/views/measures/measure-form.client.view.html',
             data: {
                 roles: ['admin']
             }
         })
         .state('measures.edit', {
             url: '/:measureId',
-            templateUrl: 'modules/recipes/client/views/measures/measure-edit.client.view.html',
+            templateUrl: 'modules/recipes/client/views/measures/measure-form.client.view.html',
             data: {
                 roles: ['admin']
             }
