@@ -47,7 +47,7 @@ angular.module('recipes').directive('updowninput', function () {
                             '<label ng-show="measure" class="input-group-addon">' +
                                 '{{measure}}' +
                             '</label>' +
-                            '<input name="input" type="number" ng-model="form.value" class="form-control">' +
+                            '<input name="input" min="{{min}}" max="{{max}}" type="number" ng-model="form.value" class="form-control">' +
                             '<label ng-show="form.alert" class="input-group-addon">' +
                                 '{{form.alertText}}' +
                             '</label>' +
@@ -111,15 +111,15 @@ angular.module('recipes').directive('updowninput', function () {
                     alertText : '',
                     value: scope.value
                 };
-                if (value) {
+                if (value !== undefined) {
                     scope.value = Number((value).toFixed(precision));
                 } else if (sign < 0) {
                     scope.value = Number((scope.value - step).toFixed(precision));
-                } else {
+                } else if (sign > 0) {
                     scope.value = Number((scope.value + step).toFixed(precision));
                 }
                 if (scope.value < min) {
-                    scope.value = oldValue;
+                    scope.value = min;
                     scope.form.alert = true;
                     scope.form.alertText = '>=' + min + '!';
                 } else {
