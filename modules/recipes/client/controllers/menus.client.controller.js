@@ -248,6 +248,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                 startTime: 17 * 60 + 30 //17:30
             } 
         );
+        $scope.menuInitByDays($scope.menu);
     };
     
     $scope.mealMoveType = function (oldType, meal, direction) {
@@ -377,13 +378,12 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             $scope.$broadcast('show-errors-check-validity', 'menuForm');
             return false;
         }
-        
         $scope.menu.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
 
         function successCallback(res) {
-            $location.path('menu/' + $scope.menu.number + '/meals');
+            $location.path('menu/' + $scope.menu.number + '/recipes');
         }
 
         function errorCallback(res) {
