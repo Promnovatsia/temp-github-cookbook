@@ -1,0 +1,73 @@
+<section ng-controller="MenusController" ng-init="findOneInit()">
+    <div class="page-header">
+        <h1 ng-show="menu.number">
+            Меню №{{menu.number}} от {{menu.startDate | date}}
+        </h1>
+        <h1 ng-hide="menu.number">
+            Новое меню
+        </h1>
+    </div>
+    <form name="menuForm" class="form-horizontal" ng-submit="saveInit(menuForm.$valid)" novalidate>
+        <fieldset>
+            <div class="row">
+                <div class="col-xs-6">
+                    <label for="menu.startDate">
+                        Начальная дата планирования меню
+                    </label>
+                    <input type="date" ng-model="menu.startDate" class="form-control" required>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <label for="types">
+                    Расписание
+                </label>
+                <div class="list-group">
+                    <div ng-repeat="type in menu.types | orderBy:'serve' track by $index" class="list-group-item">
+                        <div class="list-group-item-heading">
+                            <a class="pull-right btn btn-danger btn-xs" ng-click="removeType($index)">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
+                            <div class='row'>
+                                <div class="col-md-2 col-sm-5">
+                                    <timepicker ng-model="type.serve" show-meridian="false"></timepicker>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <label for="type.caption">
+                                        Прием пищи
+                                    </label>
+                                    <input id="type.capture" type="text" ng-model="type.caption" class="form-control" required placeholder="Например, Завтрак">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="list-group-item-heading">
+                            <a class="pull-right btn btn-success" ng-click="addType()">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                Добавить
+                            </a>
+                            <div class='row'>
+                                <div class="col-md-2 col-sm-5">
+                                    <timepicker ng-model="form.newType.serve" show-meridian="false"></timepicker>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <label for="type.caption">
+                                        Прием пищи
+                                    </label>
+                                    <input type="text" ng-model="form.newType.caption" class="form-control" placeholder="Например, Завтрак">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group"> 
+                <input type="submit" class="pull-right btn btn-default" value="{{shelf.id ? 'Применить' : 'Далее'}}">
+            </div>
+            <div ng-show="error" class="text-danger">
+                <strong ng-bind="error"></strong>
+            </div>
+        </fieldset>
+    </form>
+</section>
