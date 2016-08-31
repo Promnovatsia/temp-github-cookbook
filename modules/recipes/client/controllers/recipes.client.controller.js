@@ -35,7 +35,7 @@ function RecipesController($scope, $stateParams, $location, Authentication, Reci
                 recipe.ingridients.forEach(function (item, i, arr) {
                     Measures.get(
                         {
-                            measureId: item.ingridientAmount.measureId
+                            measureId: item.measureDefault
                         }
                     ).$promise.then(function (measure) {
                         item.measure = measure;

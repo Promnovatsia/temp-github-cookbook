@@ -165,6 +165,8 @@
                                                     </span>
                                                 </div>
                                                 <updowninput ng-model="ingridient.amount" min="ingridient.measure.min" step="ingridient.measure.step" measure="ingridient.measure.caption" convertable="ingridient.measure">
+                                                </updowninput>
+                                                <measureconverter ng-model="ingridient.amount" measure="ingridient.measure" toggle="true"></measureconverter>
                                             </div>
                                         </div>
                                     </td>
