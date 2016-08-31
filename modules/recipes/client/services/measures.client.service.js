@@ -2,7 +2,7 @@
 
 //Measures service used for communicating with the measures REST endpoints
 angular.module('recipes').factory('Measures', ['$resource',
-    function($resource) {
+    function ($resource) {
         return $resource('api/measures/:measureId', {
             measureId: '@id'
         }, {
@@ -33,6 +33,10 @@ function MeasureService($resource) {
         createOrUpdate: function () {
             var measure = this;
             return createOrUpdate(measure);
+        },
+        applyValue: function (value, precision) {
+            var measure = this;
+            return applyValue(measure, value, precision);
         }
     });
     
@@ -44,6 +48,22 @@ function MeasureService($resource) {
         } else {
             return measure.$save(onSuccess, onError);
         }
+    }
+    
+    function applyValue(measure, value, toFixed) {
+        
+        if (measure.step <= 0)
+            return undefined;
+        
+        var result = value || 0,
+            precision = toFixed || 3;
+        if (value % measure.step > 0) {
+            result = Number((value - value % measure.step + measure.step).toFixed(precision));
+        }
+        if (result < measure.min) {
+            result = measure.min;
+        }
+        return result;
     }
     
     function onSuccess(measure) {
