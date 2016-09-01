@@ -44,10 +44,10 @@ angular.module('recipes').directive('measureconverter', function (MeasureService
                 scope.convertList = [];
                 if (!scope.measure) {
                     return;
-                } 
+                }
                 scope.convertList = scope.getConvertList();
                 if (scope.convertList.length === 0) {
-                    //scope.toggle = false; //measure is not convertable, so hiding directive
+                    scope.toggle = false; //measure is not convertable, so hiding directive
                     return;
                 }
                 scope.selectItem(0);
@@ -60,8 +60,8 @@ angular.module('recipes').directive('measureconverter', function (MeasureService
                 return scope.measure.converter.map(function (item, i, arr) {
                     return {
                         id: item.id,
-                        value: (!item.uncountable) ? Number((scope.value * item.rate).toFixed(precision)) : undefined,
-                        caption: item.caption //TODO replace with actual measure to reduce accessing database each conversion
+                        value: (!item.uncountable && scope.value) ? Number((scope.value * item.rate).toFixed(precision)) : undefined,
+                        caption: item.caption
                     };
                 });
             };

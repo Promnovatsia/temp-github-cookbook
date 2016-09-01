@@ -30,7 +30,7 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Mea
                         item.index = i;
                     });
                 }
-            });    
+            });
         } else {
             $scope.measure = new MeasureService(
                 {
@@ -70,7 +70,13 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Mea
             item.index = i;
         });
     };
-
+    
+    $scope.applyStep = function (id, step) {
+        if (step <= 0) {
+            $scope.uncountable = true;
+        }
+    };
+    
     $scope.save = function (isValid) {
         
         if (!isValid) {
@@ -78,7 +84,14 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Mea
             return false;
         }
         
+        if ($scope.uncountable) {
+            $scope.measure.step = 0;
+            $scope.converter.forEach(function (item, i, arr) {
+                item.rate = 0;
+            });
+        }
         $scope.measure.converter = $scope.converter;
+        
         $scope.measure.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);

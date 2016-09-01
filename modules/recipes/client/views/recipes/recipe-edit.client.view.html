@@ -33,7 +33,7 @@
                         <label for="portions">
                             Количество порций
                         </label>
-                        <updowninput ng-model="portions" min="1">
+                        <updowninput ng-model="portions" min="1" precision="0">
                     </div>
                     <div class="form-group col-md-1"></div>
                     <div class="form-group col-md-8">
@@ -164,9 +164,9 @@
                                                         </a>
                                                     </span>
                                                 </div>
-                                                <updowninput ng-model="ingridient.amount" min="ingridient.measure.min" step="ingridient.measure.step" measure="ingridient.measure.caption" convertable="ingridient.measure">
+                                                <updowninput ng-model="ingridient.amount" measure="ingridient.measure" convertable="true" converter="ingridient.converter">
                                                 </updowninput>
-                                                <measureconverter ng-model="ingridient.amount" measure="ingridient.measure" toggle="true"></measureconverter>
+                                                <measureconverter ng-model="ingridient.amount" measure="ingridient.measure" toggle="ingridient.converter"></measureconverter>
                                             </div>
                                         </div>
                                     </td>

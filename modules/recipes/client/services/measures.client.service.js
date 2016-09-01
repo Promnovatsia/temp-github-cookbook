@@ -1,5 +1,5 @@
 'use strict';
-
+//FUTURE DEPRECATED
 //Measures service used for communicating with the measures REST endpoints
 angular.module('recipes').factory('Measures', ['$resource',
     function ($resource) {
