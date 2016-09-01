@@ -1,7 +1,7 @@
 <section ng-controller="MeasuresController" ng-init="find()">
     <div class="page-header">
         <h1>
-            Measures
+            Администрирование: меры величин
         </h1>
     </div>
     <form>
@@ -15,38 +15,44 @@
         </div>
     </form>
     <div class="list-group">
-        <div class="row">
-                <div class="col-md-2"> 
-                </div>
-                <div class="col-md-4">
-                    <h4 class="list-group-item-heading"> Caption </h4>    
-                </div>
-                <div class="col-md-3">
-                    <h4 class="list-group-item-heading"> Min </h4>    
-                </div>
-                <div class="col-md-3">
-                    <h4 class="list-group-item-heading"> Step </h4>    
-                </div>
-            </div>
         <a ng-repeat="measure in measures | filter:filterMeasures" 
            ui-sref="measures.edit({measureId: measure.id})"
            class="list-group-item">
             <div class="row">
-                <div class="col-md-2"> 
+                <div class="col-md-2">
+                    <h4 class="list-group-item-heading">
+                        {{measure.caption}}
+                    </h4>
                 </div>
-                <div class="col-md-4">
-                    <h4 class="list-group-item-text" ng-bind="measure.caption"></h4>    
+                <div ng-show="measure.step>0">
+                    <div class="col-md-4">
+                        <div class="list-group-item-text">
+                            Мин. = {{measure.min}}, шаг = {{measure.step}} 
+                        </div>    
+                    </div>    
                 </div>
-                <div class="col-md-3">
-                    <h4 class="list-group-item-text" ng-bind="measure.min"></h4>    
+                <div ng-hide="measure.step>0">
+                    <div class="col-md-4">
+                        <div class="list-group-item-text">
+                            Неисчисляемая 
+                        </div>    
+                    </div>    
                 </div>
-                <div class="col-md-3">
-                    <h4 class="list-group-item-text" ng-bind="measure.step"></h4>    
+                <div class="col-md-4" ng-show="measure.converter">
+                    Конвертируется
+                    <div ng-repeat="converter in measure.converter">
+                        <small ng-hide=converter.uncountable>
+                            {{converter.caption}} = {{converter.rate}} * {{measure.caption}}
+                        </small>
+                        <small ng-show=converter.uncountable>
+                            {{converter.caption}} ~ {{measure.caption}}
+                        </small>
+                    </div>
                 </div>
             </div>
         </a>
     </div>
     <div class="alert alert-warning text-center">
-        Or <a ui-sref="measures.create">create one</a>
+        <a ui-sref="measures.create">Добавить меру</a>
     </div>
 </section>
