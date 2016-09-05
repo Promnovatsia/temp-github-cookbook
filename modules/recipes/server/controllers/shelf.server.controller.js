@@ -59,9 +59,10 @@ exports.update = function(req, res) {
 };    
 
 exports.list = function(req, res) {
+    
     Shelf.findAll(
         {
-            //FIXME where usedId=req.user.id
+            where: req.query//FIXME where usedId=req.user.id
         }
     ).then(function(shelves) {
         if (!shelves) {
