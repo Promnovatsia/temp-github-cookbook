@@ -1,0 +1,62 @@
+<section ng-controller="IngredientsController" ng-init="findOne()">
+    <div class="page-header">
+        <h1 ng-bind="ingredient.caption"></h1>
+    </div>
+    <div class="pull-right" ng-show="authentication.user.roles.indexOf('admin') !== -1">
+        <a class="btn btn-primary" ui-sref="ingredients.edit({ingredientId: ingredient.id})">
+            <i class="glyphicon glyphicon-edit"></i>
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <span ng-if="ingredient.image">
+                <img ng-src="{{imageurl}}{{ingredient.image}}" class="img-thumbnail user-profile-picture">
+            </span>
+        </div>
+        <div class="col-md-6">
+            <p class="lead" ng-bind="ingredient.infoCard"></p>
+        </div>
+    </div>
+    <div ng-show="ingredient.measureDefault">
+        <div class="list-group-item">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="pull-right btn btn-default btn-xs" ui-sref="measures.edit({measureId: measure.id})" >
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </label>
+                    <h4 class="list-group-item-heading">
+                        {{measure.caption}}
+                    </h4>
+                </div>
+                <div ng-show="measure.step>0">
+                    <div class="col-md-4">
+                        <div class="list-group-item-text">
+                            Мин. = {{measure.min}}, шаг = {{measure.step}} 
+                        </div>    
+                    </div>    
+                </div>
+                <div ng-hide="measure.step>0">
+                    <div class="col-md-4">
+                        <div class="list-group-item-text">
+                            Неисчисляемая 
+                        </div>    
+                    </div>    
+                </div>
+                <div class="col-md-4" ng-show="measure.converter">
+                    Конвертируется
+                    <div ng-repeat="converter in measure.converter">
+                        <small ng-hide=converter.uncountable>
+                            {{converter.caption}} = {{converter.rate}} * {{measure.caption}}
+                        </small>
+                        <small ng-show=converter.uncountable>
+                            {{converter.caption}} ~ {{measure.caption}}
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-4" ng-hide="measure.converter">
+                    Не конвертируется
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
