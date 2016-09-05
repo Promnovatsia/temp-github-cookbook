@@ -61,6 +61,9 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                     deficit: 10
                 }
             );
+            if ($stateParams.ingredient) {
+                $scope.setIngridient($stateParams.ingredient);
+            }
             $scope.spoilUpdate($scope.shelf.isSpoiled);
         } 
     };
