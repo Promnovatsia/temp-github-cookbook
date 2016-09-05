@@ -2,11 +2,6 @@
     <div class="page-header">
         <h1 ng-bind="ingredient.caption"></h1>
     </div>
-    <div class="pull-right" ng-show="authentication.user.roles.indexOf('admin') !== -1">
-        <a class="btn btn-primary" ui-sref="ingredients.edit({ingredientId: ingredient.id})">
-            <i class="glyphicon glyphicon-edit"></i>
-        </a>
-    </div>
     <div class="row">
         <div class="col-md-2">
             <span ng-if="ingredient.image">
@@ -17,13 +12,14 @@
             <p class="lead" ng-bind="ingredient.infoCard"></p>
         </div>
     </div>
+    <hr>
+    <label for="measureDefault">
+        Единица измерения
+    </label>
     <div ng-show="ingredient.measureDefault">
         <div class="list-group-item">
             <div class="row">
                 <div class="col-md-3">
-                    <label class="pull-right btn btn-default btn-xs" ui-sref="measures.edit({measureId: measure.id})" >
-                        <span class="glyphicon glyphicon-edit"></span>
-                    </label>
                     <h4 class="list-group-item-heading">
                         {{measure.caption}}
                     </h4>
@@ -58,5 +54,24 @@
                 </div>
             </div>
         </div>
+    </div>
+    <hr>
+    <div>
+        <label for="shelf">
+            На полке
+        </label>
+        <a ng-show="shelf" class="list-group-item" ui-sref="shelf.view({shelfId: shelf.id})"><!--TODO shelf.read-->
+            <h4 class="list-group-item-heading">
+                {{shelf.caption}}
+            </h4>
+            <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
+            <h4 ng-show="shelf.place" class="list-group-item-text">
+                Положение: {{shelf.place}}
+            </h4>
+        </a>
+        <a ng-hide="shelf" class="list-group-item" ui-sref="shelf.create()">
+            Создать полку с данным ингредиентом            
+        </a>
+        <br>
     </div>
 </section>

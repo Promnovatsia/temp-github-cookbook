@@ -31,11 +31,9 @@ function IngredientsController($scope, $stateParams, $location, $window, $timeou
                     $scope.measure = measure;
                 });
                 ingredient.getShelf().then(function (shelves) {
-                    if (!shelves) {
-                        console.log("shelves: ", shelves);
-                    } else if (shelves.length === 1) {
+                    if (!shelves) {}
+                    else if (shelves.length === 1) {
                         $scope.shelf = shelves[0];
-                        console.log($scope.shelf);
                     }
                 });
             });    
