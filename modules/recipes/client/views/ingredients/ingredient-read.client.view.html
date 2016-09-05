@@ -69,7 +69,7 @@
                 Положение: {{shelf.place}}
             </h4>
         </a>
-        <a ng-hide="shelf" class="list-group-item" ui-sref="shelf.create()">
+        <a ng-hide="shelf" class="list-group-item" ui-sref="shelf.create({ingredient: ingredient.id})">
             Создать полку с данным ингредиентом            
         </a>
         <br>
