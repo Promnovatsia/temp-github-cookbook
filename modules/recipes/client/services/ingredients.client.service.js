@@ -5,9 +5,9 @@ angular
     .module('recipes')
     .factory('IngredientService', IngredientService);
 
-IngredientService.$inject = ['$resource', 'ShelfService'];
+IngredientService.$inject = ['$resource', 'ShelfService', 'MeasureService'];
 
-function IngredientService($resource, ShelfService) {
+function IngredientService($resource, ShelfService, MeasureService) {
     var Ingredient = $resource('api/ingridients/:ingredientId', { //TODO i to e
         ingredientId: '@id'
     }, {
@@ -24,6 +24,10 @@ function IngredientService($resource, ShelfService) {
         getShelf: function () {
             var ingredient = this;
             return getShelf(ingredient);
+        },
+        getMeasure: function() {
+            var ingredient = this;
+            return getMeasure(ingredient);
         }
     });
     
@@ -41,6 +45,14 @@ function IngredientService($resource, ShelfService) {
         return ShelfService.get(
             {
                 ingredientId: ingredient.id
+            }
+        ).$promise;
+    }
+    
+    function getMeasure(ingredient) {
+        return MeasureService.get(
+            {
+                measureId: ingredient.measureDefault
             }
         ).$promise;
     }

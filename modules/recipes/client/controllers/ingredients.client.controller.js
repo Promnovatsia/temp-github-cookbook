@@ -23,12 +23,8 @@ function IngredientsController($scope, $stateParams, $location, $window, $timeou
                 }
             ).$promise.then(function (ingredient) {
                 $scope.ingredient = ingredient;
-                MeasureService.get(
-                    {
-                        measureId: ingredient.measureDefault
-                    }
-                ).$promise.then(function (measure) {
-                    $scope.measure = measure;
+                ingredient.getMeasure().then(function (measure) {
+                    $scope.ingredient.measure = measure;
                 });
                 ingredient.getShelf().then(function (shelf) {
                     if (shelf.id) {
@@ -55,11 +51,11 @@ function IngredientsController($scope, $stateParams, $location, $window, $timeou
     
     $scope.setMeasure = function (subMeasure) {
         $scope.ingredient.measureDefault = subMeasure.id;
-        $scope.measure = subMeasure;
+        $scope.ingredient.measure = subMeasure;
     };
     
     $scope.unsetMeasure = function () {
-        $scope.measure = null;
+        $scope.ingredient.measure = null;
         $scope.ingredient.measureDefault = null;
         $scope.asyncSelected = null;
     };
