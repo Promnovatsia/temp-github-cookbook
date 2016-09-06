@@ -72,7 +72,8 @@ angular.module('recipes').directive('updowninput', function () {
                 if (measure) {
                     min = measure.min;
                     step = measure.step;
-                    scope.convertable = measure.converter;
+                    if (scope.convertable)
+                        scope.convertable = measure.converter;
                 }
             }, true);
             
