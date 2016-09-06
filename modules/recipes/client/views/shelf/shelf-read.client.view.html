@@ -1,24 +1,24 @@
 <section ng-controller="ShelfController" ng-init="findOne()">
     <div class="page-header">
         <h1>
-            Просмотр полки: {{info.caption}}
+            Просмотр полки: {{ingredient.caption}}
         </h1>
     </div>
     <div class="row">
             <div class="col-md-2">
-                <span ng-if="info.image">
-                    <img ng-src="{{imageurl}}{{info.image}}" class="img-thumbnail user-profile-picture">
+                <span ng-if="ingredient.image">
+                    <img ng-src="{{imageurl}}{{ingredient.image}}" class="img-thumbnail user-profile-picture">
                 </span>
             </div>
             <div class="col-md-6">
-                <p class="lead" ng-bind="info.card"></p>
+                <p class="lead" ng-bind="ingredient.infoCard"></p>
             </div>
         </div>
     <hr/>
     <div class="row">
         <div class="col-md-3">
             <label for="stored">
-                Единица измерения: {{info.measure}}    
+                Единица измерения: {{measure.caption}}    
             </label>
             <hr>
             <label for="place" ng-show="shelf.place">

@@ -4,9 +4,9 @@ angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
 
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'Ingridients', 'Measures'];
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'IngredientService', 'MeasureService'];
 
-function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, Ingridients, Measures) {
+function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, IngredientService, MeasureService) {
 
     // progress bar settings
     const pbLimitEmpty = 10;
@@ -25,8 +25,6 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         
     $scope.authentication = Authentication;
     $scope.error = null;
-    $scope.info = {};
-    $scope.form = {};
     
     $scope.handle = true;
     $scope.legend = false;
@@ -49,7 +47,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 $scope.shelf = shelf;
                 $scope.spoilUpdate(shelf.isSpoiled);
                 if (shelf.ingridientId) {
-                    $scope.setIngridient(shelf.ingridientId);        
+                    $scope.setIngredient(shelf.ingridientId);        
                 }
             });    
         } else {
@@ -62,13 +60,52 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 }
             );
             if ($stateParams.ingredient) {
-                $scope.setIngridient($stateParams.ingredient);
+                $scope.setIngredient($stateParams.ingredient);
             }
             $scope.spoilUpdate($scope.shelf.isSpoiled);
         } 
     };
     
-    $scope.findForShelf = function () {
+    $scope.getIngredients = function (value) {
+        return IngredientService.query().$promise.then(function (results) {
+            var matched = [];
+            results.forEach(function (item, i, arr) {
+                if (item.caption.includes(value)) {
+                    matched.push(item);
+                }
+            });
+            return matched;
+        });
+    };
+    
+    $scope.setIngredient = function (ingredient) {
+        
+        if (!ingredient) {
+            $scope.shelf.ingridientId = null;
+            $scope.ingredient = ingredient;
+            return;
+        }
+        if(!ingredient.id) {
+            IngredientService.get(
+                {
+                    ingredientId: ingredient
+                }
+            ).$promise.then(function (theIngredient) {
+                $scope.ingredient = theIngredient;
+                $scope.shelf.ingridientId = theIngredient.id;
+                theIngredient.getMeasure().then(function (measure) {
+                    $scope.measure = measure;
+                });
+            });    
+        } else {
+            $scope.ingredient = ingredient;
+            $scope.shelf.ingridientId = ingredient.id;
+            $scope.measure = ingredient.measure;
+        }
+    };
+    
+    
+    /*$scope.findForShelf = function () {
         ShelfQueryService.query(
             {
                 shelfId: $stateParams.shelfId
@@ -83,7 +120,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 $scope.shelf = shelf;
             });
         });
-    };
+    };*/
     
     $scope.filterBar = {
         spoiled: true,
@@ -124,43 +161,6 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             ($scope.filterBar.max && item.progressbar.value > pbLimitMax && item.progressbar.value <= 100);
     };
     
-    $scope.getIngridientList = function () {
-        return Ingridients.query().$promise;
-    };
-    
-    $scope.setIngridient = function (id) {
-        
-        if(!id){
-            $scope.shelf.ingridientId = null;
-            $scope.info = {};
-            return;
-        }
-        
-        Ingridients.get(
-            {
-                ingridientId: id
-            }
-        ).$promise.then(function (ingridient) {
-            $scope.shelf.ingridientId = ingridient.id;
-            $scope.info.caption = ingridient.caption;
-            $scope.info.card = ingridient.infoCard;
-            $scope.info.image = ingridient.image;
-
-            $scope.shelf.measureId = ingridient.measureDefault;
-            Measures.get(
-                {
-                    measureId: ingridient.measureDefault
-                }
-            ).$promise.then(function (measure) {
-                $scope.info.measure = measure.caption;
-                $scope.info.step = measure.step;
-                $scope.info.min = measure.min;
-                
-                $scope.settingsLoad();
-            });
-        });
-    };
-    
     $scope.spoilUpdate = function (state) {
         
         if (state) {
@@ -178,105 +178,24 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     //TODO clearSpoiled        
     };
     
-    $scope.settingsLoad = function () {
-        
-        $scope.form.deficit = {
-            alert: false,
-            input: false,
-            value: $scope.shelf.deficit
-        };
-        $scope.form.desired = {
-            alert: false,
-            input: false,
-            value: $scope.shelf.desired
-        };
-        $scope.form.max = {
-            alert: false,
-            input: false,
-            value: $scope.shelf.max
-        };
-        
-        $scope.setDeficit(0,$scope.shelf.deficit);
-        $scope.setDesired(0,$scope.shelf.desired);
-        $scope.setMax(0,$scope.shelf.max);
-    };
-    
-    $scope.setDeficit = function (sign, value) {
-        var oldValue = $scope.shelf.deficit;
-        if (value !== 0) {
-            $scope.shelf.deficit = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelf.deficit = Number(($scope.shelf.deficit - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelf.deficit = Number(($scope.shelf.deficit + $scope.info.step).toFixed(3)); 
-        }
-        if (!$scope.settingsUpdate()){
-            $scope.shelf.deficit = oldValue;
-        } else {
-            $scope.form.deficit = {
-                alert: false,
-                input: false,
-                value: $scope.shelf.deficit
-            };
-        }
-    };
-    
-    $scope.setDesired = function (sign, value) {
-        var oldValue = $scope.shelf.desired;
-        if (value !== 0) {
-            $scope.shelf.desired = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelf.desired = Number(($scope.shelf.desired - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelf.desired = Number(($scope.shelf.desired + $scope.info.step).toFixed(3)); 
-        }
-        if (!$scope.settingsUpdate()){
-            $scope.shelf.desired = oldValue;
-        } else {
-            $scope.form.desired = {
-                alert: false,
-                input: false,
-                value: $scope.shelf.desired
-            };
-        }
-    };
-    
-    $scope.setMax = function (sign, value) {
-        var oldValue = $scope.shelf.max;
-        if (value !== 0) {
-            $scope.shelf.max = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelf.max = Number(($scope.shelf.max - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelf.max = Number(($scope.shelf.max + $scope.info.step).toFixed(3)); 
-        }
-        if (!$scope.settingsUpdate()){
-            $scope.shelf.max = oldValue;
-        } else {
-            $scope.form.max = {
-                alert: false,
-                input: false,
-                value: $scope.shelf.max
-            };
-        }
-    };
-    
     $scope.settingsUpdate = function () {
         
-        $scope.form.deficit.alert = false;
-        $scope.form.desired.alert = false;
-        $scope.form.max.alert = false;
+        $scope.form = {
+            deficit: false,
+            desired: false,
+            max: false
+        };
         
-        if ($scope.shelf.deficit < $scope.info.min) {
-            $scope.form.deficit.alert = true;
+        if ($scope.shelf.deficit < $scope.measure.min) {
+            $scope.form.deficit = true;
             return false;
         }
         if ($scope.shelf.desired <= $scope.shelf.deficit) {
-            $scope.form.desired.alert = true;
+            $scope.form.desired = true;
             return false;
         }
         if ($scope.shelf.max <= $scope.shelf.desired) {
-            $scope.form.max.alert = true;
+            $scope.form.max = true;
             return false;
         }
         return true;

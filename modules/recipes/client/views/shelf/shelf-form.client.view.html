@@ -1,43 +1,49 @@
 <section ng-controller="ShelfController" ng-init="findOne()">
     <div class="page-header">
         <h1 ng-show="shelf.id">
-            Настройка полки: {{info.caption}}
+            Настройка полки: {{ingredient.caption}}
         </h1>
-        <h1 ng-hide="shelf.id">
-            Новая полка
-        </h1>
+        <div ng-hide="shelf.id">
+            <h1 ng-hide="ingredient">
+                Новая полка
+            </h1>
+            <h1 ng-show="ingredient">
+                Новая полка: {{ingredient.caption}}
+            </h1>
+        </div>
     </div>
     <div class="col-md-12">
         <form name="shelfForm" class="form-horizontal" ng-submit="save(shelfForm.$valid)" novalidate>
             <fieldset>
                 <div class="form-group">
                     <div class="row">
-                        <div class="col-md-8" ng-hide="info.caption">
+                        <div ng-hide="ingredient">
                             <div class="input-group">
-                                <input type="text" class="form-control"
-                                    ng-model="selectedIngridient"
-                                    data-animation="am-flip-x"
-                                    bs-options="obj.id as obj.caption for obj in getIngridientList()"
-                                    placeholder="Выберите ингредиент"
-                                    select-mode="true"
-                                    bs-typeahead
-                                >
-                                <span class="input-group-addon" ng-click="setIngridient(selectedIngridient)">
-                                    <span class="glyphicon glyphicon-ok"></span>
-                                </span> 
+                                <div class="input-group-addon">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                </div>
+                                <input type="text" ng-model="asyncSelected" placeholder="Введите ингредиент" typeahead="ingredient as ingredient.caption for ingredient in getIngredients($viewValue)" typeahead-loading="loadingIngredients" typeahead-no-results="noResults" class="form-control">
+                                <i ng-show="loadingIngredients" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults" class="input-group-addon">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                    Нет результатов
+                                </div>
+                                <div ng-show="asyncSelected" class="input-group-addon" ng-click="setIngredient(asyncSelected)">
+                                    ОК
+                                </div>
                             </div>
                         </div>
-                        <div ng-show="info.caption">
+                        <div ng-show="ingredient">
                             <div class="col-md-2">
-                                <span ng-if="info.image">
-                                    <img ng-src="{{imageurl}}{{info.image}}" class="img-thumbnail user-profile-picture">
+                                <span ng-if="ingredient.image">
+                                    <img ng-src="{{imageurl}}{{ingredient.image}}" class="img-thumbnail user-profile-picture">
                                 </span>
                             </div>
                             <div class="col-md-6">
-                                <p class="lead" ng-bind="info.card"></p>
+                                <p class="lead" ng-bind="ingredient.infoCard"></p>
                             </div>
                             <div class="col-md-4">
-                                <label class="btn btn-danger" ng-click="setIngridient(false)">
+                                <label class="btn btn-danger" ng-click="setIngredient(null)">
                                     <snap class="glyphicon glyphicon-remove-sign"></snap>
                                     Отвязать ингредиент
                                 </label>
@@ -53,11 +59,11 @@
                                 </label>
                             </div>
                         </div>
-                    </div><hr/>  
-                    <div ng-show="info.caption" class="row">
+                    </div>  
+                    <div ng-show="ingredient" class="row">
                         <div class="col-md-2">
-                            <label for="info.measure">
-                                Измеряется в: {{info.measure}}
+                            <label for="measure">
+                                Измеряется в: {{measure.caption}}
                             </label>
                             <br/><br/>
                             <label for="stored">
@@ -66,12 +72,7 @@
                         </div>
                         <div class="col-md-9">
                             <uib-progress>
-                                <uib-bar value="10" type="default">
-                                    <span style="color:white; white-space:nowrap;"> 
-                                        Пусто
-                                    </span>
-                                </uib-bar>
-                                <uib-bar value="10" type="danger">
+                                <uib-bar value="20" type="danger">
                                     <span style="color:white; white-space:nowrap;"> 
                                         Дефицит
                                     </span>
@@ -94,8 +95,9 @@
                             </uib-progress>
                             <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
                         </div>
-                    </div><hr/>                    
-                    <div ng-show="info.caption" class="col-md-7">
+                    </div>                    
+                    <div ng-show="ingredient" class="col-md-7">
+                        <hr>
                         <div class="row">
                             <div class="col-md-3">
                                 <label for="deficit">
@@ -103,37 +105,15 @@
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <div ng-hide="form.deficit.input">
-                                    <div class="btn-group">
-                                        <label class="btn btn-default" ng-click="setDeficit(-1,0)">
-                                            <snap class="glyphicon glyphicon-minus"></snap>
-                                        </label>
-                                        <label class="btn btn-default" ng-click="form.deficit.input = true">
-                                            {{shelf.deficit}} {{info.measure}}
-                                        </label>
-                                        <label class="btn btn-default" ng-click="setDeficit(1,0)">
-                                            <snap class="glyphicon glyphicon-plus"></snap>
-                                        </label>
-                                    </div> 
-                                </div>
-                                <div ng-show="form.deficit.input">
-                                    <div class="input-group">
-                                        <label class="input-group-addon">
-                                            {{info.measure}}
-                                        </label>
-                                        <input name="deficit" type="number" ng-model="form.deficit.value" class="form-control">
-                                        <label class="input-group-addon" ng-click="setDeficit(0,form.deficit.value)">
-                                            OK
-                                        </label>
-                                    </div>
-                                </div>
+                                <updowninput ng-model="shelf.deficit" measure="measure" validator="settingsUpdate()"><updowninput>
                             </div>
                             <div class="col-md-5">
-                                <div uib-alert ng-show="form.deficit.alert">
+                                <div uib-alert ng-show="form.deficit">
                                     Порог дефицита должен быть не меньше предела единицы измерения и меньше порога достаточности
                                 </div>
                             </div>
-                        </div><hr/>
+                        </div>
+                        <br>
                         <div class="row">
                             <div class="col-md-3">
                                 <label for="desired">
@@ -141,37 +121,15 @@
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <div ng-hide="form.desired.input">
-                                    <div class="btn-group">
-                                        <label class="btn btn-default" ng-click="setDesired(-1,0)">
-                                            <snap class="glyphicon glyphicon-minus"></snap>
-                                        </label>
-                                        <label class="btn btn-default" ng-click="form.desired.input = true">
-                                            {{shelf.desired}} {{info.measure}}
-                                        </label>
-                                        <label class="btn btn-default" ng-click="setDesired(1,0)">
-                                            <snap class="glyphicon glyphicon-plus"></snap>
-                                        </label>
-                                    </div> 
-                                </div>
-                                <div ng-show="form.desired.input">
-                                    <div class="input-group">
-                                        <label class="input-group-addon">
-                                            {{info.measure}}
-                                        </label>
-                                        <input name="desired" type="number" ng-model="form.desired.value" class="form-control">
-                                        <label class="input-group-addon" ng-click="setDesired(0,form.desired.value)">
-                                            OK
-                                        </label>
-                                    </div>
-                                </div>
+                                <updowninput ng-model="shelf.desired" measure="measure" validator="settingsUpdate()"><updowninput>
                             </div>
                             <div class="col-md-5">
-                                <div uib-alert ng-show="form.desired.alert">
+                                <div uib-alert ng-show="form.desired">
                                     Порог достаточности должен быть не меньше порога дефицита и меньше порога избытка
                                 </div>
                             </div>
-                        </div><hr/>
+                        </div>
+                        <br>
                         <div class="row">
                             <div class="col-md-3">
                                 <label for="max">
@@ -179,40 +137,17 @@
                                 </label>
                             </div>
                             <div class="col-md-4">
-                                <div ng-hide="form.max.input">
-                                    <div class="btn-group">
-                                        <label class="btn btn-default" ng-click="setMax(-1,0)">
-                                            <snap class="glyphicon glyphicon-minus"></snap>
-                                        </label>
-                                        <label class="btn btn-default" ng-click="form.max.input = true">
-                                            {{shelf.max}} {{info.measure}}
-                                        </label>
-                                        <label class="btn btn-default" ng-click="setMax(1,0)">
-                                            <snap class="glyphicon glyphicon-plus"></snap>
-                                        </label>
-                                    </div> 
-                                </div>
-                                <div ng-show="form.max.input">
-                                    <div class="input-group">
-                                        <label class="input-group-addon">
-                                            {{info.measure}}
-                                        </label>
-                                        <input name="deficit" type="number" ng-model="form.max.value" class="form-control">
-                                        <label class="input-group-addon" ng-click="setMax(0,form.max.value)">
-                                            OK
-                                        </label>
-                                    </div>
-                                </div>
+                                <updowninput ng-model="shelf.max" measure="measure" validator="settingsUpdate()"><updowninput>
                             </div>
                             <div class="col-md-5">
-                                <div uib-alert ng-show="form.max.alert">
+                                <div uib-alert ng-show="form.max">
                                     Порог избытка должен быть не меньше порога достаточности
                                 </div>
                             </div>
-                        </div><hr/>   
-                    </div>
-                    
-                    <div class="col-md-5">
+                        </div>   
+                    </div>                
+                    <div ng-show="ingredient" class="col-md-5">
+                        <hr>
                         <label for="place">
                             Место хранения
                         </label>
