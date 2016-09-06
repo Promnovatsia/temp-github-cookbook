@@ -38,9 +38,9 @@ function IngredientService($resource, ShelfService) {
     }
     
     function getShelf(ingredient) {
-        return ShelfService.query(
+        return ShelfService.get(
             {
-                ingridientId: ingredient.id //TODO i to e
+                ingredientId: ingredient.id
             }
         ).$promise;
     }

@@ -9,11 +9,11 @@ var path = require('path'),
     db = require(path.resolve('./config/lib/sequelize')).models,
     Shelf = db.shelf;
 
-exports.create = function(req, res) {
+exports.create = function (req, res) {
 
     req.body.userId = req.user.id;
     
-    Shelf.create(req.body).then(function(shelf) {
+    Shelf.create(req.body).then(function (shelf) {
         if (!shelf) {
             return res.send('users/signup', {
                 errors: 'Could not create the shelf'
@@ -21,31 +21,41 @@ exports.create = function(req, res) {
         } else {
             return res.json(shelf);
         }
-    }).catch(function(err) {
+    }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
     });       
 };
 
-exports.read = function(req, res) {
-    var shelf = req.shelf;
-    shelf.isCurrentUserOwner = !!(req.user && shelf.userId && shelf.userId === req.user.id);
-    res.json(shelf);
+exports.read = function (req, res) {
+    res.json(req.shelf);
 };
 
-exports.update = function(req, res) {
+exports.update = function (req, res) {
     
-    Shelf.findById(req.body.id).then(function(shelf) { //TODO find by number and user id
+    if (!req.user) {
+        return res.status(401).send({
+            message: 'Unauthorized. This API route returns user-specific data'
+        });
+    }
+    Shelf.findOne(
+        {
+            where: { 
+                number: req.body.id,
+                userId: req.user.id
+            }
+        }
+    ).then(function (shelf) {
         if (shelf) {
-            shelf.update(req.body).then(function(shelf) {
+            shelf.update(req.body).then(function (shelf) {
                 return res.json(shelf);
-            }).catch(function(err) {
+            }).catch(function (err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
                 });
             });
-        return null;
+            return null;
         } else {
             return res.status(400).send({
                 message: 'Unable to find the shelf'
@@ -58,11 +68,18 @@ exports.update = function(req, res) {
     });
 };    
 
-exports.list = function(req, res) {
+exports.list = function (req, res) {
     
+    if (req.query) {
+        if (req.query.ingredientId) {
+            return exports.shelfByIngredient(req, res, req.query.ingredientId);    
+        }
+    }
     Shelf.findAll(
         {
-            where: req.query//FIXME where usedId=req.user.id
+            where: {
+                userId: req.user.id
+            }
         }
     ).then(function(shelves) {
         if (!shelves) {
@@ -77,19 +94,24 @@ exports.list = function(req, res) {
     });
 };
 
-exports.shelfByID = function(req, res, next, id) {
+exports.shelfByID = function (req, res, next, id) {
 
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
             message: 'Shelf is invalid'
         });
     }
+    if (!req.user) {
+        return res.status(401).send({
+            message: 'Unauthorized. This API route returns user-specific data'
+        });
+    }
   
     Shelf.findOne(
         {
-            where: {
-                id: id
-                //TODO userID and shelf.number
+            where: { 
+                number: id,
+                userId: req.user.id
             }
         }
     ).then(function(shelf) {
@@ -104,5 +126,38 @@ exports.shelfByID = function(req, res, next, id) {
         }
     }).catch(function(err) {
         return next(err);
+    });
+};
+
+exports.shelfByIngredient = function (req, res, ingredientId) {
+    
+    if ((ingredientId % 1 === 0) === false) { //check if it's integer
+        return res.status(404).send({
+            message: 'Ingredient is invalid'
+        });
+    }
+    if (!req.user) {
+        return res.status(401).send({
+            message: 'Unauthorized. This API route returns user-specific data'
+        });
+    }
+  
+    Shelf.findOne(
+        {
+            where: {
+                ingridientId: ingredientId, //TODO i to e
+                userId: req.user.id,
+                fallback: null
+            }
+        }
+    ).then(function(shelf) {
+        if (!shelf) {
+            req.shelf = {};
+        } else {
+            req.shelf = shelf;
+        }
+        return res.json(req.shelf);
+    }).catch(function(err) {
+        return res.jsonp(err);
     });
 };
