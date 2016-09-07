@@ -29,12 +29,7 @@
             <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
             <hr>
             <uib-progress ng-show="legend">
-                <uib-bar value="10" type="default">
-                    <span style="color:white; white-space:nowrap;"> 
-                        Пусто
-                    </span>
-                </uib-bar>
-                <uib-bar value="10" type="danger">
+                <uib-bar value="20" type="danger">
                     <span style="color:white; white-space:nowrap;"> 
                         Дефицит
                     </span>
@@ -57,13 +52,13 @@
             </uib-progress>
             <div ng-show="legend">
                 <label for="deficit">
-                    Порог дефицита: {{shelf.deficit}} {{info.measure}}     
+                    Порог дефицита: {{shelf.deficit}} {{measure.caption}}     
                 </label>
                 <label for="desired">
-                    Порог достаточности: {{shelf.desired}} {{info.measure}}    
+                    Порог достаточности: {{shelf.desired}} {{measure.caption}}    
                 </label>
                 <label for="max">
-                    Порог избытка: {{shelf.max}} {{info.measure}}    
+                    Порог избытка: {{shelf.max}} {{measure.caption}}    
                 </label>
             </div>
         </div>

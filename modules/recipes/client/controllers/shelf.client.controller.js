@@ -47,7 +47,9 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 $scope.shelf = shelf;
                 $scope.spoilUpdate(shelf.isSpoiled);
                 if (shelf.ingridientId) {
-                    $scope.setIngredient(shelf.ingridientId);        
+                    $scope.loadIngredient(shelf.ingridientId).then(function (ingredient) {
+                        $scope.setIngredient(ingredient);    
+                    });      
                 }
             });    
         } else {
@@ -78,32 +80,30 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         });
     };
     
+    $scope.loadIngredient = function (id) {
+        return IngredientService.get(
+            {
+                ingredientId: id
+            }
+        ).$promise;
+    };
+    
     $scope.setIngredient = function (ingredient) {
         
         if (!ingredient) {
             $scope.shelf.ingridientId = null;
-            $scope.ingredient = ingredient;
+            $scope.ingredient = null;
             return;
         }
-        if(!ingredient.id) {
-            IngredientService.get(
-                {
-                    ingredientId: ingredient
-                }
-            ).$promise.then(function (theIngredient) {
-                $scope.ingredient = theIngredient;
-                $scope.shelf.ingridientId = theIngredient.id;
-                theIngredient.getMeasure().then(function (measure) {
-                    $scope.measure = measure;
-                });
-            });    
-        } else {
-            $scope.ingredient = ingredient;
-            $scope.shelf.ingridientId = ingredient.id;
-            $scope.measure = ingredient.measure;
-        }
+        
+        $scope.ingredient = ingredient;
+        $scope.shelf.ingridientId = ingredient.id;
+        ingredient.getMeasure().then(function (measure) {
+            $scope.measure = measure;
+        });
+        
+        $scope.asyncSelected = '';
     };
-    
     
     /*$scope.findForShelf = function () {
         ShelfQueryService.query(
@@ -178,8 +178,26 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     //TODO clearSpoiled        
     };
     
-    $scope.settingsUpdate = function () {
+    $scope.validateDeficit = function (id, value, oldValue) {
+        console.log(value,oldValue, $scope.shelf.deficit);
+        $scope.form = {
+            deficit: false,
+            desired: false,
+            max: false
+        };
+        if (value < $scope.measure.min) {
+            $scope.form.deficit = true;
+            $scope.shelf.deficit = oldValue;
+        }
+        if ($scope.shelf.desired <= value) {
+            $scope.form.desired = true;
+            $scope.shelf.deficit = oldValue;
+        }    
+    };
+    
+    $scope.settingsUpdate = function (id, value, oldValue) {
         
+        console.log($scope.shelf.deficit,$scope.shelf.desired,$scope.shelf.max);
         $scope.form = {
             deficit: false,
             desired: false,
@@ -215,8 +233,8 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             return false;
         }
         
-        $scope.shelf.caption = $scope.info.caption;
-        $scope.shelf.measureCaption = $scope.info.measure;
+        $scope.shelf.caption = $scope.ingredient.caption;
+        $scope.shelf.measureCaption = $scope.measure.caption;
         $scope.shelf.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);

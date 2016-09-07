@@ -66,7 +66,6 @@ angular.module('recipes').directive('updowninput', function () {
                 step = (scope.step !== undefined) ? scope.step : 1;
             }
             precision = (scope.precision !== undefined) ? scope.precision : 3;
-            oldValue = scope.value;
             
             scope.$watch('measure', function (measure, oldValue) {
                 if (measure) {
@@ -91,6 +90,7 @@ angular.module('recipes').directive('updowninput', function () {
                     alertText : '',
                     value: scope.value
                 };
+                oldValue = scope.value;
                 if (value !== undefined) {
                     scope.value = Number((value).toFixed(precision));
                 } else if (sign < 0) {
@@ -102,7 +102,7 @@ angular.module('recipes').directive('updowninput', function () {
                     scope.value = min;
                     scope.form.alert = true;
                     scope.form.alertText = '>=' + min + '!';
-                } else {
+                } else {//TODO look at apply model view tmth
                     scope.form = {
                         alert: false,
                         alertText : '',
@@ -112,7 +112,8 @@ angular.module('recipes').directive('updowninput', function () {
                     scope.validator(
                         {
                             id: scope.validationId,
-                            value: scope.value
+                            value: scope.value,
+                            oldValue: oldValue
                         }
                     );
                 }

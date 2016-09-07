@@ -40,12 +40,12 @@
                 </div>
                 <div class="col-md-4" ng-show="ingredient.measure.converter">
                     Конвертируется
-                    <div ng-repeat="converter in measure.converter">
+                    <div ng-repeat="converter in ingredient.measure.converter">
                         <small ng-hide=converter.uncountable>
-                            {{converter.caption}} = {{converter.rate}} * {{measure.caption}}
+                            {{converter.caption}} = {{converter.rate}} * {{ingredient.measure.caption}}
                         </small>
                         <small ng-show=converter.uncountable>
-                            {{converter.caption}} ~ {{measure.caption}}
+                            {{converter.caption}} ~ {{ingredient.measure.caption}}
                         </small>
                     </div>
                 </div>
