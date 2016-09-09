@@ -18,7 +18,7 @@ exports.create = function (req, res) {
                 userId: req.user.id
             },
             order: [
-                ['number','ASC']
+                ['number','DESC']
             ]
         }
     ).then(function (shelf) {
@@ -36,6 +36,7 @@ exports.create = function (req, res) {
                 return res.json(shelf);
             }
         });
+        return null;
     }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
