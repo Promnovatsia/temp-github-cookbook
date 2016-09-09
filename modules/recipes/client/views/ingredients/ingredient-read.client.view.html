@@ -12,51 +12,51 @@
             <p class="lead" ng-bind="ingredient.infoCard"></p>
         </div>
     </div>
-    <hr>
-    <label for="measureDefault">
-        Единица измерения
-    </label>
     <div ng-show="ingredient.measureDefault">
+        <hr>
+        <label for="measureDefault">
+            Единица измерения
+        </label>
         <div class="list-group-item">
             <div class="row">
                 <div class="col-md-3">
                     <h4 class="list-group-item-heading">
-                        {{measure.caption}}
+                        {{ingredient.measure.caption}}
                     </h4>
                 </div>
-                <div ng-show="measure.step>0">
+                <div ng-show="ingredient.measure.step>0">
                     <div class="col-md-4">
                         <div class="list-group-item-text">
-                            Мин. = {{measure.min}}, шаг = {{measure.step}} 
+                            Мин. = {{ingredient.measure.min}}, шаг = {{ingredient.measure.step}} 
                         </div>    
                     </div>    
                 </div>
-                <div ng-hide="measure.step>0">
+                <div ng-hide="ingredient.measure.step>0">
                     <div class="col-md-4">
                         <div class="list-group-item-text">
                             Неисчисляемая 
                         </div>    
                     </div>    
                 </div>
-                <div class="col-md-4" ng-show="measure.converter">
+                <div class="col-md-4" ng-show="ingredient.measure.converter">
                     Конвертируется
-                    <div ng-repeat="converter in measure.converter">
+                    <div ng-repeat="converter in ingredient.measure.converter">
                         <small ng-hide=converter.uncountable>
-                            {{converter.caption}} = {{converter.rate}} * {{measure.caption}}
+                            {{converter.caption}} = {{converter.rate}} * {{ingredient.measure.caption}}
                         </small>
                         <small ng-show=converter.uncountable>
-                            {{converter.caption}} ~ {{measure.caption}}
+                            {{converter.caption}} ~ {{ingredient.measure.caption}}
                         </small>
                     </div>
                 </div>
-                <div class="col-md-4" ng-hide="measure.converter">
+                <div class="col-md-4" ng-hide="ingredient.measure.converter">
                     Не конвертируется
                 </div>
             </div>
         </div>
     </div>
-    <hr>
-    <div>
+    <div ng-show="authentication.user.id">
+        <hr>
         <label for="shelf">
             На полке
         </label>
@@ -69,7 +69,7 @@
                 Положение: {{shelf.place}}
             </h4>
         </a>
-        <a ng-hide="shelf" class="list-group-item" ui-sref="shelf.create({ingredient: ingredient.id})">
+        <a ng-hide="shelf" class="list-group-item" ui-sref="shelf.create({ingredient: ingredient})">
             Создать полку с данным ингредиентом            
         </a>
         <br>

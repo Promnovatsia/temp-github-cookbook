@@ -4,66 +4,75 @@
             Полки
         </h1>
     </div>
-    
-    <div class="list-group">
-        <div class="row list-group-item">
-            <div class="col-md-3">
-                <label class="btn btn-primary" ui-sref="shelf.create">
-                    <snap class="glyphicon glyphicon-plus">
-                        Добавить полку
-                    </snap>
-                </label>    
-            </div>
-            <div class="col-md-8">
-                <div class="btn-group btn-group-justified">
-
-                    <label ng-show="filterBar.empty" class="btn btn-primary" ng-click="filterBar.empty = false">Пусто</label>
-                    <label ng-hide="filterBar.empty" class="btn btn-default" ng-click="filterBar.empty = true">Пусто</label>
-                    
-                    <label ng-show="filterBar.spoiled" class="btn btn-danger" ng-click="filterBar.spoiled = false">Просрочено</label>
-                    <label ng-hide="filterBar.spoiled" class="btn btn-default" ng-click="filterBar.spoiled = true">Просрочено</label>
-
-                    <label ng-show="filterBar.deficit" class="btn btn-danger" ng-click="filterBar.deficit = false">Дефицит</label>
-                    <label ng-hide="filterBar.deficit" class="btn btn-default" ng-click="filterBar.deficit = true">Дефицит</label>
-
-                    <label ng-show="filterBar.lsdesired" class="btn btn-warning" ng-click="filterBar.lsdesired = false">Недостаточно</label>
-                    <label ng-hide="filterBar.lsdesired" class="btn btn-default" ng-click="filterBar.lsdesired = true">Недостаточно</label>
-
-                    <label ng-show="filterBar.desired" class="btn btn-success" ng-click="filterBar.desired = false">Достаточно</label>
-                    <label ng-hide="filterBar.desired" class="btn btn-default" ng-click="filterBar.desired = true">Достаточно</label>
-
-                    <label ng-show="filterBar.max" class="btn btn-info" ng-click="filterBar.max = false">Избыток</label>
-                    <label ng-hide="filterBar.max" class="btn btn-default" ng-click="filterBar.max = true">Избыток</label>
-
-                    <label class="btn btn-default" ng-click="filterBarToggle()">Все</label>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label for="filterBar">
+                Фильтры отображения
+            </label>
+            <br>
+            <toggle-switch class="switch-danger" ng-model="filterBar.deficit" on-label="Да" off-label="Нет"></toggle-switch>
+            <label for="filterBar.deficit">
+                Дефицитные
+            </label>
+            <br>
+            <toggle-switch class="switch-warning" ng-model="filterBar.lsdesired" on-label="Да" off-label="Нет"></toggle-switch>
+            <label for="filterBar.lsdesired">
+                Недостаточные
+            </label>
+            <br>
+            <toggle-switch class="switch-success" ng-model="filterBar.desired" on-label="Да" off-label="Нет"></toggle-switch>
+            <label for="filterBar.desired">
+                Достаточные
+            </label>
+            <br>
+            <toggle-switch class="switch-info" ng-model="filterBar.max" on-label="Да" off-label="Нет"></toggle-switch>
+            <label for="filterBar.max">
+                Избыточные
+            </label>
+            <br>
+            <toggle-switch class="switch-primary" ng-model="filterBar.spoiled" on-label="Да" off-label="Нет"></toggle-switch>
+            <label for="filterBar.spoiled">
+                Требующие ревизии
+            </label>
         </div>
-        <div ng-repeat="shelf in shelves | filter: filterByProgress | orderBy: 'progressbar.value'" class="list-group-item">
+    </div>
+    <div class="list-group">
+        <hr>
+        <div>
+            <form>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </div>
+                        <input type="text" class="form-control" ng-model="filterByName" placeholder="Поиск по названию">
+                        <div class="input-group-addon">
+                            <div ng-click="filterByName=''">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <a ng-repeat="shelf in shelves | filter: filterByName | orderBy: 'progressbar.value'" class="list-group-item" ui-sref="shelf.view({shelfId:shelf.number})" ng-show="filterByProgress($index)">
             <div class="row">
-                <div class="col-md-2">
-
+                <div class="col-md-3">
                     <h4 class="list-group-item-heading" ng-bind="shelf.caption"></h4>
                 </div>
                 <div class="col-md-1">
-                    <p class="list-group-item-heading" ng-bind="shelf.measureCaption"></p>
+                    <p class="list-group-item-heading text-center" ng-bind="shelf.measureCaption"></p>
                 </div>
-                <a ui-sref="shelf.view({ shelfId: shelf.id })">
-                    <div class="col-md-7">
-                        <shelfstatusbar ng-model="shelf" handle="shelf.progressbar"></shelfstatusbar>
-                    </div>
-                </a>
-                <div class="col-md-2">
-                    <div class="btn-group">
-                        <label class="btn btn-link" ui-sref="shelf.edit({ shelfId: shelf.id })">
-                            <snap class="glyphicon glyphicon-cog"></snap>
-                        </label>
-                        <label class="btn btn-link" ui-sref="shelf.query({ shelfId: shelf.id })">
-                            <snap class="glyphicon glyphicon-shopping-cart"></snap>
-                        </label>
-                    </div>    
+                <div class="col-md-8">
+                    <shelfstatusbar ng-model="shelf" handle="shelf.progressbar"></shelfstatusbar>
                 </div>
             </div>
-        </div>
+        </a>
+        <a class="list-group-item" ui-sref="shelf.create">
+            <h4>
+                <i class="glyphicon glyphicon-plus"></i>
+                Добавить новую полку
+            </h4>
+        </a>
     </div>
 </section>

@@ -11,7 +11,7 @@
                     <div class="row">
                         <div class="col-md-2">
                             <label for="info.measure">
-                                Измеряется в: {{info.measure}}
+                                Измеряется в: {{measure.caption}}
                             </label>
                         </div>
                     </div>
@@ -20,13 +20,13 @@
                             <label for="buy">
                                 Запланировано купить
                             </label>
-                            <updowninput ng-model="shelfQuery.buy" min="info.min" step="info.step" measure="info.measure"><updowninput>
+                            <updowninput ng-model="shelfQuery.buy" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="bought">
                                 Куплено в итоге
                             </label>
-                            <updowninput ng-model="shelfQuery.bought" min="info.min" step="info.step" measure="info.measure"><updowninput>
+                            <updowninput ng-model="shelfQuery.bought" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="buyDate">
@@ -45,13 +45,13 @@
                             <label for="use">
                                 Запланировано использовать
                             </label>
-                            <updowninput ng-model="shelfQuery.use" min="info.min" step="info.step" measure="info.measure"><updowninput>
+                            <updowninput ng-model="shelfQuery.use" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="used">
                                 Использовано в итоге
                             </label>
-                            <updowninput ng-model="shelfQuery.used" min="info.min" step="info.step" measure="info.measure"><updowninput>
+                            <updowninput ng-model="shelfQuery.used" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="useDate">
@@ -71,7 +71,7 @@
                             <label for="spoil">
                                 Иcпортилось
                             </label>
-                            <updowninput ng-model="shelfQuery.spoil" min="info.min" step="info.step" measure="info.measure"><updowninput>
+                            <updowninput ng-model="shelfQuery.spoil" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="spoilDate">
