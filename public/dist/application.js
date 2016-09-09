@@ -875,18 +875,18 @@ angular
         
         Menus.addMenuItem('topbar', {
             title: 'Ингредиенты',
-            state: 'ingridients',
+            state: 'ingredients',
             type: 'dropdown',
             roles: ['user']
         });
-        Menus.addSubMenuItem('topbar', 'ingridients', {
+        Menus.addSubMenuItem('topbar', 'ingredients', {
             title: 'Справочник',
-            state: 'ingridients.list',
+            state: 'ingredients.list',
             roles: ['user']
         });
-        Menus.addSubMenuItem('topbar', 'ingridients', {
+        Menus.addSubMenuItem('topbar', 'ingredients', {
             title: 'Добавить ингредиент',
-            state: 'ingridients.create',
+            state: 'ingredients.create',
             roles: ['user']
         });
         
@@ -965,35 +965,35 @@ function routeConfig($stateProvider) {
             }
         })
 
-        .state('ingridients', {
+        .state('ingredients', {
             abstract: true,
-            url: '/ingridients',
+            url: '/ingredients',
             template: '<ui-view/>'
         })
-        .state('ingridients.list', {
+        .state('ingredients.list', {
             url: '',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridients-list.client.view.html',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredients-list.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
         })
-        .state('ingridients.create', {
+        .state('ingredients.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridient-create.client.view.html',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredient-form.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
         })
-        .state('ingridients.view', {
-            url: '/:ingridientId',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridient-read.client.view.html',
+        .state('ingredients.view', {
+            url: '/:ingredientId',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredient-read.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
         })
-        .state('ingridients.edit', {
-            url: '/:ingridientId/edit',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridient-edit.client.view.html',
+        .state('ingredients.edit', {
+            url: '/:ingredientId/edit',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredient-form.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
@@ -1013,14 +1013,14 @@ function routeConfig($stateProvider) {
         })
         .state('measures.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/measures/measure-create.client.view.html',
+            templateUrl: 'modules/recipes/client/views/measures/measure-form.client.view.html',
             data: {
                 roles: ['admin']
             }
         })
         .state('measures.edit', {
             url: '/:measureId',
-            templateUrl: 'modules/recipes/client/views/measures/measure-edit.client.view.html',
+            templateUrl: 'modules/recipes/client/views/measures/measure-form.client.view.html',
             data: {
                 roles: ['admin']
             }
@@ -1115,6 +1115,9 @@ function routeConfig($stateProvider) {
         })
         .state('shelf.create', {
             url: '/create',
+            params: {
+                ingredient: null,
+            },
             templateUrl: 'modules/recipes/client/views/shelf/shelf-form.client.view.html',
             data: {
                 roles: ['user', 'admin']
@@ -1156,101 +1159,114 @@ function routeConfig($stateProvider) {
 // Recipes controller
 angular
     .module('recipes')
-    .controller('IngridientsController', IngridientsController);
-IngridientsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Recipes', 'Ingridients', 'Measures', 'FileUploader'];
-function IngridientsController($scope, $stateParams, $location, $window, $timeout, Authentication, Recipes, Ingridients, Measures, FileUploader) {
+    .controller('IngredientsController', IngredientsController);
+IngredientsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'IngredientService', 'MeasureService', 'FileUploader'];
+function IngredientsController($scope, $stateParams, $location, $window, $timeout, Authentication, IngredientService, MeasureService, FileUploader) {
 
     $scope.authentication = Authentication;
 
     $scope.find = function () {
-        $scope.ingridients = Ingridients.query();
+        IngredientService.query().$promise.then(function (ingredients) {
+            $scope.ingredients = ingredients;
+        });
     };
 
     $scope.findOne = function () {
-        $scope.ingridient = Ingridients.get(
-            {
-                ingridientId: $stateParams.ingridientId
-            }
-        );
-    };
-
-    $scope.getMeasuresList = function () {
-        return Measures.query().$promise;
-    };
-
-    $scope.create = function (isValid) {
-        $scope.error = null;
-
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
-            return false;
-        }
-
-        // Create new Recipe object
-
-        var ingridient = new Ingridients(
-            {
-                caption: this.caption,
-                infoCard: this.infoCard,
-                image: $scope.imageURL,
-                measureDefault: $scope.measureDefault
-            }
-        );
-
-        // Redirect after save
-        ingridient.$save(function (response) {
-            $location.path('ingridients/' + response.id);
-
-        // Clear form fields
-            $scope.caption = '';
-            $scope.infoCard = '';
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
-    };
-
-    $scope.update = function (isValid) {
-        $scope.error = null;
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
-            return false;
-        }
-
-        var ingridient = $scope.ingridient;
-        ingridient.image = $scope.imageURL;
-        ingridient.$update(function () {
-            $location.path('ingridients/' + ingridient.id);
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
-    };
-
-    $scope.remove = function (ingridient) {
-        if (ingridient) {
-            ingridient.$remove();
-            $location.path('ingridients');
+        if ($stateParams.ingredientId) {
+            IngredientService.get(
+                {
+                    ingredientId: $stateParams.ingredientId
+                }
+            ).$promise.then(function (ingredient) {
+                $scope.ingredient = ingredient;
+                ingredient.getMeasure().then(function (measure) {
+                    $scope.ingredient.measure = measure;
+                });
+                ingredient.getShelf().then(function (shelf) {
+                    if (shelf.id) {
+                        $scope.shelf = shelf;
+                    }
+                });
+            });    
         } else {
-            $scope.ingridient.$remove(function () {
-                $location.path('ingridient');
+            $scope.ingredient = new IngredientService();
+        }
+    };
+    
+    $scope.getMeasures = function (value) {
+        return MeasureService.query().$promise.then(function (results) {
+            var matched = [];
+            results.forEach(function (item, i, arr) {
+                if (item.caption.includes(value)) {
+                    matched.push(item);
+                }
             });
+            return matched;
+        });
+    };
+    
+    $scope.setMeasure = function (subMeasure) {
+        $scope.ingredient.measureDefault = subMeasure.id;
+        $scope.ingredient.measure = subMeasure;
+    };
+    
+    $scope.unsetMeasure = function () {
+        $scope.ingredient.measure = null;
+        $scope.ingredient.measureDefault = null;
+        $scope.asyncSelected = null;
+    };
+    
+    $scope.unsetPicture = function () {
+        $scope.ingredient.image = "";
+        $scope.uploader.clearQueue();
+    };
+    
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.ingredient.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('ingredients/' + $scope.ingredient.id);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
         }
     };
 
     var uploader = $scope.uploader = new FileUploader({
-        url: '/api/pictures/ingridients'
+        url: '/api/pictures/ingredients'
     });
 
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
 
     // FILTERS
 
-    uploader.filters.push({
-        name: 'imageFilter',
-        fn: function (item, options) {
-            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+    uploader.filters.push(
+        {
+            name: 'imageFilter',
+            fn: function (item, options) {
+                var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+                return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+            }
+        },
+        {
+            name: 'overWriteFilter',
+            fn: function(item, options) {
+                if(this.queue.length===1){
+                    this.clearQueue();
+                }
+                return true;
+            }
         }
-    });
+    );
 
         // Called after the user selected a new picture file
     $scope.uploader.onAfterAddingFile = function (fileItem) {
@@ -1272,171 +1288,107 @@ function IngridientsController($scope, $stateParams, $location, $window, $timeou
 angular
     .module('recipes')
     .controller('MeasuresController', MeasuresController);
-MeasuresController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes', 'Ingridients', 'Measures'];
+MeasuresController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'MeasureService'];
 
-function MeasuresController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
+function MeasuresController($scope, $stateParams, $location, Authentication, MeasureService) {
         
     $scope.authentication = Authentication;
     $scope.converter = [];
-
-    $scope.uncountable = false;
+    
     $scope.find = function () {
-        $scope.measures = Measures.query();
+        $scope.measures = MeasureService.query();
     };
 
     $scope.findOne = function () {
-        $scope.measure = Measures.get(
-            {
-                measureId: $stateParams.measureId
-            }
-        ).$promise.then(function (measure) {
-            $scope.converter = measure.converter;
-            $scope.measure = measure;
-            if ($scope.converter) {
-                $scope.converter.forEach(function (item, i, arr) {
-                    item.index = i;
-                });
-            }
+        if ($stateParams.measureId) {
+            MeasureService.get(
+                {
+                    measureId: $stateParams.measureId
+                }
+            ).$promise.then(function (measure) {
+                $scope.converter = measure.converter;
+                $scope.measure = measure;
+                $scope.uncountable = measure.step === 0;
+                if ($scope.converter) {
+                    $scope.converter.forEach(function (item, i, arr) {
+                        item.index = i;
+                    });
+                }
+            });
+        } else {
+            $scope.measure = new MeasureService(
+                {
+                    min: 0,
+                    step: 1
+                }
+            );
+        }
+    };
+
+    $scope.getMeasures = function (value) {
+        return MeasureService.query().$promise.then(function (results) {
+            var matched = [];
+            results.forEach(function (item, i, arr) {
+                if (item.caption.includes(value)) {
+                    matched.push(item);
+                }
+            });
+            return matched;
         });
     };
-
-    $scope.getMeasuresList = function () {
-        return Measures.query().$promise;
-    };
-
-    $scope.minMinus = function (measure) {
-        measure.min--;
-        if (measure.min < 0) {
-            measure.min = 0;
-        }
-    };
-
-    $scope.minPlus = function (measure) {
-        measure.min++;
-    };
-
-    $scope.stepMinus = function (measure) {
-        measure.step--;
-        if (measure.step < 0) {
-            measure.step = 0;
-        }
-    };
-
-    $scope.stepPlus = function (measure) {
-        measure.step++;
-    };
-
-    $scope.newSubMeasure = function (id) {
-        if (!id || id % 1 !== 0) {
-            $scope.selectedMeasure = '';
-            return;
-        }
-        Measures.get(
-            {
-                measureId: id
-            }
-        ).$promise.then(function (measure) {
-            $scope.converter.push({
-                id: measure.id,
-                index: $scope.converter.length,
-                caption: measure.caption,
-                rate: 1,
-                exchange: true
-            });
-            $scope.converter.forEach(function (item, i, arr) {
-                item.index = i;
-            });
+    
+    $scope.addSubMeasure = function (subMeasure) {
+        $scope.converter.push({
+            id: subMeasure.id,
+            index: $scope.converter.length,
+            caption: subMeasure.caption,
+            rate: 1,
+            uncountable: subMeasure.step === 0
         });
-        $scope.selectedMeasure = '';
+        $scope.asyncSelected = "";
     };
-
-    $scope.removeSubMeasure = function (node) {
-        $scope.converter.splice(node.index, 1);
+    
+    $scope.removeSubMeasure = function (index) {
+        $scope.converter.splice(index, 1);
         $scope.converter.forEach(function (item, i, arr) {
             item.index = i;
         });
     };
-
-    $scope.create = function (isValid) {
-        $scope.error = null;
-
+    
+    $scope.applyStep = function (id, step) {
+        if (step <= 0) {
+            $scope.uncountable = true;
+        }
+    };
+    
+    $scope.save = function (isValid) {
+        
         if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'ingridientForm');
+            $scope.$broadcast('show-errors-check-validity', 'shelfForm');
             return false;
         }
-
-        // Create new Recipe object
-
-        var measure = new Measures(
-            {
-                caption: this.caption,
-                step: this.step,
-                min: this.min,
-                converter: []
-            }
-        );
+        
         if ($scope.uncountable) {
-            measure.min = 0;
-            measure.step = 0;
-        }
-        $scope.converter.forEach(function (item, i, arr) {
-            if (!item.exchange || $scope.uncountable) {
+            $scope.measure.step = 0;
+            $scope.converter.forEach(function (item, i, arr) {
                 item.rate = 0;
-            }
-            measure.converter.push(
-                {
-                    id: item.id,
-                    caption: item.caption,
-                    rate: item.rate
-                }
-            );
-        });
-        // Redirect after save
-        measure.$save(function (response) {
+            });
+        }
+        $scope.measure.converter = $scope.converter;
+        
+        $scope.measure.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
             $location.path('measures');
-
-        // Clear form fields
-            $scope.caption = '';
-            $scope.step = '';
-            $scope.min = '';
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
-    };
-
-    $scope.update = function (isValid) {
-
-        $scope.error = null;
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'measureForm');
-            return false;
         }
 
-        var measure = $scope.measure;
-        if ($scope.uncountable) {
-            measure.min = 0;
-            measure.step = 0;
+        function errorCallback(res) {
+            $scope.error = res.data.message;
         }
-        measure.converter = [];
-        $scope.converter.forEach(function (item, i, arr) {
-            if (!item.exchange || $scope.uncountable) {
-                item.rate = 0;
-            }
-            measure.converter.push(
-                {
-                    id: item.id,
-                    caption: item.caption,
-                    rate: item.rate
-                }
-            );
-        });
-        measure.$update(function () {
-            $location.path('measures');
-        }, function (errorResponse) {
-            $scope.error = errorResponse.data.message;
-        });
     };
-
+    
 }
 'use strict';
 
@@ -1793,6 +1745,7 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                 startTime: 17 * 60 + 30 //17:30
             } 
         );
+        $scope.menuInitByDays($scope.menu);
     };
     
     $scope.mealMoveType = function (oldType, meal, direction) {
@@ -1922,13 +1875,12 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             $scope.$broadcast('show-errors-check-validity', 'menuForm');
             return false;
         }
-        
         $scope.menu.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
 
         function successCallback(res) {
-            $location.path('menu/' + $scope.menu.number + '/meals');
+            $location.path('menu/' + $scope.menu.number + '/recipes');
         }
 
         function errorCallback(res) {
@@ -2086,7 +2038,7 @@ function RecipesController($scope, $stateParams, $location, Authentication, Reci
                 recipe.ingridients.forEach(function (item, i, arr) {
                     Measures.get(
                         {
-                            measureId: item.ingridientAmount.measureId
+                            measureId: item.measureDefault
                         }
                     ).$promise.then(function (measure) {
                         item.measure = measure;
@@ -2352,31 +2304,19 @@ angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
 
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'Ingridients', 'Measures'];
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'IngredientService', 'MeasureService'];
 
-function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, Ingridients, Measures) {
+function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, IngredientService, MeasureService) {
 
     // progress bar settings
-    const pbLimitEmpty = 10;
     const pbLimitDeficit = 20;
-    const pbLengthDeficit = 20;
     const pbLimitDesired = 50;
-    const pbLengthDesired = 30;
     const pbLimitMax = 80;
-    const pbLenghtMax = 30;
-    const pbMultyMax = 5;
-    
-    // spoil button style settings
-    const btnInactive = "btn btn-default";
-    const btnGood = "btn btn-success";
-    const btnBad = "btn btn-danger";
         
     $scope.authentication = Authentication;
     $scope.error = null;
-    $scope.info = {};
-    $scope.form = {};
     
-    $scope.handle = true;
+    $scope.ingredientList = [];
     $scope.legend = false;
     $scope.selectedIngridient = "";
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
@@ -2395,9 +2335,10 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 }
             ).$promise.then(function (shelf) {
                 $scope.shelf = shelf;
-                $scope.spoilUpdate(shelf.isSpoiled);
                 if (shelf.ingridientId) {
-                    $scope.setIngridient(shelf.ingridientId);        
+                    $scope.loadIngredient(shelf.ingridientId).then(function (ingredient) {
+                        $scope.setIngredient(ingredient);    
+                    });      
                 }
             });    
         } else {
@@ -2409,30 +2350,60 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                     deficit: 10
                 }
             );
-            $scope.spoilUpdate($scope.shelf.isSpoiled);
+            if ($stateParams.ingredient) {
+                $scope.setIngredient($stateParams.ingredient);
+            }
         } 
     };
     
-    $scope.findForShelf = function () {
-        ShelfQueryService.query(
-            {
-                shelfId: $stateParams.shelfId
-            }
-        ).$promise.then(function (shelfQueries) {
-            $scope.shelfQueries = shelfQueries;
-            ShelfService.get(
-                {
-                    shelfId: $stateParams.shelfId
+    $scope.getIngredients = function (value) {
+        var matched = [];
+        if ($scope.ingredientList.length === 0) {
+            IngredientService.query().$promise.then(function (results) {
+                $scope.ingredientList = results;
+                results.forEach(function (item, i, arr) {
+                    if (item.caption.includes(value)) {
+                        matched.push(item);
+                    }
+                });
+            });   
+        } else {
+            $scope.ingredientList.forEach(function (item, i, arr) {
+                if (item.caption.includes(value)) {
+                    matched.push(item);
                 }
-            ).$promise.then(function (shelf) {
-                $scope.shelf = shelf;
-            });
+            });    
+        }
+        return matched;
+    };
+    
+    $scope.loadIngredient = function (id) {
+        return IngredientService.get(
+            {
+                ingredientId: id
+            }
+        ).$promise;
+    };
+    
+    $scope.setIngredient = function (ingredient) {
+        
+        if (!ingredient) {
+            $scope.shelf.ingridientId = null;
+            $scope.ingredient = null;
+            return;
+        }
+        
+        $scope.ingredient = ingredient;
+        $scope.shelf.ingridientId = ingredient.id;
+        ingredient.getMeasure().then(function (measure) {
+            $scope.measure = measure;
         });
+        
+        $scope.asyncSelected = '';
     };
     
     $scope.filterBar = {
         spoiled: true,
-        empty: true,
         deficit: true,
         lsdesired: true,
         desired: true,
@@ -2441,187 +2412,72 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     
     $scope.filterBarToggle = function () {
         
-        if ($scope.filterBar.spoiled && $scope.filterBar.empty && $scope.filterBar.deficit && $scope.filterBar.lsdesired && $scope.filterBar.desired && $scope.filterBar.max) {
-            $scope.filterBar.spoiled = false;
-            $scope.filterBar.empty = false;
-            $scope.filterBar.deficit = false;
-            $scope.filterBar.lsdesired = false;
-            $scope.filterBar.desired = false;
-            $scope.filterBar.max = false;        
+        if ($scope.filterBar.deficit && $scope.filterBar.lsdesired && $scope.filterBar.desired && $scope.filterBar.max) {
+            $scope.filterBar = {
+                deficit: false,
+                lsdesired: false,
+                desired: false,
+                max: false
+            };       
         } else {
-            $scope.filterBar.spoiled = true;
-            $scope.filterBar.empty = true;
-            $scope.filterBar.deficit = true;
-            $scope.filterBar.lsdesired = true;
-            $scope.filterBar.desired = true;
-            $scope.filterBar.max = true;
+            $scope.filterBar = {
+                deficit: true,
+                lsdesired: true,
+                desired: true,
+                max: true
+            };
         }
     };
     
-    $scope.filterByProgress = function (item){
+    $scope.filterByProgress = function (index) {
+        var item = $scope.shelves[index];
         if (!item.progressbar) return true;
         return false ||
             ($scope.filterBar.spoiled && item.isSpoiled) ||
-            ($scope.filterBar.empty && !item.isSpoiled && item.progressbar.value <= pbLimitEmpty) ||
-            ($scope.filterBar.deficit && item.progressbar.value > pbLimitEmpty && item.progressbar.value <= pbLimitDeficit) ||
-            ($scope.filterBar.lsdesired && item.progressbar.value > pbLimitDeficit && item.progressbar.value <= pbLimitDesired) ||
-            ($scope.filterBar.desired && item.progressbar.value > pbLimitDesired && item.progressbar.value <= pbLimitMax) ||
+            ($scope.filterBar.deficit && item.progressbar.value <= pbLimitDeficit) ||
+            ($scope.filterBar.lsdesired && item.progressbar.value > pbLimitDeficit && item.progressbar.value < pbLimitDesired) ||
+            ($scope.filterBar.desired && item.progressbar.value >= pbLimitDesired && item.progressbar.value <= pbLimitMax) ||
             ($scope.filterBar.max && item.progressbar.value > pbLimitMax && item.progressbar.value <= 100);
     };
     
-    $scope.getIngridientList = function () {
-        return Ingridients.query().$promise;
-    };
-    
-    $scope.setIngridient = function (id) {
-        
-        if(!id){
-            $scope.shelf.ingridientId = null;
-            $scope.info = {};
-            return;
-        }
-        
-        Ingridients.get(
-            {
-                ingridientId: id
-            }
-        ).$promise.then(function (ingridient) {
-            $scope.shelf.ingridientId = ingridient.id;
-            $scope.info.caption = ingridient.caption;
-            $scope.info.card = ingridient.infoCard;
-            $scope.info.image = ingridient.image;
-
-            $scope.shelf.measureId = ingridient.measureDefault;
-            Measures.get(
-                {
-                    measureId: ingridient.measureDefault
-                }
-            ).$promise.then(function (measure) {
-                $scope.info.measure = measure.caption;
-                $scope.info.step = measure.step;
-                $scope.info.min = measure.min;
-                
-                $scope.settingsLoad();
-            });
-        });
-    };
-    
-    $scope.spoilUpdate = function (state) {
-        
-        if (state) {
-            $scope.shelf.isSpoiled = true;
-            $scope.btnIsSpoiledTrue = btnInactive;
-            $scope.btnIsSpoiledFalse = btnBad;
-        } else {
-            $scope.shelf.isSpoiled = false;
-            $scope.btnIsSpoiledTrue = btnGood;
-            $scope.btnIsSpoiledFalse = btnInactive;
-        }
-    };
-    
     $scope.clearSpoiled = function () {
-    //TODO clearSpoiled        
+        //TODO clearSpoiled        
     };
     
-    $scope.settingsLoad = function () {
-        
-        $scope.form.deficit = {
-            alert: false,
-            input: false,
-            value: $scope.shelf.deficit
+    $scope.validateDeficit = function (id, value, oldValue) {
+        $scope.form = {
+            deficit: false,
+            desired: false,
+            max: false
         };
-        $scope.form.desired = {
-            alert: false,
-            input: false,
-            value: $scope.shelf.desired
-        };
-        $scope.form.max = {
-            alert: false,
-            input: false,
-            value: $scope.shelf.max
-        };
-        
-        $scope.setDeficit(0,$scope.shelf.deficit);
-        $scope.setDesired(0,$scope.shelf.desired);
-        $scope.setMax(0,$scope.shelf.max);
-    };
-    
-    $scope.setDeficit = function (sign, value) {
-        var oldValue = $scope.shelf.deficit;
-        if (value !== 0) {
-            $scope.shelf.deficit = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelf.deficit = Number(($scope.shelf.deficit - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelf.deficit = Number(($scope.shelf.deficit + $scope.info.step).toFixed(3)); 
-        }
-        if (!$scope.settingsUpdate()){
-            $scope.shelf.deficit = oldValue;
-        } else {
-            $scope.form.deficit = {
-                alert: false,
-                input: false,
-                value: $scope.shelf.deficit
-            };
-        }
-    };
-    
-    $scope.setDesired = function (sign, value) {
-        var oldValue = $scope.shelf.desired;
-        if (value !== 0) {
-            $scope.shelf.desired = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelf.desired = Number(($scope.shelf.desired - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelf.desired = Number(($scope.shelf.desired + $scope.info.step).toFixed(3)); 
-        }
-        if (!$scope.settingsUpdate()){
-            $scope.shelf.desired = oldValue;
-        } else {
-            $scope.form.desired = {
-                alert: false,
-                input: false,
-                value: $scope.shelf.desired
-            };
-        }
-    };
-    
-    $scope.setMax = function (sign, value) {
-        var oldValue = $scope.shelf.max;
-        if (value !== 0) {
-            $scope.shelf.max = Number((value).toFixed(3));
-        } else if (sign < 0) {
-            $scope.shelf.max = Number(($scope.shelf.max - $scope.info.step).toFixed(3));    
-        } else {
-            $scope.shelf.max = Number(($scope.shelf.max + $scope.info.step).toFixed(3)); 
-        }
-        if (!$scope.settingsUpdate()){
-            $scope.shelf.max = oldValue;
-        } else {
-            $scope.form.max = {
-                alert: false,
-                input: false,
-                value: $scope.shelf.max
-            };
-        }
-    };
-    
-    $scope.settingsUpdate = function () {
-        
-        $scope.form.deficit.alert = false;
-        $scope.form.desired.alert = false;
-        $scope.form.max.alert = false;
-        
-        if ($scope.shelf.deficit < $scope.info.min) {
-            $scope.form.deficit.alert = true;
+        if (value < $scope.measure.min || $scope.shelf.desired <= value) {
+            $scope.form.deficit = true;
             return false;
         }
-        if ($scope.shelf.desired <= $scope.shelf.deficit) {
-            $scope.form.desired.alert = true;
+        return true;
+    };
+    
+    $scope.validateDesired = function (id, value, oldValue) {
+        $scope.form = {
+            deficit: false,
+            desired: false,
+            max: false
+        };
+        if (value <= $scope.shelf.deficit || $scope.shelf.max <= value) {
+            $scope.form.desired = true;
             return false;
         }
-        if ($scope.shelf.max <= $scope.shelf.desired) {
-            $scope.form.max.alert = true;
+        return true;
+    };
+    
+    $scope.validateMax = function (id, value, oldValue) {
+        $scope.form = {
+            deficit: false,
+            desired: false,
+            max: false
+        };
+        if (value <= $scope.shelf.desired) {
+            $scope.form.max = true;
             return false;
         }
         return true;
@@ -2641,14 +2497,14 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             return false;
         }
         
-        $scope.shelf.caption = $scope.info.caption;
-        $scope.shelf.measureCaption = $scope.info.measure;
+        $scope.shelf.caption = $scope.ingredient.caption;
+        $scope.shelf.measureCaption = $scope.measure.caption;
         $scope.shelf.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
 
         function successCallback(res) {
-            $location.path('shelf/' + $scope.shelf.id);
+            $location.path('shelf/' + $scope.shelf.number);
         }
 
         function errorCallback(res) {
@@ -2695,9 +2551,7 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
                         measureId: shelfQuery.measureId
                     }
                 ).$promise.then(function (measure) {
-                    $scope.info.measure = measure.caption;
-                    $scope.info.step = measure.step;
-                    $scope.info.min = measure.min;
+                    $scope.measure = measure;
                 });
                 $scope.shelfQuery = shelfQuery;
             });    
@@ -8686,104 +8540,287 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 
 })();
 
+angular.module('recipes').directive('measureconverter', ["MeasureService", function (MeasureService) {
+    'use strict';
+    return {
+        restrict: 'AE',
+        scope: {
+            value: '=ngModel',
+            measure: '=',
+            toggle: '=',
+            precision: '='
+        },
+        require: 'ngModel',
+        template: '<div ng-show="toggle">' +
+                '<div class="btn-group">' +
+                    '<label class="btn btn-default" ng-click="toggle=false">' +
+                        '<div ng-hide="measure.step > 0">' +
+                            '<i class="glyphicon glyphicon-menu-left"></i> {{measure.caption}}' +
+                       '</div>' +
+                        '<div ng-show="measure.step > 0">' +
+                            '<i class="glyphicon glyphicon-menu-left"></i> {{value}} {{measure.caption}}' +
+                       '</div>' +
+                    '</label>' +
+                    '<div class="btn-group" dropdown>' +
+                        '<label class="btn btn-default" ng-click="apply()">' +
+                                '{{newValue}} {{newCaption}} <i class="glyphicon glyphicon-retweet"></i>' +
+                        '</label>' +
+                        '<label class="btn btn-default" dropdown-toggle>' +
+                            '<span class="caret"></span>' +
+                        '</label>' +
+                        '<ul class="dropdown-menu" role="menu">' +
+                            '<li role="menuitem" ng-repeat="item in convertList">' +
+                                '<a ng-click="selectItem($index)">' +
+                                    '{{item.value}} {{item.caption}}' +
+                                '</a>' +
+                            '</li>' +
+                        '</ul>' +
+                    '</div>' +
+                '</div>' +
+            '</div>',
+        link: function (scope, iElement, iAttrs, ngModelController) {
+            var precision = scope.precision || 3,
+                oldValue = scope.value;
+            
+            ngModelController.$render = function () {
+                scope.convertList = [];
+                if (!scope.measure) {
+                    return;
+                }
+                scope.convertList = scope.getConvertList();
+                if (scope.convertList.length === 0) {
+                    scope.toggle = false; //measure is not convertable, so hiding directive
+                    return;
+                }
+                scope.selectItem(0);
+            };
+            
+            scope.getConvertList = function () {
+                if (!scope.measure.converter) {
+                    return [];
+                }
+                return scope.measure.converter.map(function (item, i, arr) {
+                    return {
+                        id: item.id,
+                        value: (!item.uncountable && scope.value) ? Number((scope.value * item.rate).toFixed(precision)) : undefined,
+                        caption: item.caption
+                    };
+                });
+            };
+            
+            scope.selectItem = function (index) {
+            
+                MeasureService.get(
+                    {
+                        measureId: scope.convertList[index].id
+                    }
+                ).$promise.then(function (newMeasure) {
+                    if (!newMeasure) {
+                        return;
+                    }
+                    scope.newValue = newMeasure.applyValue(scope.convertList[index].value, precision);
+                    scope.newCaption = newMeasure.caption;
+                    scope.newMeasure = newMeasure;
+                });
+            };
+            
+            scope.apply = function () {
+                scope.value = scope.newValue;
+                scope.measure = scope.newMeasure;
+                scope.toggle = false; //job is done, so hiding directive
+            };
+        }
+    };
+}]);
+"use strict";
+angular.module('recipes').directive('toggleSwitch', ['$compile', function($compile) {
+	return {
+		restrict: 'EA',
+		replace: true,
+		require:'ngModel',
+		scope: {
+			isDisabled: '=',
+			onLabel: '@',
+			offLabel: '@',
+			knobLabel: '@',
+			html: '=',
+			onChange: '&'
+		},
+		template:
+					'<div class="ats-switch" ng-click="toggle()" ng-keypress="onKeyPress($event)" ng-class="{ \'disabled\': isDisabled }" role="switch" aria-checked="{{!!model}}">' +
+						'<div class="switch-animate" ng-class="{\'switch-off\': !model, \'switch-on\': model}">' +
+							'<span class="switch-left"></span>' +
+							'<span class="knob"></span>' +
+							'<span class="switch-right"></span>' +
+						'</div>' +
+					'</div>',
+		compile: function(element, attrs) {
+			if (angular.isUndefined(attrs.onLabel)) {
+				attrs.onLabel = 'On';
+			}
+			if (angular.isUndefined(attrs.offLabel)) {
+				attrs.offLabel = 'Off';
+			}
+			if (angular.isUndefined(attrs.knobLabel)) {
+				attrs.knobLabel = '\u00a0';
+			}
+			if (angular.isUndefined(attrs.isDisabled)) {
+				attrs.isDisabled = false;
+			}
+			if (angular.isUndefined(attrs.html)) {
+				attrs.html = false;
+			}
+			if (angular.isUndefined(attrs.tabindex)) {
+				attrs.tabindex = 0;
+			}
+
+			return function postLink(scope, iElement, iAttrs, ngModel) {
+				iElement.attr('tabindex', attrs.tabindex);
+
+				scope.toggle = function toggle() {
+					if (!scope.isDisabled) {
+						scope.model = !scope.model;
+						ngModel.$setViewValue(scope.model);
+					}
+					scope.onChange();
+				};
+
+				var spaceCharCode = 32;
+				scope.onKeyPress = function onKeyPress($event) {
+					if ($event.charCode === spaceCharCode && !$event.altKey && !$event.ctrlKey && !$event.metaKey) {
+						scope.toggle();
+						$event.preventDefault();
+					}
+				};
+
+				ngModel.$formatters.push(function(modelValue) {
+					return modelValue;
+				});
+
+				ngModel.$parsers.push(function(viewValue) {
+					return viewValue;
+				});
+
+				ngModel.$viewChangeListeners.push(function() {
+					scope.$eval(attrs.ngChange);
+				});
+
+				ngModel.$render = function() {
+					scope.model = ngModel.$viewValue;
+				};
+
+				var bindSpan = function(span, html) {
+					span = angular.element(span);
+					var bindAttributeName = (html === true) ? 'ng-bind-html' : 'ng-bind';
+
+					// remove old ng-bind attributes
+					span.removeAttr('ng-bind-html');
+					span.removeAttr('ng-bind');
+
+					if (angular.element(span).hasClass("switch-left"))
+						span.attr(bindAttributeName, 'onLabel');
+					if (span.hasClass("knob"))
+						span.attr(bindAttributeName, 'knobLabel');
+					if (span.hasClass("switch-right"))
+						span.attr(bindAttributeName, 'offLabel');
+
+					$compile(span)(scope, function(cloned, scope) {
+						span.replaceWith(cloned);
+					});
+				};
+
+				// add ng-bind attribute to each span element.
+				// NOTE: you need angular-sanitize to use ng-bind-html
+				var bindSwitch = function(iElement, html) {
+					angular.forEach(iElement[0].children[0].children, function(span, index) {
+						bindSpan(span, html);
+					});
+				};
+
+				scope.$watch('html', function(newValue) {
+					bindSwitch(iElement, newValue);
+				});
+			};
+		}
+	};
+}]);
 angular.module('recipes').directive('updowninput', function () {
     'use strict';
     return {
         restrict: 'AE',
         scope: {
             value: '=ngModel',
+            convertable: '=',
             min: '=',
-            max: '=',
             step: '=',
             precision: '=',
+            converter: '=',
             measure: '=',
-            convertable: '=',
-            validator: '&'
+            validator: '&',
+            validationId: '='
         },
         require: 'ngModel',
-        template: 
-            '<div ng-hide="form.converting">' +
-                '<div ng-hide="step > 0 || !step">' +
-                    '<label class="btn btn-default" ng-click="form.converting=true">' +
-                       '{{measure}}' +
+        template: '<div ng-hide="converter">' +
+                '<div ng-hide="(measure.step > 0) || !measure">' +
+                    '<label class="btn btn-default" ng-click="converter=true">' +
+                        '{{measure.caption}}' +
                     '</label>' +
-               '</div>' +
-                '<div ng-show="(step > 0) || !step">' +
+                '</div>' +
+                '<div ng-show="(measure.step > 0) || !measure">' +
                     '<div ng-hide="form.input">' +
                         '<div class="btn-group">' +
-                            '<label ng-show="measure && convertable" class="btn btn-default" ng-click="form.converting=true">' +
-                                '{{measure}}' +
+                            '<label ng-show="convertable" class="btn btn-default" ng-click="converter=true">' +
+                                '{{measure.caption}}' +
                             '</label>' +
                             '<label class="btn btn-default" ng-click="set(-1)">' +
                                 '<i class="glyphicon glyphicon-minus"></i>' +
                             '</label>' +
                             '<label class="btn btn-default" ng-click="form.input = true">' +
-                                '<div ng-show="!measure || (measure && convertable)">' +
+                                '<div ng-show="convertable">' +
                                     '{{value}}' +
-                               '</div>' +
-                                '<div ng-show="measure && !convertable">' +
-                                    '{{value}} {{measure}}' +
-                               '</div>' +
+                                '</div>' +
+                                '<div ng-hide="convertable">' +
+                                    '{{value}} {{measure.caption}}' +
+                                '</div>' +
                             '</label>' +
                             '<label class="btn btn-default" ng-click="set(1)">' +
                                 '<i class="glyphicon glyphicon-plus"></i>' +
                             '</label>' +
-                       '</div>' +
-                   '</div>' +
+                        '</div>' +
+                    '</div>' +
                     '<div ng-show="form.input">' +
                         '<div class="input-group">' +
                             '<label ng-show="measure" class="input-group-addon">' +
-                                '{{measure}}' +
+                                '{{measure.caption}}' +
                             '</label>' +
-                            '<input name="input" type="number" ng-model="form.value" class="form-control">' +
+                            '<input name="input" min="{{min}}" type="number" ng-model="form.value" class="form-control">' +
                             '<label ng-show="form.alert" class="input-group-addon">' +
                                 '{{form.alertText}}' +
                             '</label>' +
                             '<label class="input-group-addon" ng-click="set(0,form.value)">' +
                                 'OK' +
                             '</label>' +
-                       '</div>' +
-                   '</div>' +
-               '</div>' +
-            '</div>' +
-            '<div ng-show="form.converting">' +
-                '<div class="btn-group">' +
-                    '<label class="btn btn-default" ng-click="form.converting=false">' +
-                        '<div ng-hide="step > 0">' +
-                            '<i class="glyphicon glyphicon-menu-left"></i>{{value}}' +
-                       '</div>' +
-                        '<div ng-show="step > 0">' +
-                            '<i class="glyphicon glyphicon-menu-left"></i>{{value}} {{measure}}' +
-                       '</div>' +
-                    '</label>' +
-                    '<div class="btn-group" dropdown>' +
-                        '<label class="btn btn-default">' +
-                            '<div ng-hide="step > 0">' +
-                                '<i class="glyphicon glyphicon-retweet"></i>{{newmeasure}}' +
-                           '</div>' +
-                            '<div ng-show="step > 0">' +
-                                '<i class="glyphicon glyphicon-retweet"></i>{{newvalue}} {{newmeasure}}' +
-                           '</div>' +
-                        '</label>' +
-                        '<label class="btn btn-default" dropdown-toggle>' +
-                            '<span class="caret"></span>' +
-                        '</label>' +
-                        '<ul class="dropdown-menu" role="menu">' +
-                            '<li role="menuitem"><a href="#">Action</a></li>' +
-                            '<li role="menuitem"><a href="#">Another action</a></li>' +
-                            '<li role="menuitem"><a href="#">Something else here</a></li>' +
-                            '<li class="divider"></li>' +
-                            '<li role="menuitem"><a href="#">Separated link</a></li>' +
-                        '</ul>' +
-                   '</div>' +
-               '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
             '</div>',
         link: function (scope, iElement, iAttrs, ngModelController) {
-            var min = scope.min || 0,
-                max = scope.max || Number.MAX_VALUE,
-                step = scope.step || 1,
-                precision = scope.precision || 3,
-                oldValue = scope.value;
+            
+            var min, step, precision, newValue;
+            if (!scope.convertable) {
+                min = (scope.min !== undefined) ? scope.min : 0;
+                step = (scope.step !== undefined) ? scope.step : 1;
+            }
+            precision = (scope.precision !== undefined) ? scope.precision : 3;
+            
+            scope.$watch('measure', function (measure, oldValue) {
+                if (measure) {
+                    min = measure.min;
+                    step = measure.step;
+                    if (scope.convertable)
+                        scope.convertable = measure.converter;
+                }
+            }, true);
             
             ngModelController.$render = function () {
                 scope.form = {
@@ -8799,24 +8836,34 @@ angular.module('recipes').directive('updowninput', function () {
                     alertText : '',
                     value: scope.value
                 };
-                if (value) {
-                    scope.value = Number((value).toFixed(precision));
+                newValue = scope.value;
+                if (value !== undefined) {
+                    newValue = Number((value).toFixed(precision));
                 } else if (sign < 0) {
-                    scope.value = Number((scope.value - step).toFixed(precision));
-                } else {
-                    scope.value = Number((scope.value + step).toFixed(precision));
+                    newValue = Number((scope.value - step).toFixed(precision));
+                } else if (sign > 0) {
+                    newValue = Number((scope.value + step).toFixed(precision));
                 }
-                if (scope.value < min) {
-                    scope.value = oldValue;
+                if (newValue < min) {
+                    newValue = min;
                     scope.form.alert = true;
                     scope.form.alertText = '>=' + min + '!';
                 } else {
-                    scope.form = {
-                        alert: false,
-                        alertText : '',
-                        input: false,
-                        value: scope.value
-                    };
+                    if( scope.validator(
+                        {
+                            id: scope.validationId,
+                            value: newValue,
+                            oldValue: scope.value
+                        }
+                    )) {
+                        ngModelController.$setViewValue(newValue);//TODO look at apply model view tmth
+                        scope.form = {
+                            alert: false,
+                            alertText : '',
+                            input: false,
+                            value: newValue
+                        };
+                    }
                 }
             };
         }
@@ -10881,13 +10928,13 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                     scope.progressbar = 
                         {
                             type: 'danger',
-                            text: "! " + scope.shelf.stored + " < " + scope.shelf.deficit + " !", 
+                            text: scope.shelf.stored + " < " + scope.shelf.deficit, 
                             value: pbLimitDeficit - pbLengthDeficit + 
-                                ((scope.shelf.stored / scope.shelf.deficit) * pbLengthDeficit)
+                                ((scope.shelf.stored / scope.shelf.deficit) * pbLengthDeficit)    
                         };
                     if (scope.progressbar.value < pbLimitEmpty) {
                         scope.progressbar.value = pbLimitEmpty;
-                    }    
+                    }
                 } else if (scope.shelf.stored < scope.shelf.desired) {
                     scope.progressbar = 
                         {
@@ -10895,7 +10942,7 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                             text: scope.shelf.stored,
                             value: pbLimitDesired - pbLengthDesired + 
                                 ((scope.shelf.stored - scope.shelf.deficit) / (scope.shelf.desired - scope.shelf.deficit) * pbLengthDesired)
-                        };   
+                        };
                 } else if (scope.shelf.stored <= scope.shelf.max) {
                     scope.progressbar = 
                         {
@@ -10903,7 +10950,7 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                             text: scope.shelf.stored,
                             value: pbLimitMax - pbLenghtMax + 
                                 ((scope.shelf.stored - scope.shelf.desired) / (scope.shelf.max - scope.shelf.desired) * pbLenghtMax)
-                        };  
+                        };
                 } else {
                     scope.progressbar = 
                         {
@@ -10914,29 +10961,90 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                         };
                     if (scope.progressbar.value > 100) { // 100%
                         scope.progressbar.value = 100; // set to 100%
-                    }       
+                    }
                 }
                 if(scope.shelf.isSpoiled) {
                     scope.progressbar.class = "progress-striped active";
-                }   
+                }
             };
         }
     };
 });
 'use strict';
 
-//Ingridients service used for communicating with the ingridients REST endpoints
-angular.module('recipes').factory('Ingridients', ['$resource',
-    function($resource) {
-        return $resource('api/ingridients/:ingridientId', {
-            ingridientId: '@id'
-        }, {
-            update: {
-                method: 'PUT'
-            }
-        });
+//Ingredients service used for communicating with the Ingredients REST endpoints
+angular
+    .module('recipes')
+    .factory('IngredientService', IngredientService);
+
+IngredientService.$inject = ['$resource', 'ShelfService', 'MeasureService'];
+
+function IngredientService($resource, ShelfService, MeasureService) {
+    var Ingredient = $resource('api/ingredients/:ingredientId', {
+        ingredientId: '@id'
+    }, {
+        update: {
+            method: 'PUT'
+        }
+    });
+    
+    angular.extend(Ingredient.prototype, {
+        createOrUpdate: function () {
+            var ingredient = this;
+            return createOrUpdate(ingredient);
+        },
+        getShelf: function () {
+            var ingredient = this;
+            return getShelf(ingredient);
+        },
+        getMeasure: function() {
+            var ingredient = this;
+            return getMeasure(ingredient);
+        }
+    });
+    
+    return Ingredient;
+    
+    function createOrUpdate(ingredient) {
+        if (ingredient.id) {
+            return ingredient.$update(onSuccess, onError);
+        } else {
+            return ingredient.$save(onSuccess, onError);
+        }
     }
-]);
+    
+    function getShelf(ingredient) {
+        return ShelfService.get(
+            {
+                ingredientId: ingredient.id
+            }
+        ).$promise;
+    }
+    
+    function getMeasure(ingredient) {
+        return MeasureService.get(
+            {
+                measureId: ingredient.measureDefault
+            }
+        ).$promise;
+    }
+    
+    function onSuccess(ingredient) {
+        // Any required internal processing from inside the service, goes here.    
+    }
+    
+    // Handle error response
+    function onError(errorResponse) {
+        var error = errorResponse.data;
+        // Handle error internally
+        handleError(error);
+    }
+
+    function handleError(error) {
+        // Log error
+        console.log(error);
+    }
+}
 'use strict';
 
 //Shelf service used for communicating with the shelf REST endpoints
@@ -10989,10 +11097,10 @@ function MealService($resource) {
     }
 }
 'use strict';
-
+//FUTURE DEPRECATED
 //Measures service used for communicating with the measures REST endpoints
 angular.module('recipes').factory('Measures', ['$resource',
-    function($resource) {
+    function ($resource) {
         return $resource('api/measures/:measureId', {
             measureId: '@id'
         }, {
@@ -11002,6 +11110,76 @@ angular.module('recipes').factory('Measures', ['$resource',
         });
     }
 ]);
+
+//Measure service used for communicating with the measure REST endpoints
+angular
+    .module('recipes')
+    .factory('MeasureService', MeasureService);
+
+MeasureService.$inject = ['$resource'];
+
+function MeasureService($resource) {
+    var Measure = $resource('api/measures/:measureId', {
+        measureId: '@id'
+    }, {
+        update: {
+            method: 'PUT'
+        }
+    });
+    
+    angular.extend(Measure.prototype, {
+        createOrUpdate: function () {
+            var measure = this;
+            return createOrUpdate(measure);
+        },
+        applyValue: function (value, precision) {
+            var measure = this;
+            return applyValue(measure, value, precision);
+        }
+    });
+    
+    return Measure;
+    
+    function createOrUpdate(measure) {
+        if (measure.id) {
+            return measure.$update(onSuccess, onError);
+        } else {
+            return measure.$save(onSuccess, onError);
+        }
+    }
+    
+    function applyValue(measure, value, toFixed) {
+        
+        if (measure.step <= 0)
+            return undefined;
+        
+        var result = value || 0,
+            precision = toFixed || 3;
+        if (value % measure.step > 0) {
+            result = Number((value - value % measure.step + measure.step).toFixed(precision));
+        }
+        if (result < measure.min) {
+            result = measure.min;
+        }
+        return result;
+    }
+    
+    function onSuccess(measure) {
+        // Any required internal processing from inside the service, goes here.    
+    }
+    
+    // Handle error response
+    function onError(errorResponse) {
+        var error = errorResponse.data;
+        // Handle error internally
+        handleError(error);
+    }
+
+    function handleError(error) {
+        // Log error
+        console.log(error);
+    }
+}
 'use strict';
 
 //Shelf service used for communicating with the shelf REST endpoints
