@@ -35,12 +35,16 @@ exports.read = function(req, res) {
 
 exports.update = function(req, res) {
     
-    //TODO if(!req.shelf) error
+    if (!req.shelf) {
+        return res.status(400).send({
+            message: 'Bad request. Specify shelf id first'
+        });
+    }
     ShelfQuery.findOne(
         {
             where: { 
                 number: req.body.number,
-                shelfId: req.shelf.id //TODO change shelfId to shelfNumber and userId
+                shelfId: req.shelf.id
             }
         }
     ).then(function(shelfQuery) {
@@ -66,7 +70,11 @@ exports.update = function(req, res) {
 };    
 
 exports.list = function(req, res) {
-    //TODO if(!req.shelf) error
+    if (!req.shelf) {
+        return res.status(400).send({
+            message: 'Bad request. Specify shelf id first'
+        });
+    }
     ShelfQuery.findAll(
         {
             where: { 
@@ -93,8 +101,11 @@ exports.queryByID = function(req, res, next, id) {
             message: 'Shelf query is invalid'
         });
     }
-    
-    //TODO if(!req.shelf) error
+    if (!req.shelf) {
+        return res.status(400).send({
+            message: 'Bad request. Specify shelf id first'
+        });
+    }
   
     ShelfQuery.findOne(
         {

@@ -1,0 +1,118 @@
+<section ng-controller="IngredientsController" ng-init="findOne()">
+    <div class="page-header">
+         <h1 ng-show="ingredient.id">
+            Настройка ингредиента: {{ingredient.caption}}
+        </h1>
+        <h1 ng-hide="ingredient.id">
+            Новый ингредиент
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <form name="ingredientForm" class="form-horizontal" ng-submit="save(ingredientForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group" show-errors>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="image">
+                                Картинка
+                            </label>
+                            <div ng-show="ingredient.image || uploader.queue.length>0" class="pull-right btn btn-danger btn-xs" ng-click="unsetPicture()">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </div>
+                            <input ng-hide="ingredient.image" type="file" accept="image/*" nv-file-select="" uploader="uploader">
+                            <hr ng-if="!ingredient.image">
+                            <span ng-if="ingredient.image">
+                                <img ng-src="{{imageurl}}{{ingredient.image}}" class="img-thumbnail user-profile-picture">
+                            </span>
+                            <div ng-repeat="item in uploader.queue" ng-show="uploader.isHTML5" ng-thumb="{ file: item._file, height: 100 }">
+                            </div>    
+                        </div>
+                        <div class="col-md-6">
+                            <br /><br />
+                            <label for="caption">
+                                Наименование
+                            </label>
+                            <input name="caption" type="text" ng-model="ingredient.caption" id="caption" class="form-control" placeholder="Например, молоко" required>
+                            <div ng-messages="ingredientForm.caption.$error" role="alert">
+                                <p class="help-block error-text" ng-message="required">
+                                    Наименование ингредиента обязательно
+                                </p>
+                            </div>
+                            <hr>
+                            <label for="infoCard">
+                                Инфокарточка
+                            </label>
+                            <textarea name="infoCard" ng-model="ingredient.infoCard" id="infoCard" class="form-control" cols="30" rows="5" placeholder="Небольшое описание, видимое рядом с картинкой"></textarea>
+                            <label>
+                                Единица измерения по умолчанию
+                            </label>
+                            <div ng-show="ingredient.measureDefault">
+                                <div class="list-group-item">
+                                    <div class="row">
+                                        <div class="pull-right btn btn-danger btn-xs" ng-click="unsetMeasure()">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <h4 class="list-group-item-heading">
+                                                {{ingredient.measure.caption}}
+                                            </h4>
+                                        </div>
+                                        <div ng-show="ingredient.measure.step>0">
+                                            <div class="col-md-4">
+                                                <div class="list-group-item-text">
+                                                    Мин. = {{ingredient.measure.min}}, шаг = {{ingredient.measure.step}} 
+                                                </div>    
+                                            </div>    
+                                        </div>
+                                        <div ng-hide="ingredient.measure.step>0">
+                                            <div class="col-md-4">
+                                                <div class="list-group-item-text">
+                                                    Неисчисляемая 
+                                                </div>    
+                                            </div>    
+                                        </div>
+                                        <div class="col-md-4" ng-show="ingredient.measure.converter">
+                                            Конвертируется
+                                            <div ng-repeat="converter in ingredient.measure.converter">
+                                                <small ng-hide=converter.uncountable>
+                                                    {{converter.caption}} = {{converter.rate}} * {{ingredient.measure.caption}}
+                                                </small>
+                                                <small ng-show=converter.uncountable>
+                                                    {{converter.caption}} ~ {{ingredient.measure.caption}}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" ng-hide="ingredient.measure.converter">
+                                            Не конвертируется
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-hide="ingredient.measureDefault" class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                </div>
+                                <input type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="measure as measure.caption for measure in getMeasures($viewValue)" typeahead-loading="loadingMeasures" typeahead-no-results="noResults" class="form-control">
+                                <i ng-show="loadingMeasures" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults" class="input-group-addon">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                    Нет результатов
+                                </div>
+                                <div ng-show="asyncSelected" class="input-group-addon" ng-click="setMeasure(asyncSelected)">
+                                    ОК
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="{{ingredient.id ? 'Обновить' : 'Сохранить'}}">
+                </div>
+                <div ng-show="error" class="text-center alert alert-danger">
+                    <strong ng-bind="error">
+                    </strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>

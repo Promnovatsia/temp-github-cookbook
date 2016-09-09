@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
         defaultIngridient: {
             type: DataTypes.INTEGER,
             references: {
-                model: "ingridients",
+                model: "ingredients",
                 key: "id"
             }
         },

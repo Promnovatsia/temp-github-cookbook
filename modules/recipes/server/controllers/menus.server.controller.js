@@ -22,7 +22,7 @@ exports.create = function (req, res) {
                 userId: req.user.id
             },
             order: [
-                ['number','ASC']
+                ['number','DESC']
             ]
         }
     ).then(function (menu) {

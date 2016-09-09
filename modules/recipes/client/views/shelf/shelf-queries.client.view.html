@@ -11,27 +11,27 @@
                     <div class="panel-heading">
                         <div ng-show="query.isClosed">
                             {{query.number}}:
-                            <snap class="glyphicon glyphicon-ok-circle"></snap>
+                            <i class="glyphicon glyphicon-ok-circle"></i>
                             Выполнен
                         </div>
                         <div ng-hide="query.isClosed">
                             {{query.number}}:
-                            <snap class="glyphicon glyphicon-record"></snap>
+                            <i class="glyphicon glyphicon-record"></i>
                             В процессе
                         </div>
                     </div>
                     <div class="panel-body">
                         <a ui-sref="shelf.queryEdit({ shelfId: query.shelfId, queryId: query.number })"><!--//TODO shelf number-->
                             <div class="row">
-                                <snap class="glyphicon glyphicon-shopping-cart"></snap>
+                                <i class="glyphicon glyphicon-shopping-cart"></i>
                                 {{query.buy}} / {{query.bought}} @ {{buyDate}}
                             </div>
                             <div class="row">
-                                <snap class="glyphicon glyphicon-cutlery"></snap>
+                                <i class="glyphicon glyphicon-cutlery"></i>
                                 {{query.use}} / {{query.used}} @ {{useDate}}
                             </div>
                             <div class="row">
-                                <snap class="glyphicon glyphicon-trash"></snap>
+                                <i class="glyphicon glyphicon-trash"></i>
                                 {{query.spoil}} @ {{spoilDate}}
                             </div>
                         </a>    
@@ -48,25 +48,25 @@
                 </div>
                 <div class="col-md-2">
                     <div ng-show="query.isClosed">
-                        <snap class="glyphicon glyphicon-ok-circle"></snap>
+                        <i class="glyphicon glyphicon-ok-circle"></i>
                         Выполнен
                     </div>
                     <div ng-hide="query.isClosed">
-                        <snap class="glyphicon glyphicon-record"></snap>
+                        <i class="glyphicon glyphicon-record"></i>
                         В процессе
                     </div>
                 </div>
                 <a ui-sref="shelf.queryEdit({ shelfId: query.shelfId, queryId: query.number })"><!--//TODO shelf number-->
                     <div class="col-md-3">
-                        <snap class="glyphicon glyphicon-shopping-cart"></snap>
+                        <i class="glyphicon glyphicon-shopping-cart"></i>
                         {{query.buy}} / {{query.bought}} @ {{buyDate}}
                     </div>
                     <div class="col-md-3">
-                        <snap class="glyphicon glyphicon-cutlery"></snap>
+                        <i class="glyphicon glyphicon-cutlery"></i>
                         {{query.use}} / {{query.used}} @ {{useDate}}
                     </div>
                     <div class="col-md-3">
-                        <snap class="glyphicon glyphicon-trash"></snap>
+                        <i class="glyphicon glyphicon-trash"></i>
                         {{query.spoil}} @ {{spoilDate}}
                     </div>
                 </a>

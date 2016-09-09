@@ -23,18 +23,18 @@ angular
         
         Menus.addMenuItem('topbar', {
             title: 'Ингредиенты',
-            state: 'ingridients',
+            state: 'ingredients',
             type: 'dropdown',
             roles: ['user']
         });
-        Menus.addSubMenuItem('topbar', 'ingridients', {
+        Menus.addSubMenuItem('topbar', 'ingredients', {
             title: 'Справочник',
-            state: 'ingridients.list',
+            state: 'ingredients.list',
             roles: ['user']
         });
-        Menus.addSubMenuItem('topbar', 'ingridients', {
+        Menus.addSubMenuItem('topbar', 'ingredients', {
             title: 'Добавить ингредиент',
-            state: 'ingridients.create',
+            state: 'ingredients.create',
             roles: ['user']
         });
         

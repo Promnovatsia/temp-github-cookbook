@@ -8,7 +8,7 @@ var path = require('path'),
     cloudinary = require('cloudinary'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-    Ingridient = db.ingridient;
+    Ingredient = db.ingredient;
 
 
 exports.create = function (req, res) {
@@ -21,25 +21,25 @@ exports.create = function (req, res) {
         req.body.image = '';
     }
     
-    Ingridient.create(req.body).then(function (ingridient) {
-        if (!ingridient) {
+    Ingredient.create(req.body).then(function (ingredient) {
+        if (!ingredient) {
             return res.send('users/signup', {
-                errors: 'Could not create the ingridient'
+                errors: 'Could not create the ingredient'
             });
         } else {
             if (image !== '') {
                 cloudinary.uploader.upload(image).then(function (result) {
                     image = result.public_id + '.' + result.format;
-                    ingridient.update(
+                    ingredient.update(
                         {
                             image: image
                         }
                     ).then(function () {
-                        return res.json(ingridient);
+                        return res.json(ingredient);
                     });
                 });
             } else {
-                return res.json(ingridient);
+                return res.json(ingredient);
             }
         }
     }).catch(function (err) {
@@ -50,18 +50,18 @@ exports.create = function (req, res) {
 };
 
 exports.read = function (req, res) {
-    res.json(req.ingridient);
+    res.json(req.ingredient);
 };
 
 exports.update = function (req, res) {
     
-    Ingridient.findById(req.body.id).then(function (ingridient) {
-        if (ingridient) {
+    Ingredient.findById(req.body.id).then(function (ingredient) {
+        if (ingredient) {
             var image = '';
             if (req.body.image) {
                 cloudinary.uploader.upload(req.body.image).then(function (result) {
                     image = result.public_id + '.' + result.format;
-                    ingridient.update(
+                    ingredient.update(
                         {
                             caption: req.body.caption,
                             infoCard: req.body.infoCard,
@@ -69,7 +69,7 @@ exports.update = function (req, res) {
                             measureDefault: req.body.measureDefault
                         }
                     ).then(function () {
-                        return res.json(ingridient);
+                        return res.json(ingredient);
                     }).catch(function (err) {
                         return res.status(400).send({
                             message: errorHandler.getErrorMessage(err)
@@ -77,7 +77,7 @@ exports.update = function (req, res) {
                     });
                 });
             } else {
-                ingridient.update(
+                ingredient.update(
                     {
                         caption: req.body.caption,
                         infoCard: req.body.infoCard,
@@ -85,7 +85,7 @@ exports.update = function (req, res) {
                         measureDefault: req.body.measureDefault
                     }
                 ).then(function () {
-                    return res.json(ingridient);
+                    return res.json(ingredient);
                 }).catch(function (err) {
                     return res.status(400).send({
                         message: errorHandler.getErrorMessage(err)
@@ -94,7 +94,7 @@ exports.update = function (req, res) {
             }
         } else {
             return res.status(400).send({
-                message: 'Unable to find the ingridient'
+                message: 'Unable to find the ingredient'
             });
         }
     }).catch(function (err) {
@@ -106,11 +106,11 @@ exports.update = function (req, res) {
 
 exports.delete = function (req, res) {
     
-    var ingridient = req.ingridient;
-    Ingridient.findById(ingridient.id).then(function (ingridient) {
-        if (ingridient) {
-            ingridient.destroy().then(function () {
-                return res.json(ingridient);
+    var ingredient = req.ingredient;
+    Ingredient.findById(ingredient.id).then(function (ingredient) {
+        if (ingredient) {
+            ingredient.destroy().then(function () {
+                return res.json(ingredient);
             }).catch(function (err) {
                 return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
@@ -118,7 +118,7 @@ exports.delete = function (req, res) {
             });
         } else {
             return res.status(400).send({
-                message: 'Unable to find the ingridient'
+                message: 'Unable to find the ingredient'
             });
         }
     }).catch(function (err) {
@@ -129,45 +129,45 @@ exports.delete = function (req, res) {
 };
 
 /**
- * List of ingridients
+ * List of ingredients
  */
 exports.list = function (req, res) {
-    Ingridient.findAll(
+    Ingredient.findAll(
         {}
-    ).then(function (ingridients) {
-        if (!ingridients) {
+    ).then(function (ingredients) {
+        if (!ingredients) {
             return res.status(404).send({
-                message: 'No ingridients found'
+                message: 'No ingredients found'
             });
         } else {
-            return res.json(ingridients);
+            return res.json(ingredients);
         }
     }).catch(function (err) {
         res.jsonp(err);
     });
 };
 
-exports.ingridientByID = function (req, res, next, id) {
+exports.ingredientByID = function (req, res, next, id) {
 
     if ((id % 1 === 0) === false) { //check if it's integer
         return res.status(404).send({
-            message: 'Ingridient is invalid'
+            message: 'Ingredient is invalid'
         });
     }
   
-    Ingridient.findOne(
+    Ingredient.findOne(
         {
             where: {
                 id: id
             }
         }
-    ).then(function (ingridient) {
-        if (!ingridient) {
+    ).then(function (ingredient) {
+        if (!ingredient) {
             return res.status(404).send({
-                message: 'No ingridient with that identifier has been found'
+                message: 'No ingredient with that identifier has been found'
             });
         } else {
-            req.ingridient = ingridient;
+            req.ingredient = ingredient;
             next();
             return null;
         }

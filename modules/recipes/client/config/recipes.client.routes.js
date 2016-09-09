@@ -37,35 +37,35 @@ function routeConfig($stateProvider) {
             }
         })
 
-        .state('ingridients', {
+        .state('ingredients', {
             abstract: true,
-            url: '/ingridients',
+            url: '/ingredients',
             template: '<ui-view/>'
         })
-        .state('ingridients.list', {
+        .state('ingredients.list', {
             url: '',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridients-list.client.view.html',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredients-list.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
         })
-        .state('ingridients.create', {
+        .state('ingredients.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridient-create.client.view.html',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredient-form.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
         })
-        .state('ingridients.view', {
-            url: '/:ingridientId',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridient-read.client.view.html',
+        .state('ingredients.view', {
+            url: '/:ingredientId',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredient-read.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
         })
-        .state('ingridients.edit', {
-            url: '/:ingridientId/edit',
-            templateUrl: 'modules/recipes/client/views/ingridients/ingridient-edit.client.view.html',
+        .state('ingredients.edit', {
+            url: '/:ingredientId/edit',
+            templateUrl: 'modules/recipes/client/views/ingredients/ingredient-form.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
@@ -85,14 +85,14 @@ function routeConfig($stateProvider) {
         })
         .state('measures.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/measures/measure-create.client.view.html',
+            templateUrl: 'modules/recipes/client/views/measures/measure-form.client.view.html',
             data: {
                 roles: ['admin']
             }
         })
         .state('measures.edit', {
             url: '/:measureId',
-            templateUrl: 'modules/recipes/client/views/measures/measure-edit.client.view.html',
+            templateUrl: 'modules/recipes/client/views/measures/measure-form.client.view.html',
             data: {
                 roles: ['admin']
             }
@@ -187,6 +187,9 @@ function routeConfig($stateProvider) {
         })
         .state('shelf.create', {
             url: '/create',
+            params: {
+                ingredient: null,
+            },
             templateUrl: 'modules/recipes/client/views/shelf/shelf-form.client.view.html',
             data: {
                 roles: ['user', 'admin']

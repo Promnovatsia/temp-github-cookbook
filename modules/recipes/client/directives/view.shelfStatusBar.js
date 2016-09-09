@@ -44,13 +44,13 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                     scope.progressbar = 
                         {
                             type: 'danger',
-                            text: "! " + scope.shelf.stored + " < " + scope.shelf.deficit + " !", 
+                            text: scope.shelf.stored + " < " + scope.shelf.deficit, 
                             value: pbLimitDeficit - pbLengthDeficit + 
-                                ((scope.shelf.stored / scope.shelf.deficit) * pbLengthDeficit)
+                                ((scope.shelf.stored / scope.shelf.deficit) * pbLengthDeficit)    
                         };
                     if (scope.progressbar.value < pbLimitEmpty) {
                         scope.progressbar.value = pbLimitEmpty;
-                    }    
+                    }
                 } else if (scope.shelf.stored < scope.shelf.desired) {
                     scope.progressbar = 
                         {
@@ -58,7 +58,7 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                             text: scope.shelf.stored,
                             value: pbLimitDesired - pbLengthDesired + 
                                 ((scope.shelf.stored - scope.shelf.deficit) / (scope.shelf.desired - scope.shelf.deficit) * pbLengthDesired)
-                        };   
+                        };
                 } else if (scope.shelf.stored <= scope.shelf.max) {
                     scope.progressbar = 
                         {
@@ -66,7 +66,7 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                             text: scope.shelf.stored,
                             value: pbLimitMax - pbLenghtMax + 
                                 ((scope.shelf.stored - scope.shelf.desired) / (scope.shelf.max - scope.shelf.desired) * pbLenghtMax)
-                        };  
+                        };
                 } else {
                     scope.progressbar = 
                         {
@@ -77,11 +77,11 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                         };
                     if (scope.progressbar.value > 100) { // 100%
                         scope.progressbar.value = 100; // set to 100%
-                    }       
+                    }
                 }
                 if(scope.shelf.isSpoiled) {
                     scope.progressbar.class = "progress-striped active";
-                }   
+                }
             };
         }
     };

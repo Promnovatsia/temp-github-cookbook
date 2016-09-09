@@ -3,15 +3,14 @@
 /**
  * Module dependencies.
  */
-var path = require('path'),
-    recipesPolicy = require('../policies/recipes.server.policy'),
-    recipes = require(path.resolve('./modules/recipes/server/controllers/recipes.server.controller')),
-    ingridients = require(path.resolve('./modules/recipes/server/controllers/ingridients.server.controller')),
-    measures = require(path.resolve('./modules/recipes/server/controllers/measures.server.controller')),
-    products = require(path.resolve('./modules/recipes/server/controllers/products.server.controller')),
-    menus = require(path.resolve('./modules/recipes/server/controllers/menus.server.controller')),
-    shelf = require(path.resolve('./modules/recipes/server/controllers/shelf.server.controller')),
-    shelfQuery = require(path.resolve('./modules/recipes/server/controllers/shelfQuery.server.controller'));
+var recipesPolicy = require('../policies/recipes.server.policy'),
+    recipes = require('../controllers/recipes.server.controller'),
+    ingredients = require('../controllers/ingredients.server.controller'),
+    measures = require('../controllers/measures.server.controller'),
+    products = require('../controllers/products.server.controller'),
+    menus = require('../controllers/menus.server.controller'),
+    shelf = require('../controllers/shelf.server.controller'),
+    shelfQuery = require('../controllers/shelfQuery.server.controller');
 
 module.exports = function(app) {
 
@@ -30,17 +29,17 @@ module.exports = function(app) {
         .delete(recipes.delete)
     ;
     
-    app.route('/api/ingridients')
+    app.route('/api/ingredients')
         .all(recipesPolicy.isAllowed)
-        .get(ingridients.list)
-        .post(ingridients.create)
+        .get(ingredients.list)
+        .post(ingredients.create)
     ;
     
-    app.route('/api/ingridients/:ingridientId')
+    app.route('/api/ingredients/:ingredientId')
         .all(recipesPolicy.isAllowed)
-        .get(ingridients.read)
-        .put(ingridients.update)
-        .delete(ingridients.delete)
+        .get(ingredients.read)
+        .put(ingredients.update)
+        .delete(ingredients.delete)
     ;
     
     app.route('/api/measures')
@@ -98,10 +97,10 @@ module.exports = function(app) {
         .get(shelfQuery.read)
         .put(shelfQuery.update)
     ;
-
+    
     // Finish by binding the recipe middleware
     app.param('recipeId', recipes.recipeByID);
-    app.param('ingridientId', ingridients.ingridientByID);
+    app.param('ingredientId', ingredients.ingredientByID);
     app.param('measureId', measures.measureByID);
     app.param('productId', products.productByID);
     app.param('menuId', menus.menuByID);

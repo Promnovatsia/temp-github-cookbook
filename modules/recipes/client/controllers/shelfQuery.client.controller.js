@@ -37,9 +37,7 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
                         measureId: shelfQuery.measureId
                     }
                 ).$promise.then(function (measure) {
-                    $scope.info.measure = measure.caption;
-                    $scope.info.step = measure.step;
-                    $scope.info.min = measure.min;
+                    $scope.measure = measure;
                 });
                 $scope.shelfQuery = shelfQuery;
             });    
