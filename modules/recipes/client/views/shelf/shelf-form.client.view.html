@@ -17,7 +17,7 @@
             <fieldset>
                 <div class="form-group">
                     <div class="row">
-                        <div ng-hide="ingredient">
+                        <div ng-hide="ingredient" class="col-md-12">
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <i class="glyphicon glyphicon-search"></i>
@@ -27,6 +27,11 @@
                                 <div ng-show="noResults" class="input-group-addon">
                                     <i class="glyphicon glyphicon-remove"></i>
                                     Нет результатов
+                                </div>
+                                <div class="input-group-addon">
+                                    <div ng-click="asyncSelected=''">
+                                        <i class="glyphicon glyphicon-remove"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -60,10 +65,6 @@
                     <div ng-show="ingredient"> 
                         <div class="row">
                             <div class="col-md-2">
-                                <label for="measure">
-                                    Измеряется в: {{measure.caption}}
-                                </label>
-                                <br/><br/>
                                 <label for="stored">
                                     В наличии
                                 </label>
