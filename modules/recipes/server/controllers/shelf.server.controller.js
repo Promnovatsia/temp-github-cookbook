@@ -12,15 +12,30 @@ var path = require('path'),
 exports.create = function (req, res) {
 
     req.body.userId = req.user.id;
-    
-    Shelf.create(req.body).then(function (shelf) {
-        if (!shelf) {
-            return res.send('users/signup', {
-                errors: 'Could not create the shelf'
-            });
-        } else {
-            return res.json(shelf);
+    Shelf.findOne(
+        {
+            where: {
+                userId: req.user.id
+            },
+            order: [
+                ['number','ASC']
+            ]
         }
+    ).then(function (shelf) {
+        if (shelf) {
+            req.body.number = shelf.number + 1;
+        } else {
+            req.body.number = 1;
+        }
+        Shelf.create(req.body).then(function (shelf) {
+            if (!shelf) {
+                return res.send('users/signup', {
+                    errors: 'Could not create the shelf'
+                });
+            } else {
+                return res.json(shelf);
+            }
+        });
     }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)

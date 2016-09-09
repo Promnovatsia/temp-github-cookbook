@@ -17,17 +17,29 @@
     <hr/>
     <div class="row">
         <div class="col-md-3">
-            <label for="stored">
-                Единица измерения: {{measure.caption}}    
-            </label>
-            <hr>
             <label for="place" ng-show="shelf.place">
                 Место хранения: {{shelf.place}}
             </label>
         </div>
         <div class="col-md-7">
+            <div class="text-center">
+                {{measure.caption}}    
+            </div>
             <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
             <hr>
+        </div>
+        <div class="col-md-2">
+            <div class="btn-group">
+                <label class="btn btn-link" ng-click="legend = !legend">
+                    <snap class="glyphicon glyphicon-info-sign"></snap>
+                </label>
+                <label class="btn btn-link" ui-sref="shelf.edit({ shelfId: shelf.number })">
+                    <snap class="glyphicon glyphicon-cog"></snap>
+                </label>
+                <label class="btn btn-link" ui-sref="shelf.query({ shelfId: shelf.number })">
+                    <snap class="glyphicon glyphicon-shopping-cart"></snap>
+                </label>
+            </div> 
             <uib-progress ng-show="legend">
                 <uib-bar value="20" type="danger">
                     <span style="color:white; white-space:nowrap;"> 
@@ -61,19 +73,6 @@
                     Порог избытка: {{shelf.max}} {{measure.caption}}    
                 </label>
             </div>
-        </div>
-        <div class="col-md-2">
-            <div class="btn-group">
-                <label class="btn btn-link" ng-click="legend = !legend">
-                    <snap class="glyphicon glyphicon-info-sign"></snap>
-                </label>
-                <label class="btn btn-link" ui-sref="shelf.edit({ shelfId: shelf.id })">
-                    <snap class="glyphicon glyphicon-cog"></snap>
-                </label>
-                <label class="btn btn-link" ui-sref="shelf.query({ shelfId: shelf.id })">
-                    <snap class="glyphicon glyphicon-shopping-cart"></snap>
-                </label>
-            </div>    
         </div>  
     </div>
     <hr>    

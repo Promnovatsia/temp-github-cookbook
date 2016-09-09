@@ -59,109 +59,108 @@
                     </div>
                     <div ng-show="ingredient"> 
                         <div class="row">
-                        <div class="col-md-2">
-                            <label for="measure">
-                                Измеряется в: {{measure.caption}}
-                            </label>
-                            <br/><br/>
-                            <label for="stored">
-                                В наличии
-                            </label>
-                        </div>
-                        <div class="col-md-9">
-                            <uib-progress>
-                                <uib-bar value="20" type="danger">
-                                    <span style="color:white; white-space:nowrap;"> 
-                                        Дефицит
-                                    </span>
-                                </uib-bar>
-                                <uib-bar value="30" type="warning">
-                                    <span style="color:white; white-space:nowrap;"> 
-                                        Недостаточно
-                                    </span>
-                                </uib-bar>
-                                <uib-bar value="30" type="success">
-                                    <span style="color:white; white-space:nowrap;"> 
-                                        Достаточно
-                                    </span>
-                                </uib-bar>
-                                <uib-bar value="20" type="info">
-                                    <span style="color:white; white-space:nowrap;"> 
-                                        Избыток
-                                    </span>
-                                </uib-bar>
-                            </uib-progress>
-                            <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
-                        </div>
-                    </div>                    
+                            <div class="col-md-2">
+                                <label for="measure">
+                                    Измеряется в: {{measure.caption}}
+                                </label>
+                                <br/><br/>
+                                <label for="stored">
+                                    В наличии
+                                </label>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="text-center">
+                                    {{measure.caption}}
+                                </div>
+                                <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
+                                <uib-progress>
+                                    <uib-bar value="20" type="danger">
+                                        <span style="color:white; white-space:nowrap;"> 
+                                            Дефицит
+                                        </span>
+                                    </uib-bar>
+                                    <uib-bar value="30" type="warning">
+                                        <span style="color:white; white-space:nowrap;"> 
+                                            Недостаточно
+                                        </span>
+                                    </uib-bar>
+                                    <uib-bar value="30" type="success">
+                                        <span style="color:white; white-space:nowrap;"> 
+                                            Достаточно
+                                        </span>
+                                    </uib-bar>
+                                    <uib-bar value="20" type="info">
+                                        <span style="color:white; white-space:nowrap;"> 
+                                            Избыток
+                                        </span>
+                                    </uib-bar>
+                                </uib-progress>
+                            </div>
+                        </div>                    
                         <div class="col-md-7">
                         <hr>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="deficit">
-                                    Порог дефицита    
-                                </label>
-                            </div>
-                            <div class="col-md-4">
-                                <updowninput ng-model="shelf.deficit" measure="measure" validator="validateDeficit(id,value,oldValue)"><updowninput>
-                            </div>
-                            <div class="col-md-5">
-                                <div uib-alert ng-show="form.deficit">
-                                    Порог дефицита должен быть не меньше предела единицы измерения и меньше порога достаточности
+                            <div class="row">
+                                <div class="col-md-3 col-xs-5">
+                                    <label for="deficit">
+                                        Порог дефицита
+                                    </label>
+                                </div>
+                                <div class="col-md-4 col-xs-7">
+                                    <updowninput ng-model="shelf.deficit" measure="measure" validator="validateDeficit(id,value,oldValue)"><updowninput>
+                                </div>
+                                <div class="col-md-5 col-xs-12">
+                                    <div uib-alert ng-show="form.deficit">
+                                        Порог дефицита должен быть не меньше предела единицы измерения и меньше порога достаточности
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="desired">
-                                    Порог достаточного    
-                                </label>
-                            </div>
-                            <div class="col-md-4">
-                                <updowninput ng-model="shelf.desired" measure="measure" validator="settingsUpdate(id,value,oldValue)" validatorId="deficit"><updowninput>
-                            </div>
-                            <div class="col-md-5">
-                                <div uib-alert ng-show="form.desired">
-                                    Порог достаточности должен быть не меньше порога дефицита и меньше порога избытка
+                            <br>
+                            <div class="row">
+                                <div class="col-md-3 col-xs-5">
+                                    <label for="desired">
+                                        Порог достаточного
+                                    </label>
+                                </div>
+                                <div class="col-md-4 col-xs-7">
+                                    <updowninput ng-model="shelf.desired" measure="measure" validator="validateDesired(id,value,oldValue)"><updowninput>
+                                </div>
+                                <div class="col-md-5 col-xs-12">
+                                    <div uib-alert ng-show="form.desired">
+                                        Порог достаточности должен быть не меньше порога дефицита и меньше порога избытка
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="max">
-                                    Порог избытка    
-                                </label>
-                            </div>
-                            <div class="col-md-4">
-                                <updowninput ng-model="shelf.max" measure="measure" validator="settingsUpdate()"><updowninput>
-                            </div>
-                            <div class="col-md-5">
-                                <div uib-alert ng-show="form.max">
-                                    Порог избытка должен быть не меньше порога достаточности
+                            <br>
+                            <div class="row">
+                                <div class="col-md-3 col-xs-5">
+                                    <label for="max">
+                                        Порог избытка
+                                    </label>
                                 </div>
-                            </div>
-                        </div>   
-                    </div>                
+                                <div class="col-md-4 col-xs-7">
+                                    <updowninput ng-model="shelf.max" measure="measure" validator="validateMax(id,value,oldValue)"><updowninput>
+                                </div>
+                                <div class="col-md-5 col-xs-12">
+                                    <div uib-alert ng-show="form.max">
+                                        Порог избытка должен быть не меньше порога достаточности
+                                    </div>
+                                </div>
+                            </div>   
+                        </div>                
                         <div class="col-md-5">
-                        <hr>
-                        <label for="place">
-                            Место хранения
-                        </label>
-                        <input name="deficit" type="text" ng-model="shelf.place" class="form-control">
-                        <hr/>
-                        <label for="isSpoiled">
-                            Статус ревизии
-                        </label>
-                        <br/>
-                        <label class="{{btnIsSpoiledTrue}}" ng-click="spoilUpdate(false)">
-                            Выполнено
-                        </label>
-                        <label class="{{btnIsSpoiledFalse}}" ng-click="spoilUpdate(true)">
-                            Требуется
-                        </label> 
-                    </div>                   
+                            <hr>
+                            <label for="place">
+                                Место хранения
+                            </label>
+                            <input name="deficit" type="text" ng-model="shelf.place" class="form-control">
+                            <hr>
+                            <label for="isSpoiled">
+                                Статус ревизии
+                            </label>
+                            <br>
+                            <toggle-switch class="switch-danger" ng-model="shelf.isSpoiled" on-label="Требуется" off-label="В порядке"></toggle-switch>
+                            <hr>
+                        </div>                   
                     </div>
                 </div>
                 <div ng-show="ingredient" class="form-group">
