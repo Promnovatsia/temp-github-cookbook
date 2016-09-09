@@ -60,7 +60,7 @@ angular.module('recipes').directive('updowninput', function () {
             '</div>',
         link: function (scope, iElement, iAttrs, ngModelController) {
             
-            var min, step, precision, oldValue;
+            var min, step, precision, newValue;
             if (!scope.convertable) {
                 min = (scope.min !== undefined) ? scope.min : 0;
                 step = (scope.step !== undefined) ? scope.step : 1;
@@ -90,32 +90,34 @@ angular.module('recipes').directive('updowninput', function () {
                     alertText : '',
                     value: scope.value
                 };
-                oldValue = scope.value;
+                newValue = scope.value;
                 if (value !== undefined) {
-                    scope.value = Number((value).toFixed(precision));
+                    newValue = Number((value).toFixed(precision));
                 } else if (sign < 0) {
-                    scope.value = Number((scope.value - step).toFixed(precision));
+                    newValue = Number((scope.value - step).toFixed(precision));
                 } else if (sign > 0) {
-                    scope.value = Number((scope.value + step).toFixed(precision));
+                    newValue = Number((scope.value + step).toFixed(precision));
                 }
-                if (scope.value < min) {
-                    scope.value = min;
+                if (newValue < min) {
+                    newValue = min;
                     scope.form.alert = true;
                     scope.form.alertText = '>=' + min + '!';
-                } else {//TODO look at apply model view tmth
-                    scope.form = {
-                        alert: false,
-                        alertText : '',
-                        input: false,
-                        value: scope.value
-                    };
-                    scope.validator(
+                } else {
+                    if( scope.validator(
                         {
                             id: scope.validationId,
-                            value: scope.value,
-                            oldValue: oldValue
+                            value: newValue,
+                            oldValue: scope.value
                         }
-                    );
+                    )) {
+                        ngModelController.$setViewValue(newValue);//TODO look at apply model view tmth
+                        scope.form = {
+                            alert: false,
+                            alertText : '',
+                            input: false,
+                            value: newValue
+                        };
+                    }
                 }
             };
         }
