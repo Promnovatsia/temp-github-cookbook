@@ -8,7 +8,7 @@ angular
 IngredientService.$inject = ['$resource', 'ShelfService', 'MeasureService'];
 
 function IngredientService($resource, ShelfService, MeasureService) {
-    var Ingredient = $resource('api/ingridients/:ingredientId', { //TODO i to e
+    var Ingredient = $resource('api/ingredients/:ingredientId', {
         ingredientId: '@id'
     }, {
         update: {

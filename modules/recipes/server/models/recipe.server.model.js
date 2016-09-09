@@ -31,7 +31,7 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             defaultValue: 2
         },
-        mainIngridient: {
+        mainIngredient: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0
@@ -69,8 +69,8 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         associate: function (models) {
             Recipe.belongsTo(models.user);
-            Recipe.belongsToMany(models.ingridient, {
-                through: models.ingridientAmount
+            Recipe.belongsToMany(models.ingredient, {
+                through: models.ingredientAmount
             });
             Recipe.hasMany(models.meal);
         }

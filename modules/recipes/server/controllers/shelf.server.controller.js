@@ -1,5 +1,4 @@
 'use strict';
-//FUTURE shelf feature
 /**
  * Module dependencies.
  */
@@ -161,7 +160,7 @@ exports.shelfByIngredient = function (req, res, ingredientId) {
     Shelf.findOne(
         {
             where: {
-                ingridientId: ingredientId, //TODO i to e
+                ingredientId: ingredientId,
                 userId: req.user.id,
                 fallback: null
             }

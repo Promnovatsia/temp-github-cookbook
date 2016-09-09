@@ -2,8 +2,8 @@
 
 module.exports = function(sequelize, DataTypes) {
 
-    var IngridientAmount = sequelize.define('ingridientAmount', {
-        'index' : {
+    var IngredientAmount = sequelize.define('ingredientAmount', {
+        index : {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -15,10 +15,10 @@ module.exports = function(sequelize, DataTypes) {
         }
     },{
         associate: function(models) {
-            IngridientAmount.belongsTo(models.measure);
+            IngredientAmount.belongsTo(models.measure);
         },
         timestamps: false
     });
     
-return IngridientAmount;
+return IngredientAmount;
 };

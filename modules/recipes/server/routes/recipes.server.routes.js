@@ -5,7 +5,7 @@
  */
 var recipesPolicy = require('../policies/recipes.server.policy'),
     recipes = require('../controllers/recipes.server.controller'),
-    ingridients = require('../controllers/ingridients.server.controller'),
+    ingredients = require('../controllers/ingredients.server.controller'),
     measures = require('../controllers/measures.server.controller'),
     products = require('../controllers/products.server.controller'),
     menus = require('../controllers/menus.server.controller'),
@@ -29,17 +29,17 @@ module.exports = function(app) {
         .delete(recipes.delete)
     ;
     
-    app.route('/api/ingridients')
+    app.route('/api/ingredients')
         .all(recipesPolicy.isAllowed)
-        .get(ingridients.list)
-        .post(ingridients.create)
+        .get(ingredients.list)
+        .post(ingredients.create)
     ;
     
-    app.route('/api/ingridients/:ingridientId')
+    app.route('/api/ingredients/:ingredientId')
         .all(recipesPolicy.isAllowed)
-        .get(ingridients.read)
-        .put(ingridients.update)
-        .delete(ingridients.delete)
+        .get(ingredients.read)
+        .put(ingredients.update)
+        .delete(ingredients.delete)
     ;
     
     app.route('/api/measures')
@@ -100,7 +100,7 @@ module.exports = function(app) {
     
     // Finish by binding the recipe middleware
     app.param('recipeId', recipes.recipeByID);
-    app.param('ingridientId', ingridients.ingridientByID);
+    app.param('ingredientId', ingredients.ingredientByID);
     app.param('measureId', measures.measureByID);
     app.param('productId', products.productByID);
     app.param('menuId', menus.menuByID);

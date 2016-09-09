@@ -38,10 +38,10 @@ exports.invokeRolesPolicies = function() {
                     resources: '/api/recipes/:recipeId',
                     permissions: '*'
                 }, {
-                    resources: '/api/ingridients',
+                    resources: '/api/ingredients',
                     permissions: '*'
                 }, {
-                    resources: '/api/ingridients/:ingridientId',
+                    resources: '/api/ingredients/:ingredientId',
                     permissions: '*'
                 }, {
                     resources: '/api/measures',
@@ -91,10 +91,10 @@ exports.invokeRolesPolicies = function() {
                     resources: '/api/measures/:measureId',
                     permissions: ['get']
                 }, {
-                    resources: '/api/ingridients',
+                    resources: '/api/ingredients',
                     permissions: ['get']
                 }, {
-                    resources: '/api/ingridients/:ingridientId',
+                    resources: '/api/ingredients/:ingredientId',
                     permissions: ['get']
                 }
             ]
@@ -114,19 +114,12 @@ exports.invokeRolesPolicies = function() {
                     resources: '/api/measures/:measureId',
                     permissions: ['get']
                 }, {
-                    resources: '/api/ingridients',
+                    resources: '/api/ingredients',
                     permissions: ['get']
                 }, {
-                    resources: '/api/ingridients/:ingridientId',
+                    resources: '/api/ingredients/:ingredientId',
                     permissions: ['get']
-                },//FIXME remove after testing
-                {
-                    resources: '/api/menu',
-                    permissions: '*'
-                }, {
-                    resources: '/api/menu/:menuId',
-                    permissions: '*'
-                },
+                }
             ]
         }
     ]);

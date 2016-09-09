@@ -66,7 +66,7 @@ module.exports = function (sequelize, DataTypes) {
         paranoid: true,
         associate: function (models) {
             Shelf.belongsTo(models.user);
-            Shelf.belongsTo(models.ingridient);
+            Shelf.belongsTo(models.ingredient);
             Shelf.belongsTo(models.measure);
             Shelf.hasMany(models.shelfQuery);
         }

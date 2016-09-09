@@ -2,7 +2,7 @@
 
 module.exports = function(sequelize, DataTypes) {
 
-    var Ingridient = sequelize.define('ingridient', {
+    var Ingredient = sequelize.define('ingredient', {
         caption: {
             type: DataTypes.STRING,
             allowNull: false
@@ -22,16 +22,16 @@ module.exports = function(sequelize, DataTypes) {
         }
     },{
         associate: function(models) {
-            Ingridient.belongsToMany(models.recipe, {
-                through: models.ingridientAmount
+            Ingredient.belongsToMany(models.recipe, {
+                through: models.ingredientAmount
             });
-            Ingridient.belongsToMany(models.measure, {
-                through: models.ingridientAmount
+            Ingredient.belongsToMany(models.measure, {
+                through: models.ingredientAmount
             });
-            Ingridient.hasMany(models.shelf);
+            Ingredient.hasMany(models.shelf);
         },
         timestamps: false
     });
     
-return Ingridient;
+return Ingredient;
 };
