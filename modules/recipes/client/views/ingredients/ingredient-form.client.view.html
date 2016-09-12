@@ -92,14 +92,11 @@
                                 <div class="input-group-addon">
                                     <i class="glyphicon glyphicon-search"></i>
                                 </div>
-                                <input type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="measure as measure.caption for measure in getMeasures($viewValue)" typeahead-loading="loadingMeasures" typeahead-no-results="noResults" class="form-control">
+                                <input type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="measure as measure.caption for measure in getMeasures($viewValue)" typeahead-loading="loadingMeasures" typeahead-no-results="noResults" typeahead-on-select="setMeasure($item)" class="form-control">
                                 <i ng-show="loadingMeasures" class="glyphicon glyphicon-refresh"></i>
                                 <div ng-show="noResults" class="input-group-addon">
                                     <i class="glyphicon glyphicon-remove"></i>
                                     Нет результатов
-                                </div>
-                                <div ng-show="asyncSelected" class="input-group-addon" ng-click="setMeasure(asyncSelected)">
-                                    ОК
                                 </div>
                             </div>
                         </div>
