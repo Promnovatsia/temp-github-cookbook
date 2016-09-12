@@ -4,13 +4,14 @@
 angular
     .module('recipes')
     .controller('RecipesController', RecipesController);
-RecipesController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'Recipes', 'Ingridients', 'Measures'];
+RecipesController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'RecipeService', 'IngredientService', 'FileUploader'];
 
-function RecipesController($scope, $stateParams, $location, Authentication, Recipes, Ingridients, Measures) {
+function RecipesController($scope, $stateParams, $location, $window, $timeout, Authentication, RecipeService, IngredientService, FileUploader) {
 
     $scope.authentication = Authentication;
+    $scope.ingredientList = [];
 
-    $scope.quantity = 5;
+   /* $scope.quantity = 5;
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
     $scope.portionsEdit = false;
     $scope.portions = 2;
@@ -19,7 +20,6 @@ function RecipesController($scope, $stateParams, $location, Authentication, Reci
         return a.index - b.index;
     };
 
-// Find a list of Recipes
     $scope.find = function () {
         $scope.recipes = Recipes.query();
     };
@@ -292,6 +292,148 @@ function RecipesController($scope, $stateParams, $location, Authentication, Reci
                 $location.path('recipes');
             });
         }
+    };*/
+
+    $scope.find = function () {
+        RecipeService.query().$promise.then(function (recipes) {
+            $scope.recipes = recipes;
+        });
     };
 
+    $scope.findOne = function () {
+        if ($stateParams.recipeId) {
+            RecipeService.get(
+                {
+                    recipeId: $stateParams.recipeId
+                }
+            ).$promise.then(function (recipe) {
+                $scope.recipe = recipe;
+            });    
+        } else {
+            $scope.recipe = new RecipeService({
+                portions: 2,
+                ingredients: [],
+                steps: []
+            });
+        }
+    };
+    
+    $scope.getIngredients = function (value) {
+        var matched = [];
+        if ($scope.ingredientList.length === 0) {
+            IngredientService.query().$promise.then(function (results) {
+                $scope.ingredientList = results;
+                results.forEach(function (item, i, arr) {
+                    if (item.caption.includes(value)) {
+                        matched.push(item);
+                    }
+                });
+            });   
+        } else {
+            $scope.ingredientList.forEach(function (item, i, arr) {
+                if (item.caption.includes(value)) {
+                    matched.push(item);
+                }
+            });    
+        }
+        return matched;
+    };
+    
+    $scope.addIngredient = function (ingredient) {
+        if (!ingredient.measure) {
+            ingredient.getMeasure().then(function (measure) {
+                ingredient.measure = measure;
+                if (!ingredient.amount) {
+                    ingredient.amount = ingredient.measure.min;
+                }
+            });
+        }
+        $scope.recipe.ingredients.push(ingredient);
+        $scope.asyncSelectedAdd = "";
+    };
+    
+    $scope.removeIngredient = function (index) {
+        $scope.recipe.ingredients.splice(index, 1);
+    };
+    
+    $scope.addStep = function () {
+        $scope.recipe.steps.push({
+            action: ""
+        });
+    };
+    
+    $scope.removeStep = function (index) {
+        $scope.recipe.steps.splice(index, 1);
+    };
+    
+    $scope.selectMain = function (ingredient) {
+        $scope.recipe.mainIngredient = ingredient;
+        $scope.asyncSelectedMain = "";
+    };
+    
+    $scope.unsetPicture = function () {
+        $scope.ingredient.image = "";
+        $scope.uploader.clearQueue();
+    };
+    
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'recipeForm');
+            return false;
+        }
+        
+        $scope.recipe.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('recipes/' + $scope.recipe.id);
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+
+    var uploader = $scope.uploader = new FileUploader({
+        url: '/api/pictures/recipes'
+    });
+
+    $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
+
+    // FILTERS
+
+    uploader.filters.push(
+        {
+            name: 'imageFilter',
+            fn: function (item, options) {
+                var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+                return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+            }
+        },
+        {
+            name: 'overWriteFilter',
+            fn: function(item, options) {
+                if(this.queue.length===1){
+                    this.clearQueue();
+                }
+                return true;
+            }
+        }
+    );
+
+        // Called after the user selected a new picture file
+    $scope.uploader.onAfterAddingFile = function (fileItem) {
+        if ($window.FileReader) {
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL(fileItem._file);
+
+            fileReader.onload = function (fileReaderEvent) {
+                $timeout(function () {
+                    $scope.imageURL = fileReaderEvent.target.result;
+                }, 0);
+            };
+        }
+    };
 }
