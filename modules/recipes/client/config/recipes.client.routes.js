@@ -20,7 +20,7 @@ function routeConfig($stateProvider) {
         })
         .state('recipes.create', {
             url: '/create',
-            templateUrl: 'modules/recipes/client/views/recipes/recipe-create.client.view.html',
+            templateUrl: 'modules/recipes/client/views/recipes/recipe-form.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }
@@ -31,7 +31,7 @@ function routeConfig($stateProvider) {
         })
         .state('recipes.edit', {
             url: '/:recipeId/edit',
-            templateUrl: 'modules/recipes/client/views/recipes/recipe-edit.client.view.html',
+            templateUrl: 'modules/recipes/client/views/recipes/recipe-form.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }

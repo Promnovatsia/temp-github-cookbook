@@ -68,7 +68,7 @@ function IngredientsController($scope, $stateParams, $location, $window, $timeou
     $scope.save = function (isValid) {
         
         if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');//FIX ingredientForm
             return false;
         }
         

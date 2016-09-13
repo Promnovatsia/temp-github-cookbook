@@ -10,6 +10,7 @@ angular.module('recipes').directive('updowninput', function () {
             precision: '=',
             converter: '=',
             measure: '=',
+            validatable: "=",
             validator: '&',
             validationId: '='
         },
@@ -102,14 +103,9 @@ angular.module('recipes').directive('updowninput', function () {
                     newValue = min;
                     scope.form.alert = true;
                     scope.form.alertText = '>=' + min + '!';
-                } else {
-                    if( scope.validator(
-                        {
-                            id: scope.validationId,
-                            value: newValue,
-                            oldValue: scope.value
-                        }
-                    )) {
+                }
+                else {
+                    if (!scope.validatable) {
                         ngModelController.$setViewValue(newValue);//TODO look at apply model view tmth
                         scope.form = {
                             alert: false,
@@ -117,6 +113,22 @@ angular.module('recipes').directive('updowninput', function () {
                             input: false,
                             value: newValue
                         };
+                    } else {
+                            if( scope.validator(
+                            {
+                                id: scope.validationId,
+                                value: newValue,
+                                oldValue: scope.value
+                            }
+                        )) {
+                            ngModelController.$setViewValue(newValue);//TODO look at apply model view tmth
+                            scope.form = {
+                                alert: false,
+                                alertText : '',
+                                input: false,
+                                value: newValue
+                            };
+                        }
                     }
                 }
             };

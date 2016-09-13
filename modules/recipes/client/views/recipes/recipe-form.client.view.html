@@ -1,0 +1,188 @@
+<section ng-controller="RecipesController" ng-init="findOne()">
+    <div class="page-header">
+         <h1 ng-show="recipe.id">
+            Редактирование
+        </h1>
+        <h1 ng-hide="recipe.id">
+            Новый рецепт
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <form name="recipeForm" class="form-horizontal" ng-submit="save(recipeForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group" show-errors>
+                    <label for="title">
+                        Название
+                    </label>
+                    <input name="title" type="text" ng-model="recipe.title" id="title" class="form-control" required
+                        placeholder="Исчерпывающий заголовок рецепта до 250 символов" >
+                    <div ng-messages="recipeForm.title.$error" role="alert">
+                        <p class="help-block error-text" ng-message="required">
+                            Название рецепта обязательно
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="infoCard">
+                        Пояснение и описание
+                    </label>
+                    <textarea name="infoCard" ng-model="recipe.infoCard" id="infoCard" class="form-control" cols="30" rows="10" 
+                        placeholder="Информация, видимая в списке рецептов рядом с картинкой рецепта">
+                    </textarea>
+                </div>
+                <!--
+                <div class="form-group">
+                    <label for="image">
+                        Картинка
+                    </label>
+                    <div ng-show="recipe.image || uploader.queue.length>0" class="pull-right btn btn-danger btn-xs" ng-click="unsetPicture()">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </div>
+                    <input ng-hide="recipe.image" type="file" accept="image/*" nv-file-select="" uploader="uploader">
+                    <hr ng-if="!recipe.image">
+                    <span ng-if="recipe.image">
+                        <img ng-src="{{imageurl}}{{recipe.image}}" class="img-thumbnail user-profile-picture">
+                    </span>
+                    <div ng-repeat="item in uploader.queue" ng-show="uploader.isHTML5" ng-thumb="{ file: item._file, height: 100 }">
+                    </div>
+                </div>
+                //FUTURE image directive-->
+                <div class="row">
+                    <div class="form-group col-md-2">
+                        <label for="portions">
+                            Количество порций
+                        </label>
+                        <updowninput ng-model="recipe.portions" min="1" precision="0"></updowninput>
+                    </div>
+                    <div class="form-group col-md-8">
+                        <label for="recipe.mainIngredient">
+                            Главный ингредиент
+                        </label>
+                        <div ng-show="recipe.ingredients.length>0">
+                            <div ng-show="recipe.mainIngredient">
+                                <p>
+                                    {{recipe.mainIngredient.caption}} в количестве {{recipe.mainIngredient.amount}} {{recipe.mainIngredient.measure.caption}}
+                                <p>
+                            </div>
+                            <div ng-hide="recipe.mainIngredient" class="btn-group" dropdown>
+                                <label class="btn btn-default" dropdown-toggle>
+                                    Выберите из списка <span class="caret"></span>
+                                </label>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li role="menuitem" ng-repeat="ingredient in recipe.ingredients">
+                                        <a ng-click="selectMain(ingredient)">
+                                            {{ingredient.caption}} {{ingredient.comment}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div ng-hide="recipe.ingredients.length>0">
+                            <p>
+                                Добавьте хотя бы один ингредиент для выбора
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="ingridients">
+                            Ингредиенты
+                        </label>
+                        <div class="list-group">
+                            <div sv-root sv-part="recipe.ingredients">
+                                <div ng-repeat="ingredient in recipe.ingredients track by ingredient.index" sv-element>
+                                    <div class="list-group-item">
+                                        <div class="row">
+                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeIngredient($index)">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </a>
+                                            <div class="col-xs-1 col-md-1">
+                                                <i class="glyphicon glyphicon-sort" sv-handle></i>
+                                            </div>
+                                            <div class="col-xs-6 col-md-2">
+                                                <h4 class="list-group-item-heading">
+                                                    {{ingredient.caption}}
+                                                </h4>
+                                            </div>
+                                            <div class="col-xs-12 col-md-3">
+                                                <updowninput ng-model="ingredient.amount" measure="ingredient.measure" convertable="true" converter="ingredient.converter" validatable="false">
+                                                </updowninput>
+                                                <measureconverter ng-model="ingredient.amount" measure="ingredient.measure" toggle="ingredient.converter"></measureconverter>
+                                            </div>
+                                            <div class="col-xs-12 col-md-3">
+                                                <input name="title" type="text" ng-model="ingredient.comment" class="form-control" placeholder="Комментарий, напр. для теста">    
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <label for="ingridient">
+                                    Новый ингредиент
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="glyphicon glyphicon-search"></i>    
+                                    </div>
+                                    <input type="text" ng-model="asyncSelectedAdd" placeholder="Добавить через поиск" typeahead="ingredient as ingredient.caption for ingredient in getIngredients($viewValue)" typeahead-loading="loadingIngredientsAdd" typeahead-no-results="noResultsAdd" typeahead-on-select="addIngredient($item)" class="form-control">
+                                    <i ng-show="loadingIngredientsAdd" class="glyphicon glyphicon-refresh"></i>
+                                    <div ng-show="noResultsAdd && asyncSelectedAdd!==''" class="input-group-addon">
+                                        <i class="glyphicon glyphicon-remove"></i>
+                                        Нет результатов
+                                    </div>
+                                    <div class="input-group-addon">
+                                        <div ng-click="asyncSelectedAdd=''">
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="steps">
+                            Инструкции
+                        </label>
+                        <div class="list-group">
+                            <div sv-root sv-part="recipe.steps">
+                                <div ng-repeat="step in recipe.steps" sv-element class="list-group-item">
+                                    <div class="row">
+                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep($index)">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </a>
+                                        <div class="col-xs-1 col-md-1">
+                                            <i class="glyphicon glyphicon-sort" sv-handle></i>
+                                        </div>
+                                        <div class="col-xs-11 col-md-6">
+                                            <textarea name="action" ng-model="step.action" id="action" class="form-control" cols="30" rows="3" placeholder="Опишите действие на текущем шаге"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item" ng-click="addStep()">
+                                    Добавить шаг
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="content">
+                        Примечания
+                    </label>
+                    <textarea name="content" ng-model="recipe.content" id="content" class="form-control" cols="30" rows="10"
+                        placeholder="Это дополнительная информация, показывающаяся после рецепта. Здесь можно описать какие ингредиенты можно добавить или заменить">
+                    </textarea>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="{{recipe.id ? 'Обновить' : 'Сохранить'}}">
+                </div>
+                <div ng-show="error" class="text-center alert alert-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>
