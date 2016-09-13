@@ -10,13 +10,13 @@ module.exports = function(sequelize, DataTypes) {
         amount: {
             type: DataTypes.FLOAT
         },
-        measureCaption: {
-            type: DataTypes.STRING    
+        measureId: {
+            type: DataTypes.INTEGER
+        },
+        comment: {
+            type: DataTypes.STRING
         }
     },{
-        associate: function(models) {
-            IngredientAmount.belongsTo(models.measure);
-        },
         timestamps: false
     });
     

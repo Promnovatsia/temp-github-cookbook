@@ -9,7 +9,7 @@ var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
     Recipe = db.recipe,
-    Ingridient = db.ingridient,
+    Ingredient = db.ingredient,
     Measure = db.measure;
 
 /**
@@ -38,15 +38,20 @@ exports.create = function (req, res) {
                 errors: 'Could not create the recipe'
             });
         } else {
-            async.forEach(req.body.ingridients, function (item, callback) {
-                Ingridient.findById(item.id).then(function (ingridient) {
-                    recipe.addIngridient(ingridient, {
-                        index: item.index,
-                        measureId: item.measure.id,
-                        amount: item.amount,
-                        measureCaption: item.measure.caption
-                    });
-                    callback();
+            async.forEach(req.body.ingredients, function (item, callback) {
+                Ingredient.findById(item.id).then(function (ingredient) {
+                    if (ingredient) {
+                        recipe.addIngredient(ingredient, {
+                            index: item.index,
+                            measureId: item.measure.id,
+                            amount: item.amount,
+                            measureCaption: item.measure.caption,
+                            comment: item.comment
+                        });
+                        callback();
+                    } else {
+                        callback();
+                    }
                 });
             });
             if (image !== '') {
@@ -82,37 +87,60 @@ exports.read = function (req, res) {
  * Update a recipe
  */
 exports.update = function (req, res) {
+                 
+    var image = '';
+    if (req.body.image) {
+        image = req.body.image;
+        req.body.image = '';
+    }
+    
     Recipe.findById(req.body.id).then(function (recipe) {
         if (recipe) {
-            recipe.update(req.body).then(function () {
-                recipe.setIngridients([]).then(function (tasks) {
-                    async.forEach(req.body.ingridients, function (item, callback) {
-                        Ingridient.findById(item.id).then(function (ingridient) {
-                            recipe.addIngridient(ingridient, {
-                                index: item.index,
-                                measureId: item.measure.id,
-                                amount: item.amount,
-                                measureCaption: item.measure.caption
-                            });
-                            callback();
-                        });
-                    });
-                    return res.json(recipe);
-                }).catch(function (err) {
-                    return res.status(400).send({
-                        message: errorHandler.getErrorMessage(err)
-                    });
-                });
-            }).catch(function (err) {
-                return res.status(400).send({
-                    message: errorHandler.getErrorMessage(err)
-                });
-            });
+            return recipe.update(req.body); 
         } else {
             return res.status(400).send({
                 message: 'Unable to find the recipe'
             });
         }
+    }).then(function (recipe) {
+        return recipe.setIngredients([]).then(function (tasks) {
+            async.forEach(req.body.ingredients, function (item, callback) {
+                Ingredient.findById(item.id).then(function (ingredient) {
+                    if (ingredient) {
+                        recipe.addIngredient(ingredient, {
+                            index: item.index,
+                            measureId: item.measure.id,
+                            amount: item.amount,
+                            measureCaption: item.measure.caption,
+                            comment: item.comment
+                        });
+                        callback();
+                    } else {
+                        callback();
+                    }
+                });
+            });
+            return recipe;
+        });
+    }).then(function (recipe) {
+        if (image !== '') {
+            cloudinary.uploader.upload(image).then(function (result) {
+                image = result.public_id + '.' + result.format;
+                recipe.update(
+                    {
+                        image: image
+                    }
+                ).then(function (recipe) {
+                    return res.json(recipe);
+                });
+            });
+        } else {
+            return res.json(recipe);
+        }
+    }).catch(function (err) {
+        return res.status(400).send({
+            message: errorHandler.getErrorMessage(err)
+        });
     });
 };
 
@@ -173,7 +201,7 @@ exports.list = function (req, res) {
             where: getNonPrivateAndOwned,
             include: [
                 {model: db.user, attributes: ['id', 'username']},
-                {model: db.ingridient, include: []}
+                {model: db.ingredient, include: []}
             ]
         }
     ).then(function (recipes) {
@@ -230,27 +258,7 @@ exports.recipeByID = function (req, res, next, id) {
                     model: db.user,
                     attributes: ['id', 'username']
                 }, {
-                    model: Ingridient,
-                    include: 
-                        [
-                            {
-                                model: db.measure,
-                                attributes: ['id', 'min', 'step', 'converter']
-                            },
-                            {
-                                model: db.shelf,
-                                where: {
-                                    userId: req.user.id
-                                },
-                                include: [
-                                    {
-                                        model: db.measure,
-                                        attributes: ['id', 'min', 'step', 'converter','caption']
-                                    }    
-                                ]
-                            }
-                            
-                        ]
+                    model: Ingredient
                 }
             ]
         }

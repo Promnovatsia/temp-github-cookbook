@@ -308,6 +308,22 @@ function RecipesController($scope, $stateParams, $location, $window, $timeout, A
                 }
             ).$promise.then(function (recipe) {
                 $scope.recipe = recipe;
+                if (recipe.ingredients.length > 0) {
+                    var ingredients = recipe.ingredients;
+                    recipe.ingredients = [];
+                    ingredients.forEach(function (item, i, arr) {
+                        $scope.getIngredients(item.caption).then(function (match) {
+                            if (match.length > 0) {
+                                var measureDefault = match[0].measureDefault;
+                                match[0].measureDefault = item.ingredientAmount.measureId;
+                                match[0].amount = item.ingredientAmount.amount;
+                                match[0].comment = item.ingredientAmount.comment;
+                                $scope.addIngredient(match[0]);
+                                $scope.recipe.ingredients[i].measureDefault = measureDefault;
+                            }
+                        });
+                    });
+                }   
             });    
         } else {
             $scope.recipe = new RecipeService({
@@ -321,34 +337,40 @@ function RecipesController($scope, $stateParams, $location, $window, $timeout, A
     $scope.getIngredients = function (value) {
         var matched = [];
         if ($scope.ingredientList.length === 0) {
-            IngredientService.query().$promise.then(function (results) {
+            return IngredientService.query().$promise.then(function (results) {
                 $scope.ingredientList = results;
                 results.forEach(function (item, i, arr) {
                     if (item.caption.includes(value)) {
                         matched.push(item);
                     }
                 });
-            });   
+                return matched;
+            });
         } else {
             $scope.ingredientList.forEach(function (item, i, arr) {
                 if (item.caption.includes(value)) {
                     matched.push(item);
                 }
-            });    
+            });
+            return matched;
         }
-        return matched;
     };
     
     $scope.addIngredient = function (ingredient) {
+        var newIngredient = new IngredientService(ingredient);
         if (!ingredient.measure) {
             ingredient.getMeasure().then(function (measure) {
-                ingredient.measure = measure;
+                newIngredient.measure = measure;
                 if (!ingredient.amount) {
-                    ingredient.amount = ingredient.measure.min;
+                    newIngredient.amount = newIngredient.measure.min;
                 }
             });
+        } else {
+            newIngredient.measure = ingredient.measure;
+            newIngredient.amount = ingredient.amount;
         }
-        $scope.recipe.ingredients.push(ingredient);
+        newIngredient.index = $scope.recipe.ingredients.length;
+        $scope.recipe.ingredients.push(newIngredient);
         $scope.asyncSelectedAdd = "";
     };
     
@@ -383,6 +405,9 @@ function RecipesController($scope, $stateParams, $location, $window, $timeout, A
             return false;
         }
         
+        $scope.recipe.ingredients.forEach(function (item, i, arr) {
+            item.index = i; 
+        });
         $scope.recipe.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
@@ -397,7 +422,7 @@ function RecipesController($scope, $stateParams, $location, $window, $timeout, A
     };
 
     var uploader = $scope.uploader = new FileUploader({
-        url: '/api/pictures/recipes'
+        url: '/api/pictures/ingredients'
     });
 
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';

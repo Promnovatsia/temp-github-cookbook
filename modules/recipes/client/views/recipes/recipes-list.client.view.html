@@ -27,7 +27,7 @@
         </form>    
     </div>
     <div class="list-group">
-        <a ng-repeat="recipe in recipes | filter:filterRecipes | limitTo:quantity" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
+        <a ng-repeat="recipe in recipes | filter:filterRecipes" ui-sref="recipes.view({recipeId: recipe.id})" class="list-group-item">
             <div class="row">
                 <div class="col-md-2">
                     <span ng-if="recipe.image">

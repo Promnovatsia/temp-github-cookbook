@@ -25,24 +25,24 @@
     <small>
         Количество порций: 
         <span ng-bind="recipe.portions"></span>
-<!-- TODO добавить ввод числа основного ингридиента и преобразование под него-->
+<!-- TODO добавить ввод числа основного ингредиента и преобразование под него-->
         <!--        TODO добавить селектор и преобразование чисел-->
     </small>
     <hr>
-    <label for="ingridients">
+    <label for="ingredients">
         Ингридиенты
     </label>
     <ol>
-        <li ng-repeat="ingridient in recipe.ingridients | orderBy : ingridient.ingridientAmount.index">
+        <li ng-repeat="ingredient in recipe.ingredients">
             <div class="row">
                 <div class="col-md-4">
-                    <span ng-bind="ingridient.caption"></span>    
+                    <span ng-bind="ingredient.caption"></span>    
                 </div>
                 <div class="col-md-1">
-                    <span ng-bind="ingridient.ingridientAmount.amount"></span>
+                    <span ng-bind="ingredient.amount"></span>
                 </div>
                 <div class="col-md-1">
-                    <span ng-bind="ingridient.ingridientAmount.measureCaption"></span>
+                    <span ng-bind="ingredient.measure.caption"></span>
                 </div>
             </div>
         </li>
@@ -60,5 +60,5 @@
     <label for="content">
         Применчания
     </label>
-    <span ng-bind="ingridient.ingridientAmount.amount"></span>
+    <span ng-bind="recipe.content"></span>
 </section>
