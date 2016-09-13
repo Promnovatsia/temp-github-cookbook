@@ -40,18 +40,20 @@ angular.module('recipes').directive('measureconverter', function (MeasureService
             var precision = scope.precision || 3,
                 oldValue = scope.value;
             
-            ngModelController.$render = function () {
-                scope.convertList = [];
-                if (!scope.measure) {
-                    return;
+            scope.$watch('toggle', function (toggle, oldValue) {
+                if (toggle) {
+                    scope.convertList = [];
+                    if (!scope.measure) {
+                        return;
+                    }
+                    scope.convertList = scope.getConvertList();
+                    if (scope.convertList.length === 0) {
+                        scope.toggle = false; //measure is not convertable, so hiding directive
+                        return;
+                    }
+                    scope.selectItem(0);
                 }
-                scope.convertList = scope.getConvertList();
-                if (scope.convertList.length === 0) {
-                    scope.toggle = false; //measure is not convertable, so hiding directive
-                    return;
-                }
-                scope.selectItem(0);
-            };
+            });
             
             scope.getConvertList = function () {
                 if (!scope.measure.converter) {
@@ -83,7 +85,8 @@ angular.module('recipes').directive('measureconverter', function (MeasureService
             };
             
             scope.apply = function () {
-                scope.value = scope.newValue;
+                ngModelController.$setViewValue(scope.newValue);
+                //scope.value = scope.newValue;
                 scope.measure = scope.newMeasure;
                 scope.toggle = false; //job is done, so hiding directive
             };
