@@ -16,18 +16,13 @@ exports.create = function (req, res) {
 
     req.body.userId = req.user.id;
     
-    Menu.findOne(
-        {
-            where: {
-                userId: req.user.id
-            },
-            order: [
-                ['number','DESC']
-            ]
+    Menu.max('number', {
+        where: {
+            userId: req.user.id
         }
-    ).then(function (menu) {
-        if (menu) {
-            req.body.number = menu.number + 1;
+    }).then(function (number) {
+        if (number) {
+            req.body.number = number + 1;
         } else {
             req.body.number = 1;
         }

@@ -11,18 +11,13 @@ var path = require('path'),
 exports.create = function (req, res) {
 
     req.body.userId = req.user.id;
-    Shelf.findOne(
-        {
-            where: {
-                userId: req.user.id
-            },
-            order: [
-                ['number','DESC']
-            ]
+    Shelf.max('number', {
+        where: {
+            userId: req.user.id
         }
-    ).then(function (shelf) {
-        if (shelf) {
-            req.body.number = shelf.number + 1;
+    }).then(function (number) {
+        if (number) {
+            req.body.number = number + 1;
         } else {
             req.body.number = 1;
         }

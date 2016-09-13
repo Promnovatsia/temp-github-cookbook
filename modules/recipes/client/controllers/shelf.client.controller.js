@@ -35,8 +35,8 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 }
             ).$promise.then(function (shelf) {
                 $scope.shelf = shelf;
-                if (shelf.ingridientId) {
-                    $scope.loadIngredient(shelf.ingridientId).then(function (ingredient) {
+                if (shelf.ingredientId) {
+                    $scope.loadIngredient(shelf.ingredientId).then(function (ingredient) {
                         $scope.setIngredient(ingredient);    
                     });      
                 }
@@ -94,7 +94,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         }
         
         $scope.ingredient = ingredient;
-        $scope.shelf.ingridientId = ingredient.id;
+        $scope.shelf.ingredientId = ingredient.id;
         ingredient.getMeasure().then(function (measure) {
             $scope.measure = measure;
         });
