@@ -10,6 +10,7 @@ function RecipesController($scope, $stateParams, $location, $window, $timeout, A
 
     $scope.authentication = Authentication;
     $scope.ingredientList = [];
+    $scope.shelves = false;
 
    /* $scope.quantity = 5;
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
@@ -370,6 +371,12 @@ function RecipesController($scope, $stateParams, $location, $window, $timeout, A
             newIngredient.amount = ingredient.amount;
         }
         newIngredient.index = $scope.recipe.ingredients.length;
+        newIngredient.getShelf().then(function (shelf) {
+            if (shelf.id) {
+                console.log(shelf);
+                newIngredient.shelf = shelf;
+            }
+        });    
         $scope.recipe.ingredients.push(newIngredient);
         $scope.asyncSelectedAdd = "";
     };
@@ -394,7 +401,7 @@ function RecipesController($scope, $stateParams, $location, $window, $timeout, A
     };
     
     $scope.unsetPicture = function () {
-        $scope.ingredient.image = "";
+        $scope.recipe.image = "";
         $scope.uploader.clearQueue();
     };
     

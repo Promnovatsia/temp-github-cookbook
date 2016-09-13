@@ -1,4 +1,4 @@
-<section ng-controller="RecipesController" ng-init="findOne()">
+<section ng-controller="RecipesController" ng-init="findOne();shelves=true">
     <div class="page-header">
         <h1 ng-bind="recipe.title"></h1>
     </div>
@@ -32,17 +32,27 @@
     <label for="ingredients">
         Ингридиенты
     </label>
+    <toggle-switch class="switch-primary" ng-model="shelves" on-label="Да" off-label="Нет"></toggle-switch>
+    <label for="filterBar.spoiled">
+        Показывать полки
+    </label>
     <ol>
         <li ng-repeat="ingredient in recipe.ingredients">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <span ng-bind="ingredient.caption"></span>    
+                </div>
+                <div class="col-md-2">
+                    <span ng-bind="ingredient.comment"></span>    
                 </div>
                 <div class="col-md-1">
                     <span ng-bind="ingredient.amount"></span>
                 </div>
                 <div class="col-md-1">
                     <span ng-bind="ingredient.measure.caption"></span>
+                </div>
+                <div ng-show="shelves && ingredient.shelf" class="col-md-4">
+                    <shelfstatusbar ng-model="ingredient.shelf" handle="shelf.progressbar"></shelfstatusbar>
                 </div>
             </div>
         </li>
