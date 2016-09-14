@@ -32,10 +32,12 @@
     <label for="ingredients">
         Ингридиенты
     </label>
-    <toggle-switch class="switch-primary" ng-model="shelves" on-label="Да" off-label="Нет"></toggle-switch>
-    <label for="filterBar.spoiled">
-        Показывать полки
-    </label>
+    <div class="pull-right">
+        <label for="filterBar.spoiled">
+            Показывать полки
+        </label>
+        <toggle-switch class="switch-primary" ng-model="shelves" on-label="Да" off-label="Нет"></toggle-switch>
+    </div>
     <ol>
         <li ng-repeat="ingredient in recipe.ingredients">
             <div class="row">
