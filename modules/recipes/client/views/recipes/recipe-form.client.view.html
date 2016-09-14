@@ -94,7 +94,7 @@
                                 <div ng-repeat="ingredient in recipe.ingredients track by ingredient.index" sv-element>
                                     <div class="list-group-item">
                                         <div class="row">
-                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeIngredient($index)">
+                                            <a class="pull-right btn btn-danger btn-xs" ng-click="removeIngredient($index)">
                                                 <span class="glyphicon glyphicon-remove"></span>
                                             </a>
                                             <div class="col-xs-1 col-md-1">
@@ -150,7 +150,7 @@
                             <div sv-root sv-part="recipe.steps">
                                 <div ng-repeat="step in recipe.steps" sv-element class="list-group-item">
                                     <div class="row">
-                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep($index)">
+                                        <a class="pull-right btn btn-danger btn-xs" ng-click="removeStep($index)">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                         <div class="col-xs-1 col-md-1">
