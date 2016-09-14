@@ -1,6 +1,7 @@
 //
 // Copyright Kamil Pękala http://github.com/kamilkp
-// angular-sortable-view v0.0.15 2015/01/18
+// angular-sortable-view v0.0.15c 2015/01/18
+// forked from C0ZEN/angular-sortable-view fork of original
 //
 
 ;(function(window, angular){
@@ -8,8 +9,8 @@
 	/* jshint eqnull:true */
 	/* jshint -W041 */
 	/* jshint -W030 */
-    /* jshint -W003 */
     /* jshint -W116 */
+    /* jshint -W003 */
 
 	var module = angular.module('recipes');
 	module.directive('svRoot', [function(){
@@ -25,14 +26,84 @@
 
 		var sortingInProgress;
 		var ROOTS_MAP = Object.create(null);
+
+
+
 		// window.ROOTS_MAP = ROOTS_MAP; // for debug purposes
 
 		return {
 			restrict: 'A',
 			controller: ['$scope', '$attrs', '$interpolate', '$parse', function($scope, $attrs, $interpolate, $parse){
+
+
+				//multi select
+
+				this.MULTI_SELECT_LIST = [];
+
+				this.multiSelectRaise = function(){
+					for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+						this.MULTI_SELECT_LIST[i].element.addClass('sv-long-pressing');
+					}
+				};
+				this.isMultiSelecting = function(){
+					return this.MULTI_SELECT_LIST.length > 1;
+				};
+
+				this.clearMultiSelect = function(html){
+						for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+							this.MULTI_SELECT_LIST[i].$multiSelected = false;
+							this.MULTI_SELECT_LIST[i].element.removeClass('sv-element-multi-selected');
+							this.MULTI_SELECT_LIST[i].element.removeClass('sv-long-pressing');
+						}
+						html.removeClass('sv-multi-selected');
+						this.MULTI_SELECT_LIST=[];
+					};
+
+				 this.addToMultiSelect = function(sortableElement, multiScope, attr, html){
+				 		for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+							if (this.MULTI_SELECT_LIST[i] === sortableElement){
+								return false;
+							}
+						}
+						sortableElement.$multiSelected = true;
+						sortableElement.element.addClass('sv-element-multi-selected');
+						sortableElement.multiScope = multiScope;
+						sortableElement.attr = attr;
+						html.addClass('sv-multi-selected');
+						this.MULTI_SELECT_LIST.push(sortableElement);
+						return true;
+					};
+
+				this.removeFromMultiSelect = function(sortableElement,html){
+						sortableElement.$multiSelected = false;
+						delete sortableElement.multiScope;
+						delete sortableElement.attr;
+						sortableElement.element.removeClass('sv-element-multi-selected');
+						for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+							if (this.MULTI_SELECT_LIST[i] === sortableElement){
+								this.MULTI_SELECT_LIST.splice(i,1);
+								break;
+							}
+						}
+						if (document.querySelectorAll('.sv-element-multi-selected').length === 0){
+							html.removeClass('sv-multi-selected');
+						}
+					};
+
+				this.getMultimodels = function(){
+					var multiModels = [];
+					var that = this;
+					for (var i=0;i<that.MULTI_SELECT_LIST.length;i++){
+						multiModels.push($parse(that.MULTI_SELECT_LIST[i].attr)(that.MULTI_SELECT_LIST[i].multiScope));
+					}
+					return multiModels;
+				};
+
+
 				var mapKey = $interpolate($attrs.svRoot)($scope) || $scope.$id;
 				if(!ROOTS_MAP[mapKey]) ROOTS_MAP[mapKey] = [];
 
+				var html = angular.element(document.documentElement);
 				var that         = this;
 				var candidates;  // set of possible destinations
 				var $placeholder;// placeholder element
@@ -41,7 +112,12 @@
 				var $original;   // original element
 				var $target;     // last best candidate
 				var isGrid       = false;
+				var isDisabled   = false;
 				var onSort       = $parse($attrs.svOnSort);
+
+				$scope.$watch($parse($attrs.svDisabled), function(newVal, oldVal) {
+ 					isDisabled = newVal;
+ 				});
 
 				// ----- hack due to https://github.com/angular/angular.js/issues/8044
 				$attrs.svOnStart = $attrs.$$element[0].attributes['sv-on-start'];
@@ -54,9 +130,15 @@
 				var onStart = $parse($attrs.svOnStart);
 				var onStop = $parse($attrs.svOnStop);
 
+				this.mapKey = mapKey;
+
 				this.sortingInProgress = function(){
 					return sortingInProgress;
 				};
+
+				this.sortingDisabled = function() {
+ 					return isDisabled;
+ 				};
 
 				if($attrs.svGrid){ // sv-grid determined explicite
 					isGrid = $attrs.svGrid === "true" ? true : $attrs.svGrid === "false" ? false : null;
@@ -97,6 +179,18 @@
 					});
 				}
 
+				var stop = false;
+		    var scroll = function (step, delay) {
+		    		var el = document.querySelector('.main-ui-view');
+		    		console.log("scrolling top", el.scrollTop);
+		        el.scrollTop+=step;
+		        if (!stop) {
+		            setTimeout(function () {
+                        scroll(step);
+                    }, delay);
+		        }
+		    };
+
 				this.$moveUpdate = function(opts, mouse, svElement, svOriginal, svPlaceholder, originatingPart, originatingIndex){
 					var svRect = svElement[0].getBoundingClientRect();
 					if(opts.tolerance === 'element')
@@ -106,6 +200,7 @@
 						};
 
 					sortingInProgress = true;
+					//console.log("move update");
 					candidates = [];
 					if(!$placeholder){
 						if(svPlaceholder){ // custom placeholder
@@ -123,7 +218,9 @@
 						}
 
 						svOriginal.after($placeholder);
-						svOriginal.addClass('ng-hide');
+						if (!that.keepInList){
+							svOriginal.addClass('ng-hide');
+						}
 
 						// cache options, helper and original element reference
 						$original = svOriginal;
@@ -138,12 +235,25 @@
 						});
 						$scope.$root && $scope.$root.$$phase || $scope.$apply();
 					}
+					var reposX = mouse.x + document.body.scrollLeft - mouse.offset.x*svRect.width;
+					var reposY = mouse.y + document.body.scrollTop - mouse.offset.y*svRect.height;
 
+					$helper[0].style.position ='fixed';
 					// ----- move the element
 					$helper[0].reposition({
-						x: mouse.x + document.body.scrollLeft - mouse.offset.x*svRect.width,
-						y: mouse.y + document.body.scrollTop - mouse.offset.y*svRect.height
+						x: reposX,
+						y: reposY
 					});
+
+					if (reposY <= 30){
+						stop = false;
+						scroll(-50, 200);
+					} else if (reposY >= document.body.clientHeight - 60){
+						stop = false;
+						scroll(50, 200);
+					} else {
+						stop = true;
+					}
 
 					// ----- manage candidates
 					getSortableElements(mapKey).forEach(function(se, index){
@@ -154,11 +264,13 @@
 								!elementMatchesSelector(se.element, opts.containment + ' *')
 							) return; // element is not within allowed containment
 						}
+
 						var rect = se.element[0].getBoundingClientRect();
 						var center = {
 							x: ~~(rect.left + rect.width/2),
 							y: ~~(rect.top + rect.height/2)
 						};
+
 						if(!se.container && // not the container element
 							(se.element[0].scrollHeight || se.element[0].scrollWidth)){ // element is visible
 							candidates.push({
@@ -212,6 +324,7 @@
 				};
 
 				this.$drop = function(originatingPart, index, options){
+					stop=true;
 					if(!$placeholder) return;
 
 					if(options.revert){
@@ -257,26 +370,67 @@
 							$item: originatingPart.model(originatingPart.scope)[index]
 						});
 
+						var multiModels = that.getMultimodels();
+
 						if($target){
 							$target.element.removeClass('sv-candidate');
-							var spliced = originatingPart.model(originatingPart.scope).splice(index, 1);
+							var spliced = [originatingPart.model(originatingPart.scope)[index]];
+							if (!that.keepInList){
+								spliced = originatingPart.model(originatingPart.scope).splice(index, 1);
+							}
 							var targetIndex = $target.targetIndex;
 							if($target.view === originatingPart && $target.targetIndex > index)
 								targetIndex--;
 							if($target.after)
 								targetIndex++;
-							$target.view.model($target.view.scope).splice(targetIndex, 0, spliced[0]);
 
+							if (multiModels.length ===0)
+								multiModels =  spliced;
+
+							for (var i =0;i<multiModels.length;i++){
+								$target.view.model($target.view.scope).splice(targetIndex+i, 0, multiModels[i]);
+							}
+
+							var sortMethod;
+							var destinationScope = $scope;
+							var shouldSort = false;
+							if(index != targetIndex){
+								sortMethod = onSort;
+								shouldSort = true;
+							}
 							// sv-on-sort callback
-							if($target.view !== originatingPart || index !== targetIndex)
-								onSort($scope, {
-									$partTo: $target.view.model($target.view.scope),
-									$partFrom: originatingPart.model(originatingPart.scope),
-									$item: spliced[0],
-									$indexTo: targetIndex,
-									$indexFrom: index
-								});
+							if($target.view !== originatingPart){
+								shouldSort = true;
 
+								//if destination has sv-on-sort call it not the parent's
+								if ($target.view.element && $target.view.element.attr("sv-on-external-sort")){
+									destinationScope = $target.view.element.scope();
+									var destinationOnSort = $parse($target.view.element.attr("sv-on-external-sort"));
+									if (destinationOnSort){
+										sortMethod = destinationOnSort;
+									}
+								}
+							}
+
+							if (sortMethod){
+									sortMethod(destinationScope, {
+										$partTo: $target.view.model($target.view.scope),
+										$partFrom: originatingPart.model(originatingPart.scope),
+										// $item: spliced[0],
+										$items:multiModels,
+										$indexTo: targetIndex,
+										$indexFrom: index
+									});
+							}
+							if (shouldSort){
+								var $viewEl = $target.view.element;
+								$viewEl.addClass("sv-dropped");
+								setTimeout(function(){
+									$viewEl.removeClass("sv-dropped");
+									$viewEl = void 0;
+									that.clearMultiSelect(html);
+								},300);
+							}
 						}
 						$target = void 0;
 
@@ -301,7 +455,8 @@
 	}]);
 
 	module.directive('svPart', ['$parse', function($parse){
-		return {
+
+			return {
 			restrict: 'A',
 			require: '^svRoot',
 			controller: ['$scope', function($scope){
@@ -309,16 +464,25 @@
 				this.getPart = function(){
 					return $scope.part;
 				};
-				this.$drop = function(index, options){
-					$scope.$sortableRoot.$drop($scope.part, index, options);
-				};
+					this.$drop = function(index, options){
+						$scope.$sortableRoot.$drop($scope.part, index, options);
+					};
 			}],
 			scope: true,
 			link: function($scope, $element, $attrs, $sortable){
+				var html = angular.element(document.documentElement);
 				if(!$attrs.svPart) throw new Error('no model provided');
 				var model = $parse($attrs.svPart);
 				if(!model.assign) throw new Error('model not assignable');
+				$sortable.keepInList = $parse($attrs.svKeepInList)($scope);
+				$scope.$ctrl.isDropzone = $parse($attrs.svIsDropzone)($scope) === false ? false : true;
+				$scope.$ctrl.multiSelect = $parse($attrs.svMultiSelect)($scope) === true ? true : false;
 
+				if($scope.$ctrl.multiSelect){
+					$element.on('mousedown',function(){
+						$sortable.clearMultiSelect(html);
+					});
+				}
 				$scope.part = {
 					id: $scope.$id,
 					element: $element,
@@ -332,7 +496,10 @@
 					getPart: $scope.$ctrl.getPart,
 					container: true
 				};
-				$sortable.addToSortableElements(sortablePart);
+
+				if ($scope.$ctrl.isDropzone){
+					$sortable.addToSortableElements(sortablePart);
+				}
 				$scope.$on('$destroy', function(){
 					$sortable.removeFromSortableElements(sortablePart);
 				});
@@ -340,7 +507,7 @@
 		};
 	}]);
 
-	module.directive('svElement', ['$parse', function($parse){
+	module.directive('svElement', ['$parse','svDragging', function($parse, svDragging){
 		return {
 			restrict: 'A',
 			require: ['^svPart', '^svRoot'],
@@ -348,6 +515,9 @@
 				$scope.$ctrl = this;
 			}],
 			link: function($scope, $element, $attrs, $controllers){
+
+
+
 				var sortableElement = {
 					element: $element,
 					getPart: $controllers[0].getPart,
@@ -355,18 +525,74 @@
 						return $scope.$index;
 					}
 				};
-				$controllers[1].addToSortableElements(sortableElement);
+				if ($controllers[0].isDropzone){
+					$controllers[1].addToSortableElements(sortableElement);
+				}
 				$scope.$on('$destroy', function(){
 					$controllers[1].removeFromSortableElements(sortableElement);
 				});
 
+				var startTimer;
+				var clearEvent = function () {
+					svDragging.isDragging = false;
+				  clearTimeout(startTimer);
+			 	};
+
+		 	  var event = function (e) {
+		 	  	function setMulti(ev){
+		 	    	if (!moveExecuted && $controllers[0].multiSelect){
+			 	    	if (ev.ctrlKey || ev.metaKey){
+			 	    		if(sortableElement.$multiSelected){
+			 	    			$controllers[1].removeFromMultiSelect(sortableElement, html);
+			 	    		} else {
+			 	    			$controllers[1].addToMultiSelect(sortableElement, $scope, $attrs.svElement, html);
+			 	    		}
+			 	    	} else if (!sortableElement.$multiSelected){
+			 	    		$controllers[1].clearMultiSelect(html);
+			 	    		$controllers[1].addToMultiSelect(sortableElement, $scope,$attrs.svElement, html);
+			 	    	}
+			 	    }
+		 	  	}
+
+		 	  	//ignore other buttons
+		 	  	var evt = (e==null ? event:e);
+		 	  	if (evt && (evt.which>1 || evt.button>2)){
+		 	  		return true;
+		 	  	}
+		 	  	if($controllers[1].sortingDisabled()){
+		 	  		return true;
+		 	  	}
+		 	    html.on('mouseup touchend', function mouseup(e){
+		 	    	setMulti(e);
+		 	    	clearEvent();
+		 	    	html.off('mouseup touchend', mouseup);
+		 	    });
+
+		 	    startTimer = setTimeout(function () {
+		 	    	setMulti(e);
+	 	    		onMousedown(e);
+ 	    		}, 300);
+ 	    		e.preventDefault();
+ 	    		e.stopPropagation();
+ 	    		return false;
+		 	  };
+
+				// assume every element is draggable unless specified
+				$scope.$watch($parse($attrs.svElementDisabled), function(newVal, oldVal) {
+					if (newVal){
+						resetOnStartEvent(false, event);
+					} else {
+						resetOnStartEvent($element, event);
+					}
+
+ 				});
+
 				var handle = $element;
-				handle.on('mousedown touchstart', onMousedown);
+
+				handle.on('mousedown touchstart', event);
 				$scope.$watch('$ctrl.handle', function(customHandle){
 					if(customHandle){
-						handle.off('mousedown touchstart', onMousedown);
-						handle = customHandle;
-						handle.on('mousedown touchstart', onMousedown);
+						resetOnStartEvent(customHandle, event);
 					}
 				});
 
@@ -389,10 +615,36 @@
 
 				var moveExecuted;
 
+
+				function resetOnStartEvent(newHandle, event){
+					if (newHandle){
+							handle.off('mousedown touchstart', event);
+							handle = newHandle;
+							handle.on('mousedown touchstart', event);
+							return;
+					} else {
+						handle.off('mousedown touchstart', event);
+					}
+				}
+
 				function onMousedown(e){
+					if (svDragging.isDragging){
+						return;
+					}
+
+					if ($controllers[0].multiSelect && !sortableElement.$multiSelect){
+						$controllers[1].addToMultiSelect(sortableElement, $scope, $attrs.svElement, html);
+						$controllers[1].multiSelectRaise();
+					} else {
+						$element.addClass('sv-long-pressing');
+					}
+
+
+					svDragging.isDragging = true;
 					touchFix(e);
 
 					if($controllers[1].sortingInProgress()) return;
+					if($controllers[1].sortingDisabled()) return;
 					if(e.button != 0 && e.type === 'mousedown') return;
 
 					moveExecuted = false;
@@ -409,7 +661,6 @@
 					var target = $element;
 					var clientRect = $element[0].getBoundingClientRect();
 					var clone;
-
 					if(!helper) helper = $controllers[0].helper;
 					if(!placeholder) placeholder = $controllers[0].placeholder;
 					if(helper){
@@ -419,10 +670,22 @@
 							'left': clientRect.left + document.body.scrollLeft + 'px',
 							'top': clientRect.top + document.body.scrollTop + 'px'
 						});
-						target.addClass('sv-visibility-hidden');
+							target.addClass('sv-visibility-hidden');
+					} else if ($controllers[1].isMultiSelecting()){
+						clone = angular.element(document.querySelector("#sv-multi-helper")).clone();
+						var models = $controllers[1].getMultimodels();
+						clone[0].querySelector(".card-title-text").innerHTML = target[0].querySelector(".card-title-text").innerHTML;
+
+						clone[0].querySelector(".badge").innerHTML = $controllers[1].MULTI_SELECT_LIST.length;
+						clone.addClass('sv-helper').css({
+							'left': clientRect.left + document.body.scrollLeft + 'px',
+							'top': clientRect.top + document.body.scrollTop + 'px',
+							'width': clientRect.width + 'px'
+						});
 					}
 					else{
 						clone = target.clone();
+						clone.removeClass("sv-element-multi-selected");
 						clone.addClass('sv-helper').css({
 							'left': clientRect.left + document.body.scrollLeft + 'px',
 							'top': clientRect.top + document.body.scrollTop + 'px',
@@ -456,21 +719,42 @@
 						y: (e.clientY - clientRect.top)/clientRect.height
 					};
 					html.addClass('sv-sorting-in-progress');
+
+					var dropzoneClass = 'sv-sorting-'+$controllers[1].mapKey;
+					html.addClass(dropzoneClass);
+
 					html.on('mousemove touchmove', onMousemove).on('mouseup touchend touchcancel', function mouseup(e){
+						svDragging.isDragging = false;
 						html.off('mousemove touchmove', onMousemove);
 						html.off('mouseup touchend', mouseup);
-						html.removeClass('sv-sorting-in-progress');
+
+						// timeout so animation goes to the right element
+						setTimeout(function(){
+							html.removeClass('sv-sorting-in-progress');
+							html.removeClass(dropzoneClass);
+						},500);
+
 						if(moveExecuted){
 							$controllers[0].$drop($scope.$index, opts);
+							moveExecuted = false;
 						}
 						$element.removeClass('sv-visibility-hidden');
+						if (!$controllers[0].multiSelect){
+							setTimeout(function(){
+								target.removeClass('sv-long-pressing');
+							},300);
+						} else {
+							if ($controllers[1].MULTI_SELECT_LIST.length === 1){
+								$controllers[1].clearMultiSelect(html);
+							}
+						}
 					});
 
 					// onMousemove(e);
 					function onMousemove(e){
 						touchFix(e);
 						if(!moveExecuted){
-							$element.parent().prepend(clone);
+							body.prepend(clone);
 							moveExecuted = true;
 						}
 						$controllers[1].$moveUpdate(opts, {
@@ -478,6 +762,9 @@
 							y: e.clientY,
 							offset: pointerOffset
 						}, clone, $element, placeholder, $controllers[0].getPart(), $scope.$index);
+						e.stopPropagation();
+						e.preventDefault();
+						return false;
 					}
 				}
 			}
@@ -512,12 +799,29 @@
 			require: ['?^svPart', '?^svElement'],
 			link: function($scope, $element, $attrs, $ctrl){
 				$element.addClass('sv-placeholder').addClass('ng-hide');
-				if($ctrl[1])
+				if ($ctrl[1] && $ctrl[0]){
+					//find closest svPart or svElement and set placeholder in the correct place
+					var p = $element.parent();
+					while (p.length > 0) {
+					  if (p[0].hasAttribute('sv-element')){
+					  	$ctrl[1].placeholder = $element;
+					  	return;
+					  } else if (p[0].hasAttribute('sv-part')){
+					  	$ctrl[0].placeholder = $element;
+					  	return;
+					  }
+					  p = p.parent();
+					}
+				} else if($ctrl[1])
 					$ctrl[1].placeholder = $element;
 				else if($ctrl[0])
 					$ctrl[0].placeholder = $element;
 			}
 		};
+	});
+
+	module.service('svDragging', function(){
+		this.isDragging = false;
 	});
 
 	angular.element(document.head).append([
