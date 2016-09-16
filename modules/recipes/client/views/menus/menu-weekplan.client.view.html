@@ -1,0 +1,119 @@
+<section ng-controller="MenuWeekplanController" ng-init="findOne()">
+    <div class="page-header">
+        <h1 ng-show="menu.number">
+            Меню №{{menu.number}} от {{menu.startDate | date}}
+        </h1>
+        <h1 ng-hide="menu.number">
+            Новое меню
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <label for="menu.meals">
+                        Нераспределенные блюда
+                    </label>
+                </div>
+                <div class="panel-body">
+                    <div sv-root="meal" sv-part="unassigned">
+                        <div ng-repeat="meal in unassigned" sv-element class="col-md-3">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" sv-handle>
+                                    <i class="glyphicon glyphicon-move"></i>
+                                    {{meal.recipe.title}}
+                                </div>
+                                <div class="panel-body">
+                                    {{meal.portions}}
+                                </div>
+                            </div>
+                            <div sv-helper class="col-md-2 col-sm-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" sv-handle>
+                                        <i class="glyphicon glyphicon-move"></i>
+                                        {{meal.recipe.title}}
+                                    </div>
+                                    <div class="panel-body">
+                                        <pre>{{meal.recipe | json}}</pre>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group">
+                <div sv-root="day" sv-part="weekDays">
+                    <div ng-repeat="weekday in weekDays" sv-element class="list-group-item">
+                        <div class="list-group-item-text">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" sv-handle>
+                                    <i class="glyphicon glyphicon-sort"></i>
+                                    {{weekDayExamples[$index] | date : 'EEEE'}}
+                                    <a class="pull-right btn btn-danger btn-xs" ng-click="clearDay($index)">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div ng-repeat="type in menu.types | orderBy:'serve' track by $index">
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        {{type.caption}}
+                                                        <div class="pull-right">
+                                                            <snap class="glyphicon glyphicon-time"></snap>
+                                                            {{type.serve | date:'HH:mm'}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div sv-root="meal" sv-part="weekday.types[type.index].meals">
+                                                            <div ng-repeat="meal in weekday.types[type.index].meals" sv-element>
+                                                                <div class="panel panel-default">
+                                                                    <div sv-handle class="panel-heading">
+                                                                        <i class="glyphicon glyphicon-move"></i>
+                                                                        {{meal.recipe.title}}
+                                                                    </div>
+                                                                    <div class="panel-body">
+                                                                        {{meal.portions}} 
+                                                                    </div>  
+                                                                </div>
+                                                                <div sv-helper class="col-md-2 col-sm-6">
+                                                                    <div class="panel panel-default">
+                                                                        <div class="panel-heading" sv-handle>
+                                                                            <i class="glyphicon glyphicon-move"></i>
+                                                                            {{meal.recipe.title}}
+                                                                        </div>
+                                                                        <div class="panel-body">
+                                                                            <pre>{{meal.recipe | json}}</pre>
+                                                                        </div>
+                                                                    </div> 
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="{{menu.number ? 'Обновить' : 'Сохранить'}}">
+                </div>
+                <div ng-show="error" class="text-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>

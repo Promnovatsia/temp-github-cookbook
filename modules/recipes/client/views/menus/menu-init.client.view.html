@@ -1,4 +1,4 @@
-<section ng-controller="MenusController" ng-init="findOneInit()">
+<section ng-controller="MenuInitController" ng-init="findOne()">
     <div class="page-header">
         <h1 ng-show="menu.number">
             Меню №{{menu.number}} от {{menu.startDate | date}}
@@ -7,7 +7,7 @@
             Новое меню
         </h1>
     </div>
-    <form name="menuForm" class="form-horizontal" ng-submit="saveInit(menuForm.$valid)" novalidate>
+    <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
         <fieldset>
             <div class="row">
                 <div class="col-xs-6">

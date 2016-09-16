@@ -151,16 +151,16 @@ function routeConfig($stateProvider) {
                 roles: ['admin']
             }
         })
-        .state('menu.recipes', {
-            url: '/:menuId/recipes',
-            templateUrl: 'modules/recipes/client/views/menus/menu-recipes.client.view.html',
+        .state('menu.meals', {
+            url: '/:menuId/meals',
+            templateUrl: 'modules/recipes/client/views/menus/menu-meals.client.view.html',
             data: {
                 roles: ['admin']
             }
         })
         .state('menu.edit', {
-            url: '/:menuId/edit',
-            templateUrl: 'modules/recipes/client/views/menus/menu-form.client.view.html',
+            url: '/:menuId/weekplan',
+            templateUrl: 'modules/recipes/client/views/menus/menu-weekplan.client.view.html',
             data: {
                 roles: ['admin']
             }
@@ -168,6 +168,13 @@ function routeConfig($stateProvider) {
         .state('menu.view', {
             url: '/:menuId',
             templateUrl: 'modules/recipes/client/views/menus/menu-read.client.view.html',
+            data: {
+                roles: ['admin']
+            }
+        })
+        .state('menu.summary', {
+            url: '/:menuId/summary',
+            templateUrl: 'modules/recipes/client/views/menus/menu-summary.client.view.html',
             data: {
                 roles: ['admin']
             }

@@ -155,7 +155,6 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                     ]
                 }
             );
-            $scope.menuInitByDays($scope.menu);
         }
     };
     
@@ -227,7 +226,6 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             caption: null,
             serve: $scope.menu.types[$scope.menu.types.length - 1].serve
         };
-        $scope.menuInitByDays($scope.menu);
     };
     
     $scope.removeType = function (typeIndex) {
@@ -365,25 +363,6 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
 
         function successCallback(res) {
             $location.path('menu/' + $scope.menu.number);
-        }
-
-        function errorCallback(res) {
-            $scope.error = res.data.message;
-        }
-    };
-    
-    $scope.saveInit = function (isValid) {
-        
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'menuForm');
-            return false;
-        }
-        $scope.menu.createOrUpdate()
-            .then(successCallback)
-            .catch(errorCallback);
-
-        function successCallback(res) {
-            $location.path('menu/' + $scope.menu.number + '/recipes');
         }
 
         function errorCallback(res) {
