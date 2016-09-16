@@ -100,6 +100,7 @@ module.exports = function(app) {
     
     // Finish by binding the recipe middleware
     app.param('recipeId', recipes.recipeByID);
+    app.param('recipeSearchTitle', recipes.recipeSearchByTitle);
     app.param('ingredientId', ingredients.ingredientByID);
     app.param('measureId', measures.measureByID);
     app.param('productId', products.productByID);

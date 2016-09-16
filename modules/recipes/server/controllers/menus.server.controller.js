@@ -26,14 +26,30 @@ exports.create = function (req, res) {
         } else {
             req.body.number = 1;
         }
-        Menu.create(req.body, {
-            include: [Meal]
-        }).then(function (menu) {
+        Menu.create(req.body).then(function (menu) {
             if (!menu) {
                 return res.send('users/signup', {
                     errors: 'Could not create the menu'
                 });
             } else {
+                if (req.body.meals) {
+                    async.forEach(req.body.meals, function (item, callback) {
+                        Meal.findById(item.id).then(function (meal) {
+                            if (!meal || meal.menuId !== menu.id) {
+                                Meal.create(item).then(function (newMeal) {
+                                    menu.addMeal(newMeal).then(function() {
+                                        callback();
+                                    });
+                                });    
+                            } else {
+                                item.menuId = menu.id;
+                                meal.update(item).then(function () {
+                                    callback();   
+                                });
+                            }
+                        });
+                    });
+                }
                 return res.json(menu);
             }
         }).catch(function (err) {
@@ -50,7 +66,6 @@ exports.read = function (req, res) {
 
 exports.update = function (req, res) {
     
-    console.log(req.menu.meals);
     Menu.findOne(
         {
             where: {
@@ -60,29 +75,37 @@ exports.update = function (req, res) {
         }
     ).then(function (menu) {
         if (menu) {
-            menu.update(
+            return menu.update(
                 {
-                    isPurchased: req.body.isPurchased,
-                    isDone: req.body.isDone,
-                    weekDayMask: req.body.weekDayMask,
                     types: req.body.types,
-                    meals: req.body.meals
-                }, {
-                    include: [Meal]
+                    isClosed: req.body.isClosed
                 }
-            ).then(function (menu) {
-                    return res.json(menu);
-                }).catch(function (err) {
-                    return res.status(400).send({
-                        message: errorHandler.getErrorMessage(err)
-                    });
-                });
+            );
         } else {
             return res.status(400).send({
                 message: 'Unable to find the menu'
             });
         }
-        return null;
+    }).then(function (menu) {
+        if (req.body.meals) {
+            async.forEach(req.body.meals, function (item, callback) {
+                Meal.findById(item.id).then(function (meal) {
+                    if (!meal || meal.menuId !== menu.id) {
+                        Meal.create(item).then(function (newMeal) {
+                            menu.addMeal(newMeal).then(function() {
+                                callback();
+                            });
+                        });    
+                    } else {
+                        item.menuId = menu.id;
+                        meal.update(item).then(function () {
+                            callback();   
+                        });
+                    }
+                });
+            });
+        }
+        return res.json(menu);
     }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)

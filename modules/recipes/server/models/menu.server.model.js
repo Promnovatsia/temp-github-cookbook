@@ -9,19 +9,10 @@ module.exports = function (sequelize, DataTypes) {
         startDate: {
             type: DataTypes.DATE  
         },
-        isPurchased: {
+        isClosed: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
-        },
-        isDone: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        weekDayMask: {
-            type: DataTypes.ARRAY(DataTypes.BOOLEAN),
-            defaultValue: [true, true, true, true, true, true, false]
         },
         types: {
             type: DataTypes.ARRAY(DataTypes.JSONB)

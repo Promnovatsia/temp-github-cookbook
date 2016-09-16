@@ -279,3 +279,31 @@ exports.recipeByID = function (req, res, next, id) {
         return next(err);
     });
 };
+
+exports.recipeSearchByTitle = function (req, res, next, title) {
+    
+    console.log(title);
+    Recipe.findAll(
+        {
+            where: { 
+                title: { 
+                    $like: '%' + title + '%' 
+                },
+                $or: [
+                    {
+                        isPrivate: false
+                    }, {
+                        userId: req.user.id
+                    }
+                ]
+            },
+            attributes: ['id','title']
+        }
+    ).then(function (recipes) {
+        req.recipes = recipes;
+        next();
+        return null;
+    }).catch(function (err) {
+        return next(err);
+    });
+};
