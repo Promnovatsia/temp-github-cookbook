@@ -5,9 +5,9 @@ angular
     .module('recipes')
     .factory('MealService', MealService);
 
-MealService.$inject = ['$resource'];
+MealService.$inject = ['$resource', 'RecipeService'];
 
-function MealService($resource) {
+function MealService($resource, RecipeService) {
     var Meal = $resource('api/meal/:mealId', {
         mealId: '@number'
     }, {
@@ -20,6 +20,10 @@ function MealService($resource) {
         createOrUpdate: function () {
             var meal = this;
             return createOrUpdate(meal);
+        },
+        getRecipe: function () {
+            var meal = this;
+            return getRecipe(meal);
         }
     });
     
@@ -31,6 +35,14 @@ function MealService($resource) {
         } else {
             return meal.$save(onSuccess, onError);
         }
+    }
+    
+    function getRecipe(meal) {
+        return RecipeService.get(
+            {
+                recipeId: meal.recipeId
+            }
+        ).$promise;
     }
     
     function onSuccess(menu) {
