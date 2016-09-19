@@ -24,7 +24,7 @@
                                     {{meal.recipe.title}}
                                 </div>
                                 <div class="panel-body">
-                                    {{meal.portions}}
+                                    {{meal.weekday}} {{meal.type}}
                                 </div>
                             </div>
                             <div sv-helper class="col-md-2 col-sm-6">
@@ -34,7 +34,7 @@
                                         {{meal.recipe.title}}
                                     </div>
                                     <div class="panel-body">
-                                        <pre>{{meal.recipe | json}}</pre>
+                                        <pre>{{meal.recipe.title | json}}</pre>
                                     </div>
                                 </div> 
                             </div>
@@ -75,7 +75,7 @@
                                                                         {{meal.recipe.title}}
                                                                     </div>
                                                                     <div class="panel-body">
-                                                                        {{meal.portions}} 
+                                                                        {{meal.weekday}} {{meal.type}} 
                                                                     </div>  
                                                                 </div>
                                                                 <div sv-helper class="col-md-2 col-sm-6">
@@ -85,7 +85,7 @@
                                                                             {{meal.recipe.title}}
                                                                         </div>
                                                                         <div class="panel-body">
-                                                                            <pre>{{meal.recipe | json}}</pre>
+                                                                            <pre>{{meal.recipe.title | json}}</pre>
                                                                         </div>
                                                                     </div> 
                                                                 </div>

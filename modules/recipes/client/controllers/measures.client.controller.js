@@ -22,7 +22,7 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Mea
                     measureId: $stateParams.measureId
                 }
             ).$promise.then(function (measure) {
-                $scope.converter = measure.converter;
+                $scope.converter = measure.converter || [];
                 $scope.measure = measure;
                 $scope.uncountable = measure.step === 0;
                 if ($scope.converter) {
