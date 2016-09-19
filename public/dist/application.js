@@ -1313,7 +1313,7 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Mea
                     measureId: $stateParams.measureId
                 }
             ).$promise.then(function (measure) {
-                $scope.converter = measure.converter;
+                $scope.converter = measure.converter || [];
                 $scope.measure = measure;
                 $scope.uncountable = measure.step === 0;
                 if ($scope.converter) {
@@ -2176,21 +2176,24 @@ function MenuWeekplanController($scope, $stateParams, $location, $window, Authen
                 );
                 $scope.weekDays[i].types[j].meals = [];
                 $scope.meals.forEach(function (meal, k, arr) {
-                    if (!meal.done && meal.weekday === i && meal.type === $scope.weekDays[i].types[j].index) {
-                        $scope.weekDays[i].types[j].meals.push(meal);
-                        meal.done = true;
+                    if (meal.weekday === i && meal.type === $scope.weekDays[i].types[j].index) {
+                        meal = new MealService(meal);
+                        meal.getRecipe().then(function (recipe) {
+                            meal.recipe = recipe;
+                            $scope.weekDays[i].types[j].meals.push(meal);
+                        });
                     }
                 });
             });
         });
         $scope.meals.forEach(function (meal, k, arr) {
-            meal = new MealService(meal);
-            meal.getRecipe().then(function (recipe) {
-                meal.recipe = recipe;
-                if (!meal.done) {
+            if (meal.weekday === -1 || meal.type === -1 || meal.type >= $scope.menu.types.length) {
+                meal = new MealService(meal);
+                meal.getRecipe().then(function (recipe) {
+                    meal.recipe = recipe;
                     $scope.unassigned.push(meal);    
-                }
-            });
+                });
+            }
         });
     };
     
@@ -2201,19 +2204,21 @@ function MenuWeekplanController($scope, $stateParams, $location, $window, Authen
             return false;
         }
         
-        console.log($scope.menu.meals);
-        $scope.weekDayExamples.forEach(function (weekDay, i, arr) {
+        $scope.meals = [];
+        $scope.weekDays.forEach(function (weekDay, i, arr) {
             $scope.menu.types.forEach(function (type, j, arr) {
                 $scope.weekDays[i].types[j].meals.forEach(function (meal, k, arr) {
                     meal.type = type.index;
                     meal.weekday = weekDay.index;
+                    $scope.meals.push(meal);
                 });
             });
         });
         $scope.unassigned.forEach(function (meal, i, arr) {
-            meal.weekday = -1;   
+            meal.weekday = -1;
+            $scope.meals.push(meal);
         });
-        console.log($scope.menu);
+        $scope.menu.meals = $scope.meals;
         $scope.menu.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
