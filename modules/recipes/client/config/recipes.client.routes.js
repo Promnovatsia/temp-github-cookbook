@@ -195,7 +195,7 @@ function routeConfig($stateProvider) {
         .state('shelf.create', {
             url: '/create',
             params: {
-                ingredient: null,
+                ingredient: null
             },
             templateUrl: 'modules/recipes/client/views/shelf/shelf-form.client.view.html',
             data: {

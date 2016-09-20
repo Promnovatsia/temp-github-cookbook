@@ -28,7 +28,7 @@
                                     <label for="portions">
                                         Количество порций
                                     </label>
-                                    <updowninput ng-model="meal.portions" min="0.5" step="0.5" precision="1"></updowninput>
+                                    <updowninput id="portions" ng-model="meal.portions" min="0.5" step="0.5" precision="1"></updowninput>
                                 </div>
                             </div>
                         </div>
@@ -49,7 +49,7 @@
                                 <div sv-handle class="panel-heading">
                                     <span class="glyphicon glyphicon-move">
                                         {{meal.recipe.title}}
-                                    </span> 
+                                    </span>
                                 </div>
                                 <div class="panel-body">
                                     <div class="row">
@@ -77,7 +77,7 @@
                         <div class="input-group-addon">
                             <i class="glyphicon glyphicon-search"></i>
                         </div>
-                        <input type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="recipe as recipe.title for recipe in getRecipes($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="addRecipe($item)" class="form-control">
+                        <input id="asyncSelected" type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="recipe as recipe.title for recipe in getRecipes($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="addRecipe($item)" class="form-control">
                         <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
                         <div ng-show="noResults">
                             <i class="glyphicon glyphicon-remove"></i>

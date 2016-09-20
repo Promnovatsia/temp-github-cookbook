@@ -14,7 +14,7 @@
                     <label for="caption">
                         Название меры
                     </label>
-                    <input class="form-control" type="text" ng-model="measure.caption" placeholder="Например, ст.л.">   
+                    <input id="caption" class="form-control" type="text" ng-model="measure.caption" placeholder="Например, ст.л.">
                 </div>
             </div>
             <hr>
@@ -25,8 +25,8 @@
                     </label>
                 </div>
                 <div class="col-md-4">
-                    <toggle-switch class="switch-default" ng-model="uncountable" on-label="Словесная" off-label="Числовая"></toggle-switch>
-                </div>    
+                    <toggle-switch id="uncountable" class="switch-default" ng-model="uncountable" on-label="Словесная" off-label="Числовая"></toggle-switch>
+                </div>
             </div>
             <div class="row" ng-hide="uncountable">
                 <hr>
@@ -36,7 +36,7 @@
                     </label>
                 </div>
                 <div class="col-md-4">
-                    <updowninput ng-model="measure.min" min="0" step="0.005" max="100"></updowninput>
+                    <updowninput id="min" ng-model="measure.min" min="0" step="0.005" max="100"></updowninput>
                 </div>
             </div>
             <div class="row" ng-hide="uncountable">
@@ -47,13 +47,13 @@
                     </label>
                 </div>
                 <div class="col-md-4">
-                    <updowninput ng-model="measure.step" min="0" step="0.05" validator="applyStep(id,value,oldValue)"></updowninput>
+                    <updowninput id="step" ng-model="measure.step" min="0" step="0.05" validator="applyStep(id,value,oldValue)"></updowninput>
                 </div>
             </div>
             <div class="row">
                 <hr>
                 <div class="col-md-6">
-                    <label for="converter">
+                    <label>
                         Доступные преобразования
                     </label>
                     <div class="list-group">
@@ -66,7 +66,7 @@
                                     <h4 class="list-group-item-heading" ng-bind="subMeasure.caption"></h4>
                                 </div>
                                 <div class="col-xs-8 col-md-4" ng-hide="uncountable || measure.step<=0 || subMeasure.uncountable">
-                                    <updowninput ng-model="subMeasure.rate" min="0" step="0.001"></updowninput>    
+                                    <updowninput ng-model="subMeasure.rate" min="0" step="0.001"></updowninput>
                                 </div>
                             </div>
                         </div>
@@ -78,7 +78,7 @@
                                 <div class="input-group-addon">
                                     <i class="glyphicon glyphicon-search"></i>
                                 </div>
-                                <input type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="measure as measure.caption for measure in getMeasures($viewValue)" typeahead-loading="loadingMeasures" typeahead-no-results="noResults" typeahead-on-select="addSubMeasure($item)" class="form-control">
+                                <input id="asyncSelected" type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="measure as measure.caption for measure in getMeasures($viewValue)" typeahead-loading="loadingMeasures" typeahead-no-results="noResults" typeahead-on-select="addSubMeasure($item)" class="form-control">
                                 <i ng-show="loadingMeasures" class="glyphicon glyphicon-refresh"></i>
                                 <div ng-show="noResults" class="input-group-addon">
                                     <i class="glyphicon glyphicon-remove"></i>

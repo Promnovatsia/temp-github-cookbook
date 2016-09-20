@@ -14,12 +14,12 @@
                     <label for="menu.startDate">
                         Начальная дата планирования меню
                     </label>
-                    <input type="date" ng-model="menu.startDate" class="form-control" required>
+                    <input id="menu.startDate" type="date" ng-model="menu.startDate" class="form-control" required>
                 </div>
             </div>
             <hr>
             <div class="row">
-                <label for="types">
+                <label>
                     Расписание
                 </label>
                 <div class="list-group">
@@ -36,7 +36,7 @@
                                     <label for="type.caption">
                                         Прием пищи
                                     </label>
-                                    <input id="type.capture" type="text" ng-model="type.caption" class="form-control" required placeholder="Например, Завтрак">
+                                    <input id="type.caption" type="text" ng-model="type.caption" class="form-control" required placeholder="Например, Завтрак">
                                 </div>
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group"> 
+            <div class="form-group">
                 <input type="submit" class="pull-right btn btn-default" value="{{shelf.id ? 'Применить' : 'Далее'}}">
             </div>
             <div ng-show="error" class="text-danger">

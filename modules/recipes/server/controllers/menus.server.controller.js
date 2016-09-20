@@ -8,7 +8,6 @@ var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
         Menu = db.menu,
-        Recipe = db.recipe,
         Meal = db.meal
     ;
 

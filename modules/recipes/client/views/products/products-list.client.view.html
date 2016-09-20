@@ -16,7 +16,6 @@
     </form>
     <div class="list-group">
         <a ng-repeat="product in products | filter:filterProducts"
-           ui-sref="products.view({productId: product.id})" 
            class="list-group-item">
             <div class="row">
                 <div class="col-md-2">
@@ -28,7 +27,7 @@
                     <h4 class="list-group-item-heading" ng-bind="product.caption"></h4>
                     <p class="list-group-item-text" ng-bind="product.infoCard"></p>
                 </div>
-            </div>           
+            </div>
         </a>
     </div>
     <div class="alert alert-warning text-center" ng-if="!products.length">

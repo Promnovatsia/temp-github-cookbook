@@ -7,10 +7,10 @@
     <div class="col-md-12">
         <form name="shelfQueryForm" class="form-horizontal" ng-submit="save(shelfQueryForm.$valid)" novalidate>
             <fieldset>
-                <div class="form-group">  
+                <div class="form-group">
                     <div class="row">
                         <div class="col-md-2">
-                            <label for="info.measure">
+                            <label>
                                 Измеряется в: {{measure.caption}}
                             </label>
                         </div>
@@ -20,22 +20,22 @@
                             <label for="buy">
                                 Запланировано купить
                             </label>
-                            <updowninput ng-model="shelfQuery.buy" measure="measure"><updowninput>
+                            <updowninput id="buy" ng-model="shelfQuery.buy" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="bought">
                                 Куплено в итоге
                             </label>
-                            <updowninput ng-model="shelfQuery.bought" measure="measure"><updowninput>
+                            <updowninput id="bought" ng-model="shelfQuery.bought" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="buyDate">
                                 Купить до
                             </label>
                             <div class="input-group">
-                                <input name="buyDate" type="date" ng-model="shelfQuery.buyDate" class="form-control">
+                                <input id="buyDate" type="date" ng-model="shelfQuery.buyDate" class="form-control">
                                 <label class="input-group-addon">
-                                    <snap class="glyphicon glyphicon-calendar"></snap>
+                                    <i class="glyphicon glyphicon-calendar"></i>
                                 </label>
                             </div>
                         </div>
@@ -45,22 +45,22 @@
                             <label for="use">
                                 Запланировано использовать
                             </label>
-                            <updowninput ng-model="shelfQuery.use" measure="measure"><updowninput>
+                            <updowninput id="use" ng-model="shelfQuery.use" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="used">
                                 Использовано в итоге
                             </label>
-                            <updowninput ng-model="shelfQuery.used" measure="measure"><updowninput>
+                            <updowninput id="used" ng-model="shelfQuery.used" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="useDate">
                                 Зарезервировано до
                             </label>
                             <div class="input-group">
-                                <input name="useDate" type="date" ng-model="shelfQuery.useDate" class="form-control">
+                                <input id="useDate" type="date" ng-model="shelfQuery.useDate" class="form-control">
                                 <label class="input-group-addon">
-                                    <snap class="glyphicon glyphicon-calendar"></snap>
+                                    <i class="glyphicon glyphicon-calendar"></i>
                                 </label>
                             </div>
                         </div>
@@ -71,20 +71,20 @@
                             <label for="spoil">
                                 Иcпортилось
                             </label>
-                            <updowninput ng-model="shelfQuery.spoil" measure="measure"><updowninput>
+                            <updowninput id="spoil" ng-model="shelfQuery.spoil" measure="measure"><updowninput>
                         </div>
                         <div class="col-md-4">
                             <label for="spoilDate">
                                 Испортится после
                             </label>
                             <div class="input-group">
-                                <input name="spoilDate" type="date" ng-model="shelfQuery.spoilDate" class="form-control">
+                                <input id="spoilDate" type="date" ng-model="shelfQuery.spoilDate" class="form-control">
                                 <label class="input-group-addon">
-                                    <snap class="glyphicon glyphicon-calendar"></snap>
+                                    <i class="glyphicon glyphicon-calendar"></i>
                                 </label>
                             </div>
                         </div>
-                    </div>    
+                    </div>
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-default" value="{{shelfQuery.id ? 'Обновить' : 'Создать'}}">

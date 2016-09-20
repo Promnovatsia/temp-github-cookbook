@@ -1079,16 +1079,16 @@ function routeConfig($stateProvider) {
                 roles: ['admin']
             }
         })
-        .state('menu.recipes', {
-            url: '/:menuId/recipes',
-            templateUrl: 'modules/recipes/client/views/menus/menu-recipes.client.view.html',
+        .state('menu.meals', {
+            url: '/:menuId/meals',
+            templateUrl: 'modules/recipes/client/views/menus/menu-meals.client.view.html',
             data: {
                 roles: ['admin']
             }
         })
         .state('menu.edit', {
-            url: '/:menuId/edit',
-            templateUrl: 'modules/recipes/client/views/menus/menu-form.client.view.html',
+            url: '/:menuId/weekplan',
+            templateUrl: 'modules/recipes/client/views/menus/menu-weekplan.client.view.html',
             data: {
                 roles: ['admin']
             }
@@ -1096,6 +1096,13 @@ function routeConfig($stateProvider) {
         .state('menu.view', {
             url: '/:menuId',
             templateUrl: 'modules/recipes/client/views/menus/menu-read.client.view.html',
+            data: {
+                roles: ['admin']
+            }
+        })
+        .state('menu.summary', {
+            url: '/:menuId/summary',
+            templateUrl: 'modules/recipes/client/views/menus/menu-summary.client.view.html',
             data: {
                 roles: ['admin']
             }
@@ -1306,7 +1313,7 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Mea
                     measureId: $stateParams.measureId
                 }
             ).$promise.then(function (measure) {
-                $scope.converter = measure.converter;
+                $scope.converter = measure.converter || [];
                 $scope.measure = measure;
                 $scope.uncountable = measure.step === 0;
                 if ($scope.converter) {
@@ -1389,111 +1396,6 @@ function MeasuresController($scope, $stateParams, $location, Authentication, Mea
         }
     };
     
-}
-'use strict';
-
-// Recipes controller
-angular
-    .module('recipes')
-    .controller('MenuRecipesController', MenuRecipesController);
-MenuRecipesController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'ShelfQueryService', 'Recipes', 'Measures'];
-
-function MenuRecipesController($scope, $stateParams, $location, $window, Authentication, MenuService, ShelfQueryService, Recipes, Measures) {
-    
-    $scope.authentication = Authentication;
-    $scope.error = null;
-    $scope.info = {};
-    $scope.form = {};
-    
-    $scope.find = function () {
-        MenuService.query().$promise.then(function (menus) {
-            $scope.menus = menus;
-        });
-    };
-    
-    $scope.findOne = function () {
-        if ($stateParams.menuId) {
-            MenuService.get(
-                {
-                    menuId: $stateParams.menuId
-                }
-            ).$promise.then(function (menu) {
-                if (menu.meals) {
-                    menu.meals.forEach(function (item, i, arr) {
-                        item.recipe = $scope.getRecipe(item.recipeId);
-                    });
-                }
-                $scope.menu = menu;
-                $scope.menu.startDate = new Date(menu.startDate);
-            });
-        }
-    };
-    
-    $scope.getRecipe = function (id) {
-        return Recipes.get(
-            {
-                recipeId: id
-            }
-        );
-    };
-    
-    $scope.getMeasures = function (recipe) {
-        if (recipe.ingridients.length > 0) {
-            recipe.ingridients.forEach(function (item, i, arr) {
-                Measures.get(
-                    {
-                        measureId: item.ingridientAmount.measureId
-                    }
-                ).$promise.then(function (measure) {
-                    item.measure = measure;
-                });
-            });
-        }
-    };
-    
-    $scope.addRecipe = function (id) {
-        Recipes.get(
-            {
-                recipeId: id
-            }
-        ).$promise.then(function (recipe) {
-            $scope.menu.meals.push(
-                {
-                    recipeId: recipe.id,
-                    recipe: recipe,
-                    index: $scope.meals.length,
-                    portions: recipe.portions
-                }
-            );
-        });
-    };
-    
-    $scope.remove = function () {
-        if ($window.confirm('Are you sure you want to delete?')) {
-            $scope.menu.$remove();
-            $location.path('menu');
-        }
-    };
-
-    $scope.save = function (isValid) {
-        
-        if (!isValid) {
-            $scope.$broadcast('show-errors-check-validity', 'menuForm');
-            return false;
-        }
-        
-        $scope.menu.createOrUpdate()
-            .then(successCallback)
-            .catch(errorCallback);
-
-        function successCallback(res) {
-            $location.path('menu/' + $scope.menu.number);
-        }
-
-        function errorCallback(res) {
-            $scope.error = res.data.message;
-        }
-    };
 }
 'use strict';
 
@@ -1652,7 +1554,6 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
                     ]
                 }
             );
-            $scope.menuInitByDays($scope.menu);
         }
     };
     
@@ -1724,7 +1625,6 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             caption: null,
             serve: $scope.menu.types[$scope.menu.types.length - 1].serve
         };
-        $scope.menuInitByDays($scope.menu);
     };
     
     $scope.removeType = function (typeIndex) {
@@ -1868,8 +1768,86 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             $scope.error = res.data.message;
         }
     };
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('MenuInitController', MenuInitController);
+MenuInitController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService'];
+
+function MenuInitController($scope, $stateParams, $location, $window, Authentication, MenuService) {
     
-    $scope.saveInit = function (isValid) {
+    $scope.authentication = Authentication;
+    $scope.error = null;
+    $scope.form = {};
+    
+    $scope.find = function () {
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
+        });
+    };
+    
+    $scope.findOne = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+            });    
+        } else {
+            $scope.menu = new MenuService(
+                {
+                    startDate: new Date(Date.now()),
+                    types: [
+                        {
+                            index: 0,
+                            caption: "Завтрак",
+                            serve: new Date('2016-08-15 7:30')
+                        },
+                        {
+                            index: 1,
+                            caption: "Обед",
+                            serve: new Date('2016-08-15 19:30')
+                        }
+                    ]
+                }
+            );
+        }
+    };
+    
+    $scope.addType = function () {
+        $scope.menu.types.push(
+            {
+                index: $scope.menu.types[$scope.menu.types.length - 1].index + 1, 
+                caption: $scope.form.newType.caption,
+                serve: $scope.form.newType.serve
+            }
+        );
+        $scope.form.newType = {
+            isShown: false,
+            caption: null,
+            serve: $scope.menu.types[$scope.menu.types.length - 1].serve
+        };
+    };
+    
+    $scope.removeType = function (typeIndex) {
+        $scope.menu.types.splice(typeIndex, 1);
+        $scope.menuInitByDays($scope.menu);
+    };
+    
+    $scope.remove = function () {
+        if ($window.confirm('Are you sure you want to delete?')) {
+            $scope.menu.$remove();
+            $location.path('menu');    
+        }
+    };
+    
+    $scope.save = function (isValid) {
         
         if (!isValid) {
             $scope.$broadcast('show-errors-check-validity', 'menuForm');
@@ -1880,7 +1858,373 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
             .catch(errorCallback);
 
         function successCallback(res) {
-            $location.path('menu/' + $scope.menu.number + '/recipes');
+            $location.path('menu/' + $scope.menu.number + '/meals');
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('MenuMealsController', MenuMealsController);
+MenuMealsController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService','RecipeService', 'MealService'];
+
+function MenuMealsController($scope, $stateParams, $location, $window, Authentication, MenuService, RecipeService, MealService) {
+    
+    $scope.authentication = Authentication;
+    $scope.error = null;
+    $scope.form = {};
+    $scope.recipeList = [];
+    
+    $scope.find = function () {
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
+        });
+    };
+    
+    $scope.findOne = function () {//TODO pass object via param
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.menu = menu;
+                $scope.menu.startDate = new Date(menu.startDate);
+                $scope.assignMeals();
+            });
+        }
+    };
+    
+    $scope.getRecipes = function (value) {
+        var matched = [];
+        if ($scope.recipeList.length === 0) {
+            return RecipeService.query().$promise.then(function (results) { //FUTURE уменьшить загрузку через поиск БД
+                $scope.recipeList = results;
+                results.forEach(function (item, i, arr) {
+                    if (item.title.includes(value)) {
+                        matched.push(item);
+                    }
+                });
+                return matched;
+            });
+        } else {
+            $scope.recipeList.forEach(function (item, i, arr) {
+                if (item.title.includes(value)) {
+                    matched.push(item);
+                }
+            });
+            return matched;
+        }
+    };
+    
+    /*$scope.getRecipes = function (value) {
+        return RecipeService.query(
+            {
+                recipeSearchTitle: value
+            }
+        ).$promise.then(function (results) {
+            return results;
+        });
+    };search by param*/
+    
+    $scope.addRecipe = function (recipe) {
+        var meal = new MealService(
+            {
+                index: $scope.menu.meals.length,
+                recipeId: recipe.id,
+                weekday: -1,
+                type: -1,
+                portions: recipe.portions,
+                recipe: recipe
+            }
+        );
+        $scope.menu.meals.push(meal);
+        $scope.form.unassigned.push(meal);
+        $scope.asyncSelected = "";
+    };
+    
+    $scope.assignMeals = function () {
+        $scope.form.unassigned = [];
+        $scope.form.types = [];
+        $scope.menu.types.forEach(function (item, i, arr) {
+            $scope.form.types.push(
+                {
+                    caption: item.caption,
+                    meals: []
+                }
+            );
+        });
+        $scope.menu.meals.forEach(function (item, i, arr) {
+            item = new MealService(item);
+            item.getRecipe().then(function (recipe) {
+                item.recipe = recipe;
+                if (item.type === -1 || item.type >= $scope.form.types.length) {
+                    $scope.form.unassigned.push(item);
+                } else if($scope.form.types[item.type]) {
+                    $scope.form.types[item.type].meals.push(item);
+                }
+            });
+        });
+    };
+    
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.form.types.forEach(function (type, i, arr) {
+            type.meals.forEach(function (meal, j, arr) {
+                meal.type = i;
+                meal.recipe = undefined;
+            });
+        });
+        
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number + '/weekplan');
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('MenuSummaryController', MenuSummaryController);
+MenuSummaryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService','IngredientService', 'MealService'];
+
+function MenuSummaryController($scope, $stateParams, $location, $window, Authentication, MenuService, IngredientService, MealService) {
+    
+    $scope.authentication = Authentication;
+    $scope.error = null;
+    $scope.form = {};
+    
+    $scope.find = function () {
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
+        });
+    };
+    
+    $scope.findOne = function () {//TODO pass object via param
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.menu = menu;
+                $scope.ingredientSummary();
+                $scope.menu.startDate = new Date(menu.startDate);
+            });
+        }
+    };
+    
+    
+    $scope.ingredientSummary = function () {
+        $scope.summary = [];
+        $scope.menu.meals.forEach(function (meal, i, arr) {
+            meal = new MealService(meal);
+            meal.getRecipe().then(function (recipe) {
+                meal.recipe = recipe;
+                recipe.ingredients.forEach(function (ingredient, j, arr) {
+                    ingredient = new IngredientService(ingredient);
+                    ingredient.measureDefault = ingredient.ingredientAmount.measureId;
+                    ingredient.getMeasure().then(function (measure) {
+                        $scope.addIngredientToSum(
+                            ingredient.id,
+                            ingredient.caption,
+                            ingredient.ingredientAmount.amount,
+                            measure,
+                            meal.portions
+                        );
+                    });
+                });
+            });
+        });
+    };
+    
+    $scope.addIngredientToSum = function(id, caption, amount, measure, mult) {
+        var done = false;
+        $scope.summary.forEach(function (ingredient, i, arr) {
+            if (ingredient.id === id) {
+                ingredient.measures.forEach(function (item, j, arr) {
+                    if (item.id === measure.id) {
+                        item.amount = item.amount + amount;
+                        item.total = +Number(amount * mult).toFixed(3) + (item.total);
+                        done = true;
+                    }
+                });
+                if (done) return;
+                ingredient.measures.push(
+                    {
+                        id: measure.id,
+                        caption: measure.caption,
+                        amount: amount,
+                        total: +Number(amount * mult).toFixed(3)  
+                    }
+                );
+                done = true;
+            } 
+        });
+        if (done) return;
+        $scope.summary.push(
+            {
+                id: id,
+                caption: caption,
+                measures: [
+                    {
+                        id: measure.id,
+                        caption: measure.caption,
+                        amount: amount,
+                        total: +Number(amount * mult).toFixed(3)
+                    }
+                ]
+            }
+        );
+    };
+    
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number + '/weekplan');
+        }
+
+        function errorCallback(res) {
+            $scope.error = res.data.message;
+        }
+    };
+}
+'use strict';
+
+// Recipes controller
+angular
+    .module('recipes')
+    .controller('MenuWeekplanController', MenuWeekplanController);
+MenuWeekplanController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService', 'MealService'];
+
+function MenuWeekplanController($scope, $stateParams, $location, $window, Authentication, MenuService, MealService) {
+    
+    $scope.authentication = Authentication;
+    $scope.error = null;
+    
+    $scope.weekDays = [];
+    $scope.weekDayExamples = [new Date('2016-08-15'), new Date('2016-08-16'), new Date('2016-08-17'), new Date('2016-08-18'), new Date('2016-08-19'), new Date('2016-08-20'), new Date('2016-08-21')]; //Mon-Sun
+    
+    $scope.find = function () {
+        MenuService.query().$promise.then(function (menus) {
+            $scope.menus = menus;
+        });
+    };
+    
+    $scope.findOne = function () {
+        if ($stateParams.menuId) {
+            MenuService.get(
+                {
+                    menuId: $stateParams.menuId
+                }
+            ).$promise.then(function (menu) {
+                $scope.meals = menu.meals;
+                $scope.menu = menu;
+                $scope.menuInitByDays();
+                $scope.menu.startDate = new Date(menu.startDate);
+            });
+        }
+    };
+    
+    $scope.menuInitByDays = function () {
+        $scope.unassigned = [];
+        $scope.weekDays = [];
+        $scope.weekDayExamples.forEach(function (weekDay, i, arr) {
+            $scope.weekDays.push(
+                {
+                    index: i,
+                    caption: weekDay
+                }
+            );
+            $scope.weekDays[i].types = [];
+            $scope.menu.types.forEach(function (type, j, arr) {
+                $scope.weekDays[i].types.push(
+                    {
+                        index: j,
+                        caption: type.caption,
+                        serve: type.serve
+                    }
+                );
+                $scope.weekDays[i].types[j].meals = [];
+                $scope.meals.forEach(function (meal, k, arr) {
+                    if (meal.weekday === i && meal.type === $scope.weekDays[i].types[j].index) {
+                        meal = new MealService(meal);
+                        meal.getRecipe().then(function (recipe) {
+                            meal.recipe = recipe;
+                            $scope.weekDays[i].types[j].meals.push(meal);
+                        });
+                    }
+                });
+            });
+        });
+        $scope.meals.forEach(function (meal, k, arr) {
+            if (meal.weekday === -1 || meal.type === -1 || meal.type >= $scope.menu.types.length) {
+                meal = new MealService(meal);
+                meal.getRecipe().then(function (recipe) {
+                    meal.recipe = recipe;
+                    $scope.unassigned.push(meal);    
+                });
+            }
+        });
+    };
+    
+    $scope.save = function (isValid) {
+        
+        if (!isValid) {
+            $scope.$broadcast('show-errors-check-validity', 'menuForm');
+            return false;
+        }
+        
+        $scope.meals = [];
+        $scope.weekDays.forEach(function (weekDay, i, arr) {
+            $scope.menu.types.forEach(function (type, j, arr) {
+                $scope.weekDays[i].types[j].meals.forEach(function (meal, k, arr) {
+                    meal.type = type.index;
+                    meal.weekday = weekDay.index;
+                    $scope.meals.push(meal);
+                });
+            });
+        });
+        $scope.unassigned.forEach(function (meal, i, arr) {
+            meal.weekday = -1;
+            $scope.meals.push(meal);
+        });
+        $scope.menu.meals = $scope.meals;
+        $scope.menu.createOrUpdate()
+            .then(successCallback)
+            .catch(errorCallback);
+
+        function successCallback(res) {
+            $location.path('menu/' + $scope.menu.number);
         }
 
         function errorCallback(res) {
@@ -1894,8 +2238,8 @@ function MenusController($scope, $stateParams, $location, $window, Authenticatio
 angular
     .module('recipes')
     .controller('ProductsController', ProductsController);
-ProductsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Products', 'Ingridients', 'Measures',  'FileUploader'];
-function ProductsController($scope, $stateParams, $location, $window, $timeout, Authentication, Products, Ingridients, Measures, FileUploader) {
+ProductsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Products', 'FileUploader'];
+function ProductsController($scope, $stateParams, $location, $window, $timeout, Authentication, Products, FileUploader) {
 
     $scope.authentication = Authentication;
 
@@ -1912,7 +2256,7 @@ function ProductsController($scope, $stateParams, $location, $window, $timeout, 
     };
 
     $scope.getMeasuresList = function () {
-        return Measures.query().$promise;
+        //return Measures.query().$promise;
     };
 
     $scope.create = function (isValid) {
@@ -2409,9 +2753,9 @@ angular
     .module('recipes')
     .controller('ShelfQueryController', ShelfQueryController);
 
-ShelfQueryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfQueryService', 'Ingridients', 'Measures'];
+ShelfQueryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfQueryService', 'MeasureService'];
 
-function ShelfQueryController($scope, $stateParams, $location, $window, Authentication, ShelfQueryService, Ingridients, Measures) {
+function ShelfQueryController($scope, $stateParams, $location, $window, Authentication, ShelfQueryService, MeasureService) {
         
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -2437,7 +2781,7 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
                     queryId: $stateParams.queryId
                 }
             ).$promise.then(function (shelfQuery) {
-                Measures.get(
+                MeasureService.get(
                     {
                         measureId: shelfQuery.measureId
                     }
@@ -2482,7 +2826,8 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 }
 //
 // Copyright Kamil Pękala http://github.com/kamilkp
-// angular-sortable-view v0.0.15 2015/01/18
+// angular-sortable-view v0.0.15c 2015/01/18
+// forked from C0ZEN/angular-sortable-view fork of original
 //
 
 ;(function(window, angular){
@@ -2490,8 +2835,8 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 	/* jshint eqnull:true */
 	/* jshint -W041 */
 	/* jshint -W030 */
-    /* jshint -W003 */
     /* jshint -W116 */
+    /* jshint -W003 */
 
 	var module = angular.module('recipes');
 	module.directive('svRoot', [function(){
@@ -2507,14 +2852,84 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 
 		var sortingInProgress;
 		var ROOTS_MAP = Object.create(null);
+
+
+
 		// window.ROOTS_MAP = ROOTS_MAP; // for debug purposes
 
 		return {
 			restrict: 'A',
 			controller: ['$scope', '$attrs', '$interpolate', '$parse', function($scope, $attrs, $interpolate, $parse){
+
+
+				//multi select
+
+				this.MULTI_SELECT_LIST = [];
+
+				this.multiSelectRaise = function(){
+					for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+						this.MULTI_SELECT_LIST[i].element.addClass('sv-long-pressing');
+					}
+				};
+				this.isMultiSelecting = function(){
+					return this.MULTI_SELECT_LIST.length > 1;
+				};
+
+				this.clearMultiSelect = function(html){
+						for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+							this.MULTI_SELECT_LIST[i].$multiSelected = false;
+							this.MULTI_SELECT_LIST[i].element.removeClass('sv-element-multi-selected');
+							this.MULTI_SELECT_LIST[i].element.removeClass('sv-long-pressing');
+						}
+						html.removeClass('sv-multi-selected');
+						this.MULTI_SELECT_LIST=[];
+					};
+
+				 this.addToMultiSelect = function(sortableElement, multiScope, attr, html){
+				 		for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+							if (this.MULTI_SELECT_LIST[i] === sortableElement){
+								return false;
+							}
+						}
+						sortableElement.$multiSelected = true;
+						sortableElement.element.addClass('sv-element-multi-selected');
+						sortableElement.multiScope = multiScope;
+						sortableElement.attr = attr;
+						html.addClass('sv-multi-selected');
+						this.MULTI_SELECT_LIST.push(sortableElement);
+						return true;
+					};
+
+				this.removeFromMultiSelect = function(sortableElement,html){
+						sortableElement.$multiSelected = false;
+						delete sortableElement.multiScope;
+						delete sortableElement.attr;
+						sortableElement.element.removeClass('sv-element-multi-selected');
+						for (var i=0;i<this.MULTI_SELECT_LIST.length;i++){
+							if (this.MULTI_SELECT_LIST[i] === sortableElement){
+								this.MULTI_SELECT_LIST.splice(i,1);
+								break;
+							}
+						}
+						if (document.querySelectorAll('.sv-element-multi-selected').length === 0){
+							html.removeClass('sv-multi-selected');
+						}
+					};
+
+				this.getMultimodels = function(){
+					var multiModels = [];
+					var that = this;
+					for (var i=0;i<that.MULTI_SELECT_LIST.length;i++){
+						multiModels.push($parse(that.MULTI_SELECT_LIST[i].attr)(that.MULTI_SELECT_LIST[i].multiScope));
+					}
+					return multiModels;
+				};
+
+
 				var mapKey = $interpolate($attrs.svRoot)($scope) || $scope.$id;
 				if(!ROOTS_MAP[mapKey]) ROOTS_MAP[mapKey] = [];
 
+				var html = angular.element(document.documentElement);
 				var that         = this;
 				var candidates;  // set of possible destinations
 				var $placeholder;// placeholder element
@@ -2523,7 +2938,12 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 				var $original;   // original element
 				var $target;     // last best candidate
 				var isGrid       = false;
+				var isDisabled   = false;
 				var onSort       = $parse($attrs.svOnSort);
+
+				$scope.$watch($parse($attrs.svDisabled), function(newVal, oldVal) {
+ 					isDisabled = newVal;
+ 				});
 
 				// ----- hack due to https://github.com/angular/angular.js/issues/8044
 				$attrs.svOnStart = $attrs.$$element[0].attributes['sv-on-start'];
@@ -2536,9 +2956,15 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 				var onStart = $parse($attrs.svOnStart);
 				var onStop = $parse($attrs.svOnStop);
 
+				this.mapKey = mapKey;
+
 				this.sortingInProgress = function(){
 					return sortingInProgress;
 				};
+
+				this.sortingDisabled = function() {
+ 					return isDisabled;
+ 				};
 
 				if($attrs.svGrid){ // sv-grid determined explicite
 					isGrid = $attrs.svGrid === "true" ? true : $attrs.svGrid === "false" ? false : null;
@@ -2579,6 +3005,18 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 					});
 				}
 
+				var stop = false;
+		    var scroll = function (step, delay) {
+		    		var el = document.querySelector('.main-ui-view');
+		    		console.log("scrolling top", el.scrollTop);
+		        el.scrollTop+=step;
+		        if (!stop) {
+		            setTimeout(function () {
+                        scroll(step);
+                    }, delay);
+		        }
+		    };
+
 				this.$moveUpdate = function(opts, mouse, svElement, svOriginal, svPlaceholder, originatingPart, originatingIndex){
 					var svRect = svElement[0].getBoundingClientRect();
 					if(opts.tolerance === 'element')
@@ -2588,6 +3026,7 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 						};
 
 					sortingInProgress = true;
+					//console.log("move update");
 					candidates = [];
 					if(!$placeholder){
 						if(svPlaceholder){ // custom placeholder
@@ -2605,7 +3044,9 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 						}
 
 						svOriginal.after($placeholder);
-						svOriginal.addClass('ng-hide');
+						if (!that.keepInList){
+							svOriginal.addClass('ng-hide');
+						}
 
 						// cache options, helper and original element reference
 						$original = svOriginal;
@@ -2620,12 +3061,25 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 						});
 						$scope.$root && $scope.$root.$$phase || $scope.$apply();
 					}
+					var reposX = mouse.x + document.body.scrollLeft - mouse.offset.x*svRect.width;
+					var reposY = mouse.y + document.body.scrollTop - mouse.offset.y*svRect.height;
 
+					$helper[0].style.position ='fixed';
 					// ----- move the element
 					$helper[0].reposition({
-						x: mouse.x + document.body.scrollLeft - mouse.offset.x*svRect.width,
-						y: mouse.y + document.body.scrollTop - mouse.offset.y*svRect.height
+						x: reposX,
+						y: reposY
 					});
+
+					if (reposY <= 30){
+						stop = false;
+						scroll(-50, 200);
+					} else if (reposY >= document.body.clientHeight - 60){
+						stop = false;
+						scroll(50, 200);
+					} else {
+						stop = true;
+					}
 
 					// ----- manage candidates
 					getSortableElements(mapKey).forEach(function(se, index){
@@ -2636,11 +3090,13 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 								!elementMatchesSelector(se.element, opts.containment + ' *')
 							) return; // element is not within allowed containment
 						}
+
 						var rect = se.element[0].getBoundingClientRect();
 						var center = {
 							x: ~~(rect.left + rect.width/2),
 							y: ~~(rect.top + rect.height/2)
 						};
+
 						if(!se.container && // not the container element
 							(se.element[0].scrollHeight || se.element[0].scrollWidth)){ // element is visible
 							candidates.push({
@@ -2694,6 +3150,7 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 				};
 
 				this.$drop = function(originatingPart, index, options){
+					stop=true;
 					if(!$placeholder) return;
 
 					if(options.revert){
@@ -2739,26 +3196,67 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 							$item: originatingPart.model(originatingPart.scope)[index]
 						});
 
+						var multiModels = that.getMultimodels();
+
 						if($target){
 							$target.element.removeClass('sv-candidate');
-							var spliced = originatingPart.model(originatingPart.scope).splice(index, 1);
+							var spliced = [originatingPart.model(originatingPart.scope)[index]];
+							if (!that.keepInList){
+								spliced = originatingPart.model(originatingPart.scope).splice(index, 1);
+							}
 							var targetIndex = $target.targetIndex;
 							if($target.view === originatingPart && $target.targetIndex > index)
 								targetIndex--;
 							if($target.after)
 								targetIndex++;
-							$target.view.model($target.view.scope).splice(targetIndex, 0, spliced[0]);
 
+							if (multiModels.length ===0)
+								multiModels =  spliced;
+
+							for (var i =0;i<multiModels.length;i++){
+								$target.view.model($target.view.scope).splice(targetIndex+i, 0, multiModels[i]);
+							}
+
+							var sortMethod;
+							var destinationScope = $scope;
+							var shouldSort = false;
+							if(index != targetIndex){
+								sortMethod = onSort;
+								shouldSort = true;
+							}
 							// sv-on-sort callback
-							if($target.view !== originatingPart || index !== targetIndex)
-								onSort($scope, {
-									$partTo: $target.view.model($target.view.scope),
-									$partFrom: originatingPart.model(originatingPart.scope),
-									$item: spliced[0],
-									$indexTo: targetIndex,
-									$indexFrom: index
-								});
+							if($target.view !== originatingPart){
+								shouldSort = true;
 
+								//if destination has sv-on-sort call it not the parent's
+								if ($target.view.element && $target.view.element.attr("sv-on-external-sort")){
+									destinationScope = $target.view.element.scope();
+									var destinationOnSort = $parse($target.view.element.attr("sv-on-external-sort"));
+									if (destinationOnSort){
+										sortMethod = destinationOnSort;
+									}
+								}
+							}
+
+							if (sortMethod){
+									sortMethod(destinationScope, {
+										$partTo: $target.view.model($target.view.scope),
+										$partFrom: originatingPart.model(originatingPart.scope),
+										// $item: spliced[0],
+										$items:multiModels,
+										$indexTo: targetIndex,
+										$indexFrom: index
+									});
+							}
+							if (shouldSort){
+								var $viewEl = $target.view.element;
+								$viewEl.addClass("sv-dropped");
+								setTimeout(function(){
+									$viewEl.removeClass("sv-dropped");
+									$viewEl = void 0;
+									that.clearMultiSelect(html);
+								},300);
+							}
 						}
 						$target = void 0;
 
@@ -2783,7 +3281,8 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 	}]);
 
 	module.directive('svPart', ['$parse', function($parse){
-		return {
+
+			return {
 			restrict: 'A',
 			require: '^svRoot',
 			controller: ['$scope', function($scope){
@@ -2791,16 +3290,25 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 				this.getPart = function(){
 					return $scope.part;
 				};
-				this.$drop = function(index, options){
-					$scope.$sortableRoot.$drop($scope.part, index, options);
-				};
+					this.$drop = function(index, options){
+						$scope.$sortableRoot.$drop($scope.part, index, options);
+					};
 			}],
 			scope: true,
 			link: function($scope, $element, $attrs, $sortable){
+				var html = angular.element(document.documentElement);
 				if(!$attrs.svPart) throw new Error('no model provided');
 				var model = $parse($attrs.svPart);
 				if(!model.assign) throw new Error('model not assignable');
+				$sortable.keepInList = $parse($attrs.svKeepInList)($scope);
+				$scope.$ctrl.isDropzone = $parse($attrs.svIsDropzone)($scope) === false ? false : true;
+				$scope.$ctrl.multiSelect = $parse($attrs.svMultiSelect)($scope) === true ? true : false;
 
+				if($scope.$ctrl.multiSelect){
+					$element.on('mousedown',function(){
+						$sortable.clearMultiSelect(html);
+					});
+				}
 				$scope.part = {
 					id: $scope.$id,
 					element: $element,
@@ -2814,7 +3322,10 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 					getPart: $scope.$ctrl.getPart,
 					container: true
 				};
-				$sortable.addToSortableElements(sortablePart);
+
+				if ($scope.$ctrl.isDropzone){
+					$sortable.addToSortableElements(sortablePart);
+				}
 				$scope.$on('$destroy', function(){
 					$sortable.removeFromSortableElements(sortablePart);
 				});
@@ -2822,7 +3333,7 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 		};
 	}]);
 
-	module.directive('svElement', ['$parse', function($parse){
+	module.directive('svElement', ['$parse','svDragging', function($parse, svDragging){
 		return {
 			restrict: 'A',
 			require: ['^svPart', '^svRoot'],
@@ -2830,6 +3341,9 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 				$scope.$ctrl = this;
 			}],
 			link: function($scope, $element, $attrs, $controllers){
+
+
+
 				var sortableElement = {
 					element: $element,
 					getPart: $controllers[0].getPart,
@@ -2837,18 +3351,74 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 						return $scope.$index;
 					}
 				};
-				$controllers[1].addToSortableElements(sortableElement);
+				if ($controllers[0].isDropzone){
+					$controllers[1].addToSortableElements(sortableElement);
+				}
 				$scope.$on('$destroy', function(){
 					$controllers[1].removeFromSortableElements(sortableElement);
 				});
 
+				var startTimer;
+				var clearEvent = function () {
+					svDragging.isDragging = false;
+				  clearTimeout(startTimer);
+			 	};
+
+		 	  var event = function (e) {
+		 	  	function setMulti(ev){
+		 	    	if (!moveExecuted && $controllers[0].multiSelect){
+			 	    	if (ev.ctrlKey || ev.metaKey){
+			 	    		if(sortableElement.$multiSelected){
+			 	    			$controllers[1].removeFromMultiSelect(sortableElement, html);
+			 	    		} else {
+			 	    			$controllers[1].addToMultiSelect(sortableElement, $scope, $attrs.svElement, html);
+			 	    		}
+			 	    	} else if (!sortableElement.$multiSelected){
+			 	    		$controllers[1].clearMultiSelect(html);
+			 	    		$controllers[1].addToMultiSelect(sortableElement, $scope,$attrs.svElement, html);
+			 	    	}
+			 	    }
+		 	  	}
+
+		 	  	//ignore other buttons
+		 	  	var evt = (e==null ? event:e);
+		 	  	if (evt && (evt.which>1 || evt.button>2)){
+		 	  		return true;
+		 	  	}
+		 	  	if($controllers[1].sortingDisabled()){
+		 	  		return true;
+		 	  	}
+		 	    html.on('mouseup touchend', function mouseup(e){
+		 	    	setMulti(e);
+		 	    	clearEvent();
+		 	    	html.off('mouseup touchend', mouseup);
+		 	    });
+
+		 	    startTimer = setTimeout(function () {
+		 	    	setMulti(e);
+	 	    		onMousedown(e);
+ 	    		}, 300);
+ 	    		e.preventDefault();
+ 	    		e.stopPropagation();
+ 	    		return false;
+		 	  };
+
+				// assume every element is draggable unless specified
+				$scope.$watch($parse($attrs.svElementDisabled), function(newVal, oldVal) {
+					if (newVal){
+						resetOnStartEvent(false, event);
+					} else {
+						resetOnStartEvent($element, event);
+					}
+
+ 				});
+
 				var handle = $element;
-				handle.on('mousedown touchstart', onMousedown);
+
+				handle.on('mousedown touchstart', event);
 				$scope.$watch('$ctrl.handle', function(customHandle){
 					if(customHandle){
-						handle.off('mousedown touchstart', onMousedown);
-						handle = customHandle;
-						handle.on('mousedown touchstart', onMousedown);
+						resetOnStartEvent(customHandle, event);
 					}
 				});
 
@@ -2871,10 +3441,36 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 
 				var moveExecuted;
 
+
+				function resetOnStartEvent(newHandle, event){
+					if (newHandle){
+							handle.off('mousedown touchstart', event);
+							handle = newHandle;
+							handle.on('mousedown touchstart', event);
+							return;
+					} else {
+						handle.off('mousedown touchstart', event);
+					}
+				}
+
 				function onMousedown(e){
+					if (svDragging.isDragging){
+						return;
+					}
+
+					if ($controllers[0].multiSelect && !sortableElement.$multiSelect){
+						$controllers[1].addToMultiSelect(sortableElement, $scope, $attrs.svElement, html);
+						$controllers[1].multiSelectRaise();
+					} else {
+						$element.addClass('sv-long-pressing');
+					}
+
+
+					svDragging.isDragging = true;
 					touchFix(e);
 
 					if($controllers[1].sortingInProgress()) return;
+					if($controllers[1].sortingDisabled()) return;
 					if(e.button != 0 && e.type === 'mousedown') return;
 
 					moveExecuted = false;
@@ -2891,7 +3487,6 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 					var target = $element;
 					var clientRect = $element[0].getBoundingClientRect();
 					var clone;
-
 					if(!helper) helper = $controllers[0].helper;
 					if(!placeholder) placeholder = $controllers[0].placeholder;
 					if(helper){
@@ -2901,10 +3496,22 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 							'left': clientRect.left + document.body.scrollLeft + 'px',
 							'top': clientRect.top + document.body.scrollTop + 'px'
 						});
-						target.addClass('sv-visibility-hidden');
+							target.addClass('sv-visibility-hidden');
+					} else if ($controllers[1].isMultiSelecting()){
+						clone = angular.element(document.querySelector("#sv-multi-helper")).clone();
+						var models = $controllers[1].getMultimodels();
+						clone[0].querySelector(".card-title-text").innerHTML = target[0].querySelector(".card-title-text").innerHTML;
+
+						clone[0].querySelector(".badge").innerHTML = $controllers[1].MULTI_SELECT_LIST.length;
+						clone.addClass('sv-helper').css({
+							'left': clientRect.left + document.body.scrollLeft + 'px',
+							'top': clientRect.top + document.body.scrollTop + 'px',
+							'width': clientRect.width + 'px'
+						});
 					}
 					else{
 						clone = target.clone();
+						clone.removeClass("sv-element-multi-selected");
 						clone.addClass('sv-helper').css({
 							'left': clientRect.left + document.body.scrollLeft + 'px',
 							'top': clientRect.top + document.body.scrollTop + 'px',
@@ -2938,21 +3545,42 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 						y: (e.clientY - clientRect.top)/clientRect.height
 					};
 					html.addClass('sv-sorting-in-progress');
+
+					var dropzoneClass = 'sv-sorting-'+$controllers[1].mapKey;
+					html.addClass(dropzoneClass);
+
 					html.on('mousemove touchmove', onMousemove).on('mouseup touchend touchcancel', function mouseup(e){
+						svDragging.isDragging = false;
 						html.off('mousemove touchmove', onMousemove);
 						html.off('mouseup touchend', mouseup);
-						html.removeClass('sv-sorting-in-progress');
+
+						// timeout so animation goes to the right element
+						setTimeout(function(){
+							html.removeClass('sv-sorting-in-progress');
+							html.removeClass(dropzoneClass);
+						},500);
+
 						if(moveExecuted){
 							$controllers[0].$drop($scope.$index, opts);
+							moveExecuted = false;
 						}
 						$element.removeClass('sv-visibility-hidden');
+						if (!$controllers[0].multiSelect){
+							setTimeout(function(){
+								target.removeClass('sv-long-pressing');
+							},300);
+						} else {
+							if ($controllers[1].MULTI_SELECT_LIST.length === 1){
+								$controllers[1].clearMultiSelect(html);
+							}
+						}
 					});
 
 					// onMousemove(e);
 					function onMousemove(e){
 						touchFix(e);
 						if(!moveExecuted){
-							$element.parent().prepend(clone);
+							body.prepend(clone);
 							moveExecuted = true;
 						}
 						$controllers[1].$moveUpdate(opts, {
@@ -2960,6 +3588,9 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 							y: e.clientY,
 							offset: pointerOffset
 						}, clone, $element, placeholder, $controllers[0].getPart(), $scope.$index);
+						e.stopPropagation();
+						e.preventDefault();
+						return false;
 					}
 				}
 			}
@@ -2994,12 +3625,29 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
 			require: ['?^svPart', '?^svElement'],
 			link: function($scope, $element, $attrs, $ctrl){
 				$element.addClass('sv-placeholder').addClass('ng-hide');
-				if($ctrl[1])
+				if ($ctrl[1] && $ctrl[0]){
+					//find closest svPart or svElement and set placeholder in the correct place
+					var p = $element.parent();
+					while (p.length > 0) {
+					  if (p[0].hasAttribute('sv-element')){
+					  	$ctrl[1].placeholder = $element;
+					  	return;
+					  } else if (p[0].hasAttribute('sv-part')){
+					  	$ctrl[0].placeholder = $element;
+					  	return;
+					  }
+					  p = p.parent();
+					}
+				} else if($ctrl[1])
 					$ctrl[1].placeholder = $element;
 				else if($ctrl[0])
 					$ctrl[0].placeholder = $element;
 			}
 		};
+	});
+
+	module.service('svDragging', function(){
+		this.isDragging = false;
 	});
 
 	angular.element(document.head).append([
@@ -11585,9 +12233,9 @@ angular
     .module('recipes')
     .factory('MealService', MealService);
 
-MealService.$inject = ['$resource'];
+MealService.$inject = ['$resource', 'RecipeService'];
 
-function MealService($resource) {
+function MealService($resource, RecipeService) {
     var Meal = $resource('api/meal/:mealId', {
         mealId: '@number'
     }, {
@@ -11600,6 +12248,10 @@ function MealService($resource) {
         createOrUpdate: function () {
             var meal = this;
             return createOrUpdate(meal);
+        },
+        getRecipe: function () {
+            var meal = this;
+            return getRecipe(meal);
         }
     });
     
@@ -11611,6 +12263,14 @@ function MealService($resource) {
         } else {
             return meal.$save(onSuccess, onError);
         }
+    }
+    
+    function getRecipe(meal) {
+        return RecipeService.get(
+            {
+                recipeId: meal.recipeId
+            }
+        ).$promise;
     }
     
     function onSuccess(menu) {
