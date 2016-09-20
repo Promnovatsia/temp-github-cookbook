@@ -5,24 +5,24 @@
         </h1>
     </div>
     <div class="pull-right">
-        <label class="btn btn-link" ui-sref="menu.edit({ menuId: menu.number })">
-            <snap class="glyphicon glyphicon-edit"></snap>
-        </label>
         <label class="btn btn-link" ui-sref="menu.init({ menuId: menu.number })">
-            <snap class="glyphicon glyphicon-cog"></snap>
+            <i class="glyphicon glyphicon-cog"></i>
         </label>
-        <label class="btn btn-link" ui-sref="menu.recipes({ menuId: menu.number })">
-            <snap class="glyphicon glyphicon-cutlery"></snap>
+        <label class="btn btn-link" ui-sref="menu.meals({ menuId: menu.number })">
+            <i class="glyphicon glyphicon-cutlery"></i>
+        </label>
+        <label class="btn btn-link" ui-sref="menu.edit({ menuId: menu.number })">
+            <i class="glyphicon glyphicon-edit"></i>
         </label>
     </div>
     <div class="row">
-        <label for="types">
+        <label>
             Расписание
         </label>
         <div class="list-group">
             <div ng-repeat="type in menu.types" class="list-group-item">
                 <h4 class="list-group-item-heading">
-                    <snap class="glyphicon glyphicon-time"></snap>    
+                    <i class="glyphicon glyphicon-time"></i>
                     {{type.serve | date:'HH:mm'}} - {{type.caption}}
                 </h4>
             </div>
@@ -47,7 +47,7 @@
                                     <div class="panel-heading">
                                         {{type.caption}}
                                         <div class="pull-right">
-                                            <snap class="glyphicon glyphicon-time"></snap>
+                                            <i class="glyphicon glyphicon-time"></i>
                                             {{type.serve | date:'HH:mm'}}
                                         </div>
                                     </div>
@@ -58,13 +58,13 @@
                                                 <p class="list-group-item-text">
                                                     Порций: {{meal.portions}}
                                                 </p>
-                                            </div> 
-                                        </div>   
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>    
+                    </div>
                 </div>
             </div>
         </div>

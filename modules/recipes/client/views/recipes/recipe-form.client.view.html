@@ -26,7 +26,7 @@
                     <label for="infoCard">
                         Пояснение и описание
                     </label>
-                    <textarea name="infoCard" ng-model="recipe.infoCard" id="infoCard" class="form-control" cols="30" rows="10" 
+                    <textarea name="infoCard" ng-model="recipe.infoCard" id="infoCard" class="form-control" cols="30" rows="10"
                         placeholder="Информация, видимая в списке рецептов рядом с картинкой рецепта">
                     </textarea>
                 </div>
@@ -52,10 +52,10 @@
                         <label for="portions">
                             Количество порций
                         </label>
-                        <updowninput ng-model="recipe.portions" min="1" precision="0"></updowninput>
+                        <updowninput id="portions" ng-model="recipe.portions" min="1" precision="0"></updowninput>
                     </div>
                     <div class="form-group col-md-8">
-                        <label for="recipe.mainIngredient">
+                        <label>
                             Главный ингредиент
                         </label>
                         <div ng-show="recipe.ingredients.length>0">
@@ -86,7 +86,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <label for="ingridients">
+                        <label>
                             Ингредиенты
                         </label>
                         <div class="list-group">
@@ -94,7 +94,7 @@
                                 <div ng-repeat="ingredient in recipe.ingredients track by ingredient.index" sv-element>
                                     <div class="list-group-item">
                                         <div class="row">
-                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeIngredient($index)">
+                                            <a class="pull-right btn btn-danger btn-xs" ng-click="removeIngredient($index)">
                                                 <span class="glyphicon glyphicon-remove"></span>
                                             </a>
                                             <div class="col-xs-1 col-md-1">
@@ -111,19 +111,19 @@
                                                 <measureconverter ng-model="ingredient.amount" measure="ingredient.measure" toggle="ingredient.converter"></measureconverter>
                                             </div>
                                             <div class="col-xs-12 col-md-3">
-                                                <input name="title" type="text" ng-model="ingredient.comment" class="form-control" placeholder="Комментарий, напр. для теста">    
+                                                <input name="title" type="text" ng-model="ingredient.comment" class="form-control" placeholder="Комментарий, напр. для теста">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="list-group-item">
-                                <label for="ingridient">
+                                <label>
                                     Новый ингредиент
                                 </label>
                                 <div class="input-group">
                                     <div class="input-group-addon">
-                                        <i class="glyphicon glyphicon-search"></i>    
+                                        <i class="glyphicon glyphicon-search"></i>
                                     </div>
                                     <input type="text" ng-model="asyncSelectedAdd" placeholder="Добавить через поиск" typeahead="ingredient as ingredient.caption for ingredient in getIngredients($viewValue)" typeahead-loading="loadingIngredientsAdd" typeahead-no-results="noResultsAdd" typeahead-on-select="addIngredient($item)" class="form-control">
                                     <i ng-show="loadingIngredientsAdd" class="glyphicon glyphicon-refresh"></i>
@@ -143,14 +143,14 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <label for="steps">
+                        <label>
                             Инструкции
                         </label>
                         <div class="list-group">
                             <div sv-root sv-part="recipe.steps">
                                 <div ng-repeat="step in recipe.steps" sv-element class="list-group-item">
                                     <div class="row">
-                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeStep($index)">
+                                        <a class="pull-right btn btn-danger btn-xs" ng-click="removeStep($index)">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                         <div class="col-xs-1 col-md-1">

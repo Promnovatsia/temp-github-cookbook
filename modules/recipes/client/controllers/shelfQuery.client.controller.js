@@ -4,9 +4,9 @@ angular
     .module('recipes')
     .controller('ShelfQueryController', ShelfQueryController);
 
-ShelfQueryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfQueryService', 'Ingridients', 'Measures'];
+ShelfQueryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfQueryService', 'MeasureService'];
 
-function ShelfQueryController($scope, $stateParams, $location, $window, Authentication, ShelfQueryService, Ingridients, Measures) {
+function ShelfQueryController($scope, $stateParams, $location, $window, Authentication, ShelfQueryService, MeasureService) {
         
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -32,7 +32,7 @@ function ShelfQueryController($scope, $stateParams, $location, $window, Authenti
                     queryId: $stateParams.queryId
                 }
             ).$promise.then(function (shelfQuery) {
-                Measures.get(
+                MeasureService.get(
                     {
                         measureId: shelfQuery.measureId
                     }

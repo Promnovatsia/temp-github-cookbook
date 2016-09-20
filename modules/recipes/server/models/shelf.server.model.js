@@ -51,7 +51,7 @@ module.exports = function (sequelize, DataTypes) {
                 model: "shelves",
                 key: "id"
             }
-        },
+        }
         /* FUTURE product integration
         product: {
             type: DataTypes.INTEGER,

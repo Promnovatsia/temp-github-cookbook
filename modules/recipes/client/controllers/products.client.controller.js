@@ -4,8 +4,8 @@
 angular
     .module('recipes')
     .controller('ProductsController', ProductsController);
-ProductsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Products', 'Ingridients', 'Measures',  'FileUploader'];
-function ProductsController($scope, $stateParams, $location, $window, $timeout, Authentication, Products, Ingridients, Measures, FileUploader) {
+ProductsController.$inject = ['$scope', '$stateParams', '$location', '$window', '$timeout', 'Authentication', 'Products', 'FileUploader'];
+function ProductsController($scope, $stateParams, $location, $window, $timeout, Authentication, Products, FileUploader) {
 
     $scope.authentication = Authentication;
 
@@ -22,7 +22,7 @@ function ProductsController($scope, $stateParams, $location, $window, $timeout, 
     };
 
     $scope.getMeasuresList = function () {
-        return Measures.query().$promise;
+        //return Measures.query().$promise;
     };
 
     $scope.create = function (isValid) {

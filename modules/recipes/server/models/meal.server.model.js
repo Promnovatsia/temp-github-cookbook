@@ -3,33 +3,38 @@
 module.exports = function (sequelize, DataTypes) {
     
     var Meal = sequelize.define('meal', {
-        number: {
+        weekday: {
             type: DataTypes.INTEGER
         },
         type: {
             type: DataTypes.INTEGER
         },
-        weekday: {
-            type: DataTypes.INTEGER
-        },
         portions: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             defaultValue: 2
         },
-        comment: {
-            type: DataTypes.TEXT
+        isFulfilled: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         },
         isDone: {
             type: DataTypes.BOOLEAN,
-            allowNull: false,
             defaultValue: false
         },
+        rating: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
         startTime: {
-            type: DataTypes.INTEGER
+            type: DataTypes.DATE
         },
         serveTime: {
-            type: DataTypes.INTEGER
+            type: DataTypes.DATE
+        },
+        comment: {
+            type: DataTypes.STRING
         }
+        //FUTURE override ingredientsAmount
     }, {
         timestamps: true,
         paranoid: true,
