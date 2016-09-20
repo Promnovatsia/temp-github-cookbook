@@ -4,9 +4,9 @@
 angular
     .module('recipes')
     .controller('MenuSummaryController', MenuSummaryController);
-MenuSummaryController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'MenuService','IngredientService', 'MealService'];
+MenuSummaryController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'MenuService','IngredientService', 'MealService'];
 
-function MenuSummaryController($scope, $stateParams, $location, $window, Authentication, MenuService, IngredientService, MealService) {
+function MenuSummaryController($scope, $stateParams, $location, Authentication, MenuService, IngredientService, MealService) {
     
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -41,14 +41,17 @@ function MenuSummaryController($scope, $stateParams, $location, $window, Authent
                 meal.recipe = recipe;
                 recipe.ingredients.forEach(function (ingredient, j, arr) {
                     ingredient = new IngredientService(ingredient);
+                    ingredient.amount = ingredient.ingredientAmount.amount;
                     ingredient.measureDefault = ingredient.ingredientAmount.measureId;
+                    ingredient.getShelf().then(function (shelf) {
+                        ingredient.shelf = shelf;
+                    });
                     ingredient.getMeasure().then(function (measure) {
                         $scope.addIngredientToSum(
-                            ingredient.id,
-                            ingredient.caption,
-                            ingredient.ingredientAmount.amount,
+                            ingredient,
                             measure,
-                            meal.portions
+                            meal.portions,
+                            recipe.portions
                         );
                     });
                 });
@@ -56,14 +59,18 @@ function MenuSummaryController($scope, $stateParams, $location, $window, Authent
         });
     };
     
-    $scope.addIngredientToSum = function(id, caption, amount, measure, mult) {
-        var done = false;
+    $scope.addIngredientToSum = function(ingredient, measure, mealPortions, recipePortions) {
+        var done = false,
+            id = ingredient.id,
+            caption = ingredient.caption,
+            amount = ingredient.amount,
+            total = +Number(amount / recipePortions * mealPortions).toFixed(3);
         $scope.summary.forEach(function (ingredient, i, arr) {
             if (ingredient.id === id) {
                 ingredient.measures.forEach(function (item, j, arr) {
                     if (item.id === measure.id) {
                         item.amount = item.amount + amount;
-                        item.total = +Number(amount * mult).toFixed(3) + (item.total);
+                        item.total = total + (item.total);
                         done = true;
                     }
                 });
@@ -73,7 +80,7 @@ function MenuSummaryController($scope, $stateParams, $location, $window, Authent
                         id: measure.id,
                         caption: measure.caption,
                         amount: amount,
-                        total: +Number(amount * mult).toFixed(3)  
+                        total: total
                     }
                 );
                 done = true;
@@ -89,7 +96,7 @@ function MenuSummaryController($scope, $stateParams, $location, $window, Authent
                         id: measure.id,
                         caption: measure.caption,
                         amount: amount,
-                        total: +Number(amount * mult).toFixed(3)
+                        total: total
                     }
                 ]
             }

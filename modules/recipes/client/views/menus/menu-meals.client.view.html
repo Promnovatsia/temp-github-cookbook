@@ -8,90 +8,91 @@
         </h1>
     </div>
     <hr>
-    <div class="row">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Некатегоризованные
-                Количество: {{form.unassigned.length}}
-            </div>
-            <div class="panel-body">
-                <div sv-root="meals" sv-part="form.unassigned">
-                    <div ng-repeat="meal in form.unassigned" sv-element class="col-md-4">
-                        <div class="panel panel-default">
-                            <div sv-handle class="panel-heading">
+  <div class="row">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Некатегоризованные
+        Количество: {{form.unassigned.length}}
+      </div>
+      <div class="panel-body">
+        <div sv-root="meals" sv-part="form.unassigned">
+          <div ng-repeat="meal in form.unassigned" sv-element class="col-md-4">
+            <div class="panel panel-default">
+              <div sv-handle class="panel-heading">
                                 <span class="glyphicon glyphicon-move">
                                     {{meal.recipe.title}}
                                 </span>
-                            </div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <label for="portions">
-                                        Количество порций
-                                    </label>
-                                    <updowninput id="portions" ng-model="meal.portions" min="0.5" step="0.5" precision="1"></updowninput>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <label for="portions">
+                    Количество порций
+                  </label>
+                  <updowninput id="portions" ng-model="meal.portions" min="0.5" step="0.5" precision="1"></updowninput>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-        <div ng-repeat="type in menu.types">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Категория: {{type.caption}}
-                    Количество: {{form.types[type.index].meals.length}}
-                </div>
-                <div class="panel-body">
-                    <div sv-root="meals" sv-part="form.types[type.index].meals">
-                        <div ng-repeat="meal in form.types[type.index].meals" sv-element class="col-md-4">
-                            <div class="panel panel-default">
-                                <div sv-handle class="panel-heading">
+      </div>
+    </div>
+    <div ng-repeat="type in menu.types">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Категория: {{type.caption}}
+          Количество: {{form.types[type.index].meals.length}}
+        </div>
+        <div class="panel-body">
+          <div sv-root="meals" sv-part="form.types[type.index].meals">
+            <div ng-repeat="meal in form.types[type.index].meals" sv-element class="col-md-4">
+              <div class="panel panel-default">
+                <div sv-handle class="panel-heading">
                                     <span class="glyphicon glyphicon-move">
                                         {{meal.recipe.title}}
                                     </span>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <label for="portions">
-                                            Количество порций
-                                        </label>
-                                        <updowninput ng-model="meal.portions" min="0.5" step="0.5" precision="1"></updowninput>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
-            <fieldset>
-                <div class="form-group">
-                    <label for="asyncSelected">
-                        Поиск рецептов
+                <div class="panel-body">
+                  <div class="row">
+                    <label for="portions">
+                      Количество порций
                     </label>
-                    <div class="input-group">
-                        <div class="input-group-addon">
-                            <i class="glyphicon glyphicon-search"></i>
-                        </div>
-                        <input id="asyncSelected" type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="recipe as recipe.title for recipe in getRecipes($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="addRecipe($item)" class="form-control">
-                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
-                        <div ng-show="noResults">
-                            <i class="glyphicon glyphicon-remove"></i>
-                            Нет результатов
-                        </div>
-                    </div>
+                    <updowninput ng-model="meal.portions" min="0.5" step="0.5" precision="1"></updowninput>
+                  </div>
                 </div>
-                <div class="form-group">
-                    <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Обновить' : 'Сохранить'}}">
-                </div>
-                <div ng-show="error" class="text-danger">
-                    <strong ng-bind="error"></strong>
-                </div>
-            </fieldset>
-        </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group">
+          <label for="asyncSelected">
+            Поиск рецептов
+          </label>
+          <div class="input-group">
+            <div class="input-group-addon">
+              <i class="glyphicon glyphicon-search"></i>
+            </div>
+            <input id="asyncSelected" type="text" ng-model="asyncSelected" placeholder="Введите название"
+                   typeahead="recipe as recipe.title for recipe in getRecipes($viewValue)"
+                   typeahead-loading="loadingLocations" typeahead-no-results="noResults"
+                   typeahead-on-select="addRecipe($item)" class="form-control">
+            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+            <div ng-show="noResults">
+              <i class="glyphicon glyphicon-remove"></i>Нет результатов
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <input type="submit" class="btn btn-default" value="{{shelf.id ? 'Обновить' : 'Сохранить'}}">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
 </section>
