@@ -475,8 +475,8 @@
 				var model = $parse($attrs.svPart);
 				if(!model.assign) throw new Error('model not assignable');
 				$sortable.keepInList = $parse($attrs.svKeepInList)($scope);
-				$scope.$ctrl.isDropzone = $parse($attrs.svIsDropzone)($scope) === false ? false : true;
-				$scope.$ctrl.multiSelect = $parse($attrs.svMultiSelect)($scope) === true ? true : false;
+				$scope.$ctrl.isDropzone = $parse($attrs.svIsDropzone)($scope) !== false;
+				$scope.$ctrl.multiSelect = $parse($attrs.svMultiSelect)($scope) === true;
 
 				if($scope.$ctrl.multiSelect){
 					$element.on('mousedown',function(){
@@ -621,7 +621,7 @@
 							handle.off('mousedown touchstart', event);
 							handle = newHandle;
 							handle.on('mousedown touchstart', event);
-							return;
+							
 					} else {
 						handle.off('mousedown touchstart', event);
 					}

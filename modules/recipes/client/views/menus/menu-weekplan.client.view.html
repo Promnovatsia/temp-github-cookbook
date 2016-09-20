@@ -11,7 +11,7 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <label for="menu.meals">
+                    <label>
                         Нераспределенные блюда
                     </label>
                 </div>
@@ -36,7 +36,7 @@
                                     <div class="panel-body">
                                         <pre>{{meal.recipe.title | json}}</pre>
                                     </div>
-                                </div> 
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                                     <i class="glyphicon glyphicon-sort"></i>
                                     {{weekDayExamples[$index] | date : 'EEEE'}}
                                     <a class="pull-right btn btn-danger btn-xs" ng-click="clearDay($index)">
-                                        <span class="glyphicon glyphicon-remove"></span>
+                                        <i class="glyphicon glyphicon-remove"></i>
                                     </a>
                                 </div>
                                 <div class="panel-body">
@@ -62,7 +62,7 @@
                                                     <div class="panel-heading">
                                                         {{type.caption}}
                                                         <div class="pull-right">
-                                                            <snap class="glyphicon glyphicon-time"></snap>
+                                                            <i class="glyphicon glyphicon-time"></i>
                                                             {{type.serve | date:'HH:mm'}}
                                                         </div>
                                                     </div>
@@ -75,8 +75,8 @@
                                                                         {{meal.recipe.title}}
                                                                     </div>
                                                                     <div class="panel-body">
-                                                                        {{meal.weekday}} {{meal.type}} 
-                                                                    </div>  
+                                                                        {{meal.weekday}} {{meal.type}}
+                                                                    </div>
                                                                 </div>
                                                                 <div sv-helper class="col-md-2 col-sm-6">
                                                                     <div class="panel panel-default">
@@ -87,9 +87,9 @@
                                                                         <div class="panel-body">
                                                                             <pre>{{meal.recipe.title | json}}</pre>
                                                                         </div>
-                                                                    </div> 
+                                                                    </div>
                                                                 </div>
-                                                            </div> 
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

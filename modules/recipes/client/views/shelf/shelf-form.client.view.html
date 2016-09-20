@@ -46,26 +46,26 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="btn btn-danger" ng-click="setIngredient(null)">
-                                    <snap class="glyphicon glyphicon-remove-sign"></snap>
+                                    <i class="glyphicon glyphicon-remove-sign"></i>
                                     Отвязать ингредиент
                                 </label>
                                 <br/>
                                 <label class="btn btn-link">
-                                    <snap class="glyphicon glyphicon-transfer"></snap>
+                                    <i class="glyphicon glyphicon-transfer"></i>
                                     Замена для {{shelf.override}} <!-- //FUTURE override UI-->
                                 </label>
                                 <br/>
                                 <label class="btn btn-link">
-                                    <snap class="glyphicon glyphicon-transfer"></snap>
+                                    <i class="glyphicon glyphicon-transfer"></i>
                                     Заменимо на {{shelf.fallback}} <!-- //FUTURE fallback UI-->
                                 </label>
                             </div>
                         </div>
                     </div>
-                    <div ng-show="ingredient"> 
+                    <div ng-show="ingredient">
                         <div class="row">
                             <div class="col-md-2">
-                                <label for="stored">
+                                <label>
                                     В наличии
                                 </label>
                             </div>
@@ -76,28 +76,28 @@
                                 <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
                                 <uib-progress>
                                     <uib-bar value="20" type="danger">
-                                        <span style="color:white; white-space:nowrap;"> 
+                                        <span style="color:white; white-space:nowrap;">
                                             Дефицит
                                         </span>
                                     </uib-bar>
                                     <uib-bar value="30" type="warning">
-                                        <span style="color:white; white-space:nowrap;"> 
+                                        <span style="color:white; white-space:nowrap;">
                                             Недостаточно
                                         </span>
                                     </uib-bar>
                                     <uib-bar value="30" type="success">
-                                        <span style="color:white; white-space:nowrap;"> 
+                                        <span style="color:white; white-space:nowrap;">
                                             Достаточно
                                         </span>
                                     </uib-bar>
                                     <uib-bar value="20" type="info">
-                                        <span style="color:white; white-space:nowrap;"> 
+                                        <span style="color:white; white-space:nowrap;">
                                             Избыток
                                         </span>
                                     </uib-bar>
                                 </uib-progress>
                             </div>
-                        </div>                    
+                        </div>
                         <div class="col-md-7">
                         <hr>
                             <div class="row">
@@ -107,7 +107,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-4 col-xs-7">
-                                    <updowninput ng-model="shelf.deficit" measure="measure" validator="validateDeficit(id,value,oldValue)"><updowninput>
+                                    <updowninput id="deficit" ng-model="shelf.deficit" measure="measure" validator="validateDeficit(id,value,oldValue)"><updowninput>
                                 </div>
                                 <div class="col-md-5 col-xs-12">
                                     <div uib-alert ng-show="form.deficit">
@@ -123,7 +123,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-4 col-xs-7">
-                                    <updowninput ng-model="shelf.desired" measure="measure" validator="validateDesired(id,value,oldValue)"><updowninput>
+                                    <updowninput id="desired" ng-model="shelf.desired" measure="measure" validator="validateDesired(id,value,oldValue)"><updowninput>
                                 </div>
                                 <div class="col-md-5 col-xs-12">
                                     <div uib-alert ng-show="form.desired">
@@ -139,29 +139,29 @@
                                     </label>
                                 </div>
                                 <div class="col-md-4 col-xs-7">
-                                    <updowninput ng-model="shelf.max" measure="measure" validator="validateMax(id,value,oldValue)"><updowninput>
+                                    <updowninput id="max" ng-model="shelf.max" measure="measure" validator="validateMax(id,value,oldValue)"><updowninput>
                                 </div>
                                 <div class="col-md-5 col-xs-12">
                                     <div uib-alert ng-show="form.max">
                                         Порог избытка должен быть не меньше порога достаточности
                                     </div>
                                 </div>
-                            </div>   
-                        </div>                
+                            </div>
+                        </div>
                         <div class="col-md-5">
                             <hr>
                             <label for="place">
                                 Место хранения
                             </label>
-                            <input name="deficit" type="text" ng-model="shelf.place" class="form-control">
+                            <input id="place" type="text" ng-model="shelf.place" class="form-control">
                             <hr>
                             <label for="isSpoiled">
                                 Статус ревизии
                             </label>
                             <br>
-                            <toggle-switch class="switch-danger" ng-model="shelf.isSpoiled" on-label="Требуется" off-label="В порядке"></toggle-switch>
+                            <toggle-switch id="isSpoiled" class="switch-danger" ng-model="shelf.isSpoiled" on-label="Требуется" off-label="В порядке"></toggle-switch>
                             <hr>
-                        </div>                   
+                        </div>
                     </div>
                 </div>
                 <div ng-show="ingredient" class="form-group">

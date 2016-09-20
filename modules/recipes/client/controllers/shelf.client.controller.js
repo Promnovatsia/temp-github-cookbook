@@ -132,8 +132,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     $scope.filterByProgress = function (index) {
         var item = $scope.shelves[index];
         if (!item.progressbar) return true;
-        return false ||
-            ($scope.filterBar.spoiled && item.isSpoiled) ||
+        return ($scope.filterBar.spoiled && item.isSpoiled) ||
             ($scope.filterBar.deficit && item.progressbar.value <= pbLimitDeficit) ||
             ($scope.filterBar.lsdesired && item.progressbar.value > pbLimitDeficit && item.progressbar.value < pbLimitDesired) ||
             ($scope.filterBar.desired && item.progressbar.value >= pbLimitDesired && item.progressbar.value <= pbLimitMax) ||

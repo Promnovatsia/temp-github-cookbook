@@ -23,17 +23,17 @@
     </small>
     <hr>
     <small>
-        Количество порций: 
+        Количество порций:
         <span ng-bind="recipe.portions"></span>
 <!-- TODO добавить ввод числа основного ингредиента и преобразование под него-->
         <!--        TODO добавить селектор и преобразование чисел-->
     </small>
     <hr>
-    <label for="ingredients">
+    <label>
         Ингридиенты
     </label>
     <div class="pull-right">
-        <label for="filterBar.spoiled">
+        <label>
             Показывать полки
         </label>
         <toggle-switch class="switch-primary" ng-model="shelves" on-label="Да" off-label="Нет"></toggle-switch>
@@ -42,10 +42,10 @@
         <li ng-repeat="ingredient in recipe.ingredients">
             <div class="row">
                 <div class="col-md-2">
-                    <span ng-bind="ingredient.caption"></span>    
+                    <span ng-bind="ingredient.caption"></span>
                 </div>
                 <div class="col-md-2">
-                    <span ng-bind="ingredient.comment"></span>    
+                    <span ng-bind="ingredient.comment"></span>
                 </div>
                 <div class="col-md-1">
                     <span ng-bind="ingredient.amount"></span>
@@ -60,7 +60,7 @@
         </li>
     </ol>
     <hr>
-    <label for="steps">
+    <label>
         Инструкции
     </label>
     <ol>
@@ -69,7 +69,7 @@
             <hr>
         </li>
     </ol>
-    <label for="content">
+    <label>
         Применчания
     </label>
     <span ng-bind="recipe.content"></span>

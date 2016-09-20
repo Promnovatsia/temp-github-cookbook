@@ -16,7 +16,7 @@
                             <label for="image">
                                 Картинка
                             </label>
-                            <div ng-show="ingredient.image || uploader.queue.length>0" class="pull-right btn btn-danger btn-xs" ng-click="unsetPicture()">
+                            <div id="image" ng-show="ingredient.image || uploader.queue.length>0" class="pull-right btn btn-danger btn-xs" ng-click="unsetPicture()">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </div>
                             <input ng-hide="ingredient.image" type="file" accept="image/*" nv-file-select="" uploader="uploader">
@@ -25,7 +25,7 @@
                                 <img ng-src="{{imageurl}}{{ingredient.image}}" class="img-thumbnail user-profile-picture">
                             </span>
                             <div ng-repeat="item in uploader.queue" ng-show="uploader.isHTML5" ng-thumb="{ file: item._file, height: 100 }">
-                            </div>    
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <br /><br />
@@ -60,16 +60,16 @@
                                         <div ng-show="ingredient.measure.step>0">
                                             <div class="col-md-4">
                                                 <div class="list-group-item-text">
-                                                    Мин. = {{ingredient.measure.min}}, шаг = {{ingredient.measure.step}} 
-                                                </div>    
-                                            </div>    
+                                                    Мин. = {{ingredient.measure.min}}, шаг = {{ingredient.measure.step}}
+                                                </div>
+                                            </div>
                                         </div>
                                         <div ng-hide="ingredient.measure.step>0">
                                             <div class="col-md-4">
                                                 <div class="list-group-item-text">
-                                                    Неисчисляемая 
-                                                </div>    
-                                            </div>    
+                                                    Неисчисляемая
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-4" ng-show="ingredient.measure.converter">
                                             Конвертируется
