@@ -71,7 +71,7 @@ function IngredientsController($scope, $stateParams, $location, $window, $timeou
             $scope.$broadcast('show-errors-check-validity', 'menuForm');//FIX ingredientForm
             return false;
         }
-        
+
         $scope.ingredient.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
@@ -120,7 +120,7 @@ function IngredientsController($scope, $stateParams, $location, $window, $timeou
 
             fileReader.onload = function (fileReaderEvent) {
                 $timeout(function () {
-                    $scope.imageURL = fileReaderEvent.target.result;
+                    $scope.ingredient.image = fileReaderEvent.target.result;
                 }, 0);
             };
         }
