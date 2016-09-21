@@ -8,7 +8,7 @@ var _ = require('lodash'),
   testAssets = require('./config/assets/test'),
   fs = require('fs'),
   path = require('path');
-
+process.execArgv = [];
 module.exports = function(grunt) {
   // Project Configuration
   grunt.initConfig({
