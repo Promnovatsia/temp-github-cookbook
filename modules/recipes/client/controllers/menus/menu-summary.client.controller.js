@@ -43,19 +43,22 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
                     ingredient = new IngredientService(ingredient);
                     ingredient.amount = ingredient.ingredientAmount.amount;
                     ingredient.measureDefault = ingredient.ingredientAmount.measureId;
-                    ingredient.getShelf().then(function (shelf) {
-                        ingredient.shelf = shelf;
-                    });
                     ingredient.getMeasure().then(function (measure) {
-                        $scope.addIngredientToSum(
-                            ingredient,
-                            measure,
-                            meal.portions,
-                            recipe.portions
-                        );
+                        ingredient.getShelf().then(function (shelf) {
+                            ingredient.shelf = shelf;
+                            $scope.addIngredientToSum(
+                                ingredient,
+                                measure,
+                                meal.portions,
+                                recipe.portions
+                            );
+                        });
                     });
                 });
             });
+        });
+        $scope.menu.getQueries().then(function (queries) {
+            $scope.menu.queries = queries;
         });
     };
     
@@ -64,6 +67,7 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
             id = ingredient.id,
             caption = ingredient.caption,
             amount = ingredient.amount,
+            shelf = ingredient.shelf,
             total = +Number(amount / recipePortions * mealPortions).toFixed(3);
         $scope.summary.forEach(function (ingredient, i, arr) {
             if (ingredient.id === id) {
@@ -91,6 +95,7 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
             {
                 id: id,
                 caption: caption,
+                shelf: shelf,
                 measures: [
                     {
                         id: measure.id,
@@ -102,6 +107,36 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
             }
         );
     };
+
+    $scope.checkout = function () {
+        $scope.summary.forEach(function (ingredient, i, arr) {
+            if (ingredient.shelf) {
+                ingredient.measures.forEach(function(measure, j, arr) {
+                    var found = false;
+                    if ($scope.menu.queries.some(
+                        function (query, k, arr) {
+                            if (query.shelfId===ingredient.shelf.id && query.measureId === measure.id) {
+                                found = k;
+                                return true;
+                            } else return false;
+                        })
+                    ) {
+                        $scope.menu.queries[found].use = measure.amount;
+                        $scope.menu.queries[found].useDate = $scope.menu.startDate;
+                    } else {
+                        $scope.menu.queries.push(
+                            {
+                                use: measure.amount,
+                                useDate: $scope.menu.startDate,
+                                shelfId: ingredient.shelf.id,
+                                measureId: measure.id
+                            }
+                        );
+                    }
+                });
+            }
+        });
+    };
     
     $scope.save = function (isValid) {
         
@@ -109,7 +144,8 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
             $scope.$broadcast('show-errors-check-validity', 'menuForm');
             return false;
         }
-        
+
+        $scope.checkout();
         $scope.menu.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
