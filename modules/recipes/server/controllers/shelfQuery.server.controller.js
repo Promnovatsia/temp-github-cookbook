@@ -70,6 +70,7 @@ exports.update = function(req, res) {
 };    
 
 exports.list = function(req, res) {
+
     if (!req.shelf) {
         return res.status(400).send({
             message: 'Bad request. Specify shelf id first'
@@ -126,5 +127,31 @@ exports.queryByID = function(req, res, next, id) {
         }
     }).catch(function(err) {
         return next(err);
+    });
+};
+
+exports.queryByMenu = function(req, res) {
+
+    if (!req.menu) {
+        return res.status(400).send({
+            message: 'Bad request. Specify shelf id first'
+        });
+    }
+
+    ShelfQuery.findAll(
+        {
+            where: {
+                menuId: req.menu.id
+            }
+        }
+    ).then(function(shelfQueries) {
+        if (!shelfQueries) {
+            req.queries = {};
+        } else {
+            req.queries = shelfQueries;
+        }
+        return res.json(req.queries);
+    }).catch(function (err) {
+        return res.jsonp(err);
     });
 };
