@@ -8,7 +8,8 @@ var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
         Menu = db.menu,
-        Meal = db.meal
+        Meal = db.meal,
+        ShelfQuery = db.shelfQuery
     ;
 
 exports.create = function (req, res) {
@@ -44,6 +45,24 @@ exports.create = function (req, res) {
                                 item.menuId = menu.id;
                                 meal.update(item).then(function () {
                                     callback();   
+                                });
+                            }
+                        });
+                    });
+                }
+                if (req.body.queries) {
+                    async.forEach(req.body.queries, function (item, callback) {
+                        ShelfQuery.findById(item.id).then(function (query) {
+                            if (!query || query.menuId !== menu.id) {
+                                ShelfQuery.create(item).then(function (newQuery) {
+                                    menu.addShelfQuery(newQuery).then(function() {
+                                        callback();
+                                    });
+                                });
+                            } else {
+                                item.menuId = menu.id;
+                                query.update(item).then(function () {
+                                    callback();
                                 });
                             }
                         });
@@ -99,6 +118,24 @@ exports.update = function (req, res) {
                         item.menuId = menu.id;
                         meal.update(item).then(function () {
                             callback();   
+                        });
+                    }
+                });
+            });
+        }
+        if (req.body.queries) {
+            async.forEach(req.body.queries, function (item, callback) {
+                ShelfQuery.findById(item.id).then(function (query) {
+                    if (!query || query.menuId !== menu.id) {
+                        ShelfQuery.create(item).then(function (newQuery) {
+                            menu.addShelfQuery(newQuery).then(function() {
+                                callback();
+                            });
+                        });
+                    } else {
+                        item.menuId = menu.id;
+                        query.update(item).then(function () {
+                            callback();
                         });
                     }
                 });

@@ -57,34 +57,32 @@ exports.update = function (req, res) {
     
     Ingredient.findById(req.body.id).then(function (ingredient) {
         if (ingredient) {
-            var image = '';
             if (req.body.image) {
-                cloudinary.uploader.upload(req.body.image).then(function (result) {
-                    image = result.public_id + '.' + result.format;
-                    ingredient.update(
-                        {
-                            caption: req.body.caption,
-                            infoCard: req.body.infoCard,
-                            image: image,
-                            measureDefault: req.body.measureDefault
-                        }
-                    ).then(function () {
+                return cloudinary.uploader.upload(req.body.image)
+                    .then(function (result) {
+                        return result.public_id + '.' + result.format;
+                    })
+                    .then(function (image) {
+                        return ingredient.update(
+                            {
+                                caption: req.body.caption,
+                                infoCard: req.body.infoCard,
+                                image: image,
+                                measureDefault: req.body.measureDefault
+                            }
+                        );
+                    }).then(function (ingredient) {
                         return res.json(ingredient);
-                    }).catch(function (err) {
-                        return res.status(400).send({
-                            message: errorHandler.getErrorMessage(err)
-                        });
                     });
-                });
             } else {
-                ingredient.update(
+                return ingredient.update(
                     {
                         caption: req.body.caption,
                         infoCard: req.body.infoCard,
                         image: null,
                         measureDefault: req.body.measureDefault
                     }
-                ).then(function () {
+                ).then(function (ingredient) {
                     return res.json(ingredient);
                 }).catch(function (err) {
                     return res.status(400).send({

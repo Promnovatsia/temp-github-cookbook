@@ -76,6 +76,10 @@ module.exports = function(app) {
         .get(menus.read)
         .put(menus.update)
     ;
+    app.route('/api/menu/:menuId/queries')
+        .all(recipesPolicy.isAllowed)
+        .get(shelfQuery.queryByMenu)
+    ;
     
     app.route('/api/shelf')
         .all(recipesPolicy.isAllowed)
@@ -100,7 +104,7 @@ module.exports = function(app) {
     
     // Finish by binding the recipe middleware
     app.param('recipeId', recipes.recipeByID);
-    app.param('recipeSearchTitle', recipes.recipeSearchByTitle);
+    //app.param('recipeSearchTitle', recipes.recipeSearchByTitle);
     app.param('ingredientId', ingredients.ingredientByID);
     app.param('measureId', measures.measureByID);
     app.param('productId', products.productByID);

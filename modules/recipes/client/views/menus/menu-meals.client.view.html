@@ -22,6 +22,9 @@
                                 <span class="glyphicon glyphicon-move">
                                     {{meal.recipe.title}}
                                 </span>
+                                <a class="pull-right btn btn-danger btn-xs" ng-click="removeMeal(meal)">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
                             </div>
                             <div class="panel-body">
                                 <div class="row">
@@ -65,8 +68,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
+        
         <form name="menuForm" class="form-horizontal" ng-submit="save(menuForm.$valid)" novalidate>
             <fieldset>
                 <div class="form-group">
@@ -77,11 +79,13 @@
                         <div class="input-group-addon">
                             <i class="glyphicon glyphicon-search"></i>
                         </div>
-                        <input id="asyncSelected" type="text" ng-model="asyncSelected" placeholder="Введите название" typeahead="recipe as recipe.title for recipe in getRecipes($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-on-select="addRecipe($item)" class="form-control">
+                        <input id="asyncSelected" type="text" ng-model="asyncSelected" placeholder="Введите название"
+                               typeahead="recipe as recipe.title for recipe in getRecipes($viewValue)"
+                               typeahead-loading="loadingLocations" typeahead-no-results="noResults"
+                               typeahead-on-select="addRecipe($item)" class="form-control">
                         <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
                         <div ng-show="noResults">
-                            <i class="glyphicon glyphicon-remove"></i>
-                            Нет результатов
+                            <i class="glyphicon glyphicon-remove"></i>Нет результатов
                         </div>
                     </div>
                 </div>

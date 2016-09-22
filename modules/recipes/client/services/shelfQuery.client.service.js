@@ -14,6 +14,14 @@ function ShelfQueryService($resource) {
     }, {
         update: {
             method: 'PUT'
+        },
+        queryByMenu: {
+            method: 'GET',
+            params: {
+                menuId: '@menuId'
+            },
+            isArray: true,
+            url: 'api/menu/:menuId/queries'
         }
     });
     

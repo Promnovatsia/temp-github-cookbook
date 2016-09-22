@@ -80,6 +80,24 @@ function MenuMealsController($scope, $stateParams, $location, $window, Authentic
         $scope.form.unassigned.push(meal);
         $scope.asyncSelected = "";
     };
+
+    $scope.removeMeal = function (meal) {
+        var done = false;
+        $scope.form.unassigned.forEach(function (item, i, arr) {
+            if (item === meal) {
+                arr.splice(i,1);
+                $scope.menu.meals.splice(meal.index, 1);
+                done = true;
+            }
+        });
+        if (done) return;
+        $scope.form.types[meal.type].meals.forEach(function (item, i, arr) {
+            if (item === meal) {
+                arr.splice(i,1);
+                $scope.menu.meals.splice(meal.index, 1);
+            }
+        });
+    };
     
     $scope.assignMeals = function () {
         $scope.form.unassigned = [];
