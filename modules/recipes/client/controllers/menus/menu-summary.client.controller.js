@@ -57,9 +57,11 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
                 });
             });
         });
-        $scope.menu.getQueries().then(function (queries) {
-            $scope.menu.queries = queries;
-        });
+        if (!$scope.menu.shelfQueries) {
+            $scope.menu.getQueries().then(function (queries) {
+                $scope.menu.shelfQueries = queries;
+            });
+        }
     };
     
     $scope.addIngredientToSum = function(ingredient, measure, mealPortions, recipePortions) {
@@ -113,7 +115,7 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
             if (ingredient.shelf) {
                 ingredient.measures.forEach(function(measure, j, arr) {
                     var found = false;
-                    if ($scope.menu.queries.some(
+                    if ($scope.menu.shelfQueries.some(
                         function (query, k, arr) {
                             if (query.shelfId===ingredient.shelf.id && query.measureId === measure.id) {
                                 found = k;
@@ -121,10 +123,10 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
                             } else return false;
                         })
                     ) {
-                        $scope.menu.queries[found].use = measure.amount;
-                        $scope.menu.queries[found].useDate = $scope.menu.startDate;
+                        $scope.menu.shelfQueries[found].use = measure.amount;
+                        $scope.menu.shelfQueries[found].useDate = $scope.menu.startDate;
                     } else {
-                        $scope.menu.queries.push(
+                        $scope.menu.shelfQueries.push(
                             {
                                 use: measure.amount,
                                 useDate: $scope.menu.startDate,

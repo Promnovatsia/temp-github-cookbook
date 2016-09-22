@@ -50,6 +50,24 @@ exports.create = function (req, res) {
                         });
                     });
                 }
+                if (req.body.queries) {
+                    async.forEach(req.body.queries, function (item, callback) {
+                        ShelfQuery.findById(item.id).then(function (query) {
+                            if (!query || query.menuId !== menu.id) {
+                                ShelfQuery.create(item).then(function (newQuery) {
+                                    menu.addShelfQuery(newQuery).then(function() {
+                                        callback();
+                                    });
+                                });
+                            } else {
+                                item.menuId = menu.id;
+                                query.update(item).then(function () {
+                                    callback();
+                                });
+                            }
+                        });
+                    });
+                }
                 return res.json(menu);
             }
         }).catch(function (err) {
