@@ -231,5 +231,25 @@ function routeConfig($stateProvider) {
                 roles: ['user', 'admin']
             }
         })
+
+        .state('request', {
+            abstract: true,
+            url: '/request',
+            template: '<ui-view/>'
+        })
+        .state('request.list', {
+            url: '',
+            templateUrl: 'modules/recipes/client/views/requests/requests-list.client.view.html',
+            data: {
+                roles: ['user']
+            }
+        })
+        .state('request.edit', {
+            url: '/:requestId',
+            templateUrl: 'modules/recipes/client/views/requests/request-edit.client.view.html',
+            data: {
+                roles: ['user']
+            }
+        })
     ;
 }

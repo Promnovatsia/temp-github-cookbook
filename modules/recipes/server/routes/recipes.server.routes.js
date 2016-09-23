@@ -10,6 +10,7 @@ var recipesPolicy = require('../policies/recipes.server.policy'),
     products = require('../controllers/products.server.controller'),
     menus = require('../controllers/menus.server.controller'),
     shelf = require('../controllers/shelf.server.controller'),
+    request = require('../controllers/request.server.controller.js'),
     shelfQuery = require('../controllers/shelfQuery.server.controller');
 
 module.exports = function(app) {
@@ -101,6 +102,17 @@ module.exports = function(app) {
         .get(shelfQuery.read)
         .put(shelfQuery.update)
     ;
+
+    app.route('/api/request')
+        .all(recipesPolicy.isAllowed)
+        .get(request.list)
+        .post(request.create)
+    ;
+    app.route('/api/request/:requestId')
+        .all(recipesPolicy.isAllowed)
+        .get(request.read)
+        .put(request.update)
+    ;
     
     // Finish by binding the recipe middleware
     app.param('recipeId', recipes.recipeByID);
@@ -111,4 +123,5 @@ module.exports = function(app) {
     app.param('menuId', menus.menuByID);
     app.param('shelfId', shelf.shelfByID);
     app.param('queryId', shelfQuery.queryByID);
+    app.param('requestId', request.requestByID);
 };

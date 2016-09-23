@@ -2,19 +2,21 @@
 
 module.exports = function (sequelize, DataTypes) {
 
-    var Query = sequelize.define('query', {
+    var Request = sequelize.define('request', {
         id: {
             primaryKey: true,
             type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
+            defaultValue: DataTypes.UUIDV4
         },
         isClosed: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
         },
-        itemCaption: {
-            type: DataTypes.STRING
+        isPublic: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         },
         buy: {
             type: DataTypes.FLOAT
@@ -22,37 +24,42 @@ module.exports = function (sequelize, DataTypes) {
         bought: {
             type: DataTypes.FLOAT
         },
-        buyDate: {
-            type: DataTypes.DATE
-        },
         use: {
             type: DataTypes.FLOAT
         },
         used: {
             type: DataTypes.FLOAT
         },
-        useDate: {
-            type: DataTypes.DATE
-        },
         spoil: {
             type: DataTypes.FLOAT
+        },
+        buyDate: {
+            type: DataTypes.DATE
+        },
+        useDate: {
+            type: DataTypes.DATE
         },
         spoilDate: {
             type: DataTypes.DATE
         },
+        itemCaption: {
+            type: DataTypes.STRING
+        },
+        category: {
+            type: DataTypes.STRING
+        },
         comment: {
-            type: DataTypes.TEXT
+            type: DataTypes.STRING
         }
     }, {
         paranoid: true,
-        createdAt: false,
         associate: function (models) {
-            Query.belongsTo(models.user);
-            Query.belongsTo(models.measure);
-            Query.belongsTo(models.shelf);
-            Query.belongsTo(models.menu);
+            Request.belongsTo(models.user);
+            Request.belongsTo(models.measure);
+            Request.belongsTo(models.shelf);
+            Request.belongsTo(models.menu);
         }
     });
 
-    return Query;
+    return Request;
 };

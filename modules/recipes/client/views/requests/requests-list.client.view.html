@@ -1,0 +1,21 @@
+<section ng-controller="RequestController" ng-init="find()">
+    <div class="page-header">
+        <h1>
+            Запросы
+        </h1>
+    </div>
+    <form>
+        <div class="form-group">
+        </div>
+    </form>
+    <div class="list-group">
+        <a ng-repeat="request in requests" ui-sref="request.edit({requestId: request.id})" class="list-group-item">
+            <div class="row">
+                {{request.id}}
+            </div>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center">
+        <a ui-sref="request.edit">Cоздать новый</a> запрос?
+    </div>
+</section>
