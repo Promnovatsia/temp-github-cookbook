@@ -4,9 +4,9 @@ angular
     .module('recipes')
     .factory('RequestService', RequestService);
 
-RequestService.$inject = ['$resource', 'ShelfService'];
+RequestService.$inject = ['$resource', 'ShelfService', 'MeasureService'];
 
-function RequestService($resource, ShelfService) {
+function RequestService($resource, ShelfService, MeasureService) {
     var Request = $resource('api/request/:requestId', {
         requestId: '@id'
     }, {
@@ -36,6 +36,10 @@ function RequestService($resource, ShelfService) {
             var request = this;
             return createOrUpdate(request);
         },
+        getMeasure: function () {
+            var request = this;
+            return getMeasure(request);
+        },
         getShelf: function () {
             var request = this;
             return getShelf(request);
@@ -56,6 +60,14 @@ function RequestService($resource, ShelfService) {
         return ShelfService.get(
             {
                 shelfId: request.shelfId
+            }
+        ).$promise;
+    }
+
+    function getMeasure(request) {
+        return MeasureService.get(
+            {
+                measureId: request.measureId
             }
         ).$promise;
     }

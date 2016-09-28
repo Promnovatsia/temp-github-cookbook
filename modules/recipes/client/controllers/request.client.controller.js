@@ -4,12 +4,13 @@ angular
     .module('recipes')
     .controller('RequestController', RequestController);
 
-RequestController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'RequestService', 'MeasureService'];
+RequestController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'RequestService', 'ShelfService'];
 
-function RequestController($scope, $stateParams, $location, $window, Authentication, RequestService, MeasureService) {
+function RequestController($scope, $stateParams, $location, $window, Authentication, RequestService, ShelfService) {
 
     $scope.authentication = Authentication;
     $scope.error = null;
+    $scope.asyncShelves = [];
 
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
 
@@ -27,23 +28,15 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                 }
             ).$promise.then(function (request) {
                 if (request.measureId) {
-                    MeasureService.get(
-                        {
-                            measureId: request.measureId
-                        }
-                    ).$promise.then(function (measure) {
+                    request.getMeasure().then(function (measure) {
                         $scope.measure = measure;
                     });
                 }
                 if (request.shelfId) {
                     request.getShelf().then(function (shelf) {
                         if (shelf.id) {
-                            $scope.shelf = shelf;
-                            MeasureService.get(
-                                {
-                                    measureId: shelf.measureId
-                                }
-                            ).$promise.then(function (measure) {
+                            shelf.getMeasure().then(function (measure) {
+                                $scope.shelf = shelf;
                                 $scope.shelf.measure = measure;
                             });
                         }
@@ -58,6 +51,41 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                 }
             );
         }
+    };
+
+    $scope.getAsyncShelves = function (value) {
+        var matched = [];
+        if ($scope.asyncShelves.length === 0) {
+            return ShelfService.query().$promise.then(function (results) { //FUTURE уменьшить загрузку через поиск БД
+                $scope.asyncShelves = results;
+                results.forEach(function (item, i, arr) {
+                    if (item.caption.includes(value)) {
+                        matched.push(item);
+                    }
+                });
+                return matched;
+            });
+        } else {
+            $scope.asyncShelves.forEach(function (item, i, arr) {
+                if (item.caption.includes(value)) {
+                    matched.push(item);
+                }
+            });
+            return matched;
+        }
+    };
+
+    $scope.selectShelf = function (shelf) {
+        $scope.shelf = shelf;
+        shelf.getMeasure().then(function (measure) {
+            $scope.shelf = shelf;
+            $scope.shelf.measure = measure;
+        });
+    };
+
+    $scope.clearAsync = function () {
+        $scope.asyncSelected = '';
+        $scope.asyncShelves = [];
     };
 
     $scope.remove = function () {

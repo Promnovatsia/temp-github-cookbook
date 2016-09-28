@@ -8,7 +8,25 @@
         <form name="requestForm" class="form-horizontal" ng-submit="save(requestForm.$valid)" novalidate>
             <fieldset>
                 <div ng-hide="shelf" class="form-group">
-                    
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </div>
+                        <input type="text" ng-model="asyncSelected" placeholder="Выберите полку"
+                               typeahead="shelf as shelf.caption for shelf in getAsyncShelves($viewValue)"
+                               typeahead-loading="loadingShelves" typeahead-no-results="noResults"
+                               typeahead-on-select="selectShelf($item)" class="form-control">
+                        <i ng-show="loadingShelves" class="glyphicon glyphicon-refresh"></i>
+                        <div ng-show="noResults" class="input-group-addon">
+                            <i class="glyphicon glyphicon-remove"></i>
+                            Нет результатов
+                        </div>
+                        <div class="input-group-addon">
+                            <div ng-click="clearAsync()">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div ng-show="shelf" class="form-group">
                     <div class="row">

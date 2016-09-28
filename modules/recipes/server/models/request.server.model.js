@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4
         },
-        isClosed: {
+        isClosed: { //TODO isResolved
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
@@ -24,7 +24,7 @@ module.exports = function (sequelize, DataTypes) {
         bought: {
             type: DataTypes.FLOAT
         },
-        use: {
+        use: { //TODO reserved
             type: DataTypes.FLOAT
         },
         used: {
