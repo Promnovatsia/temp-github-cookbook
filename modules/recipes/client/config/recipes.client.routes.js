@@ -246,7 +246,7 @@ function routeConfig($stateProvider) {
         })
         .state('request.edit', {
             url: '/:requestId',
-            templateUrl: 'modules/recipes/client/views/requests/request-edit.client.view.html',
+            templateUrl: 'modules/recipes/client/views/requests/request-form.client.view.html',
             data: {
                 roles: ['user']
             }

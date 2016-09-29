@@ -4,13 +4,14 @@ angular
     .module('recipes')
     .controller('RequestController', RequestController);
 
-RequestController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'RequestService', 'ShelfService'];
+RequestController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'RequestService', 'ShelfService', 'MeasureService'];
 
-function RequestController($scope, $stateParams, $location, $window, Authentication, RequestService, ShelfService) {
+function RequestController($scope, $stateParams, $location, $window, Authentication, RequestService, ShelfService, MeasureService) {
 
     $scope.authentication = Authentication;
     $scope.error = null;
     $scope.asyncShelves = [];
+    $scope.asyncMeasures = [];
 
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
 
@@ -43,11 +44,15 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                     });
                 }
                 $scope.request = request;
+                $scope.request.buy = request.buy || 1;
+                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : Date.now();
             });
         } else {
             $scope.request = new RequestService(
                 {
-                    createdAt: Date.now()
+                    createdAt: Date.now(),
+                    buy: 1,
+                    buyDate: Date.now()
                 }
             );
         }
@@ -56,7 +61,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.getAsyncShelves = function (value) {
         var matched = [];
         if ($scope.asyncShelves.length === 0) {
-            return ShelfService.query().$promise.then(function (results) { //FUTURE уменьшить загрузку через поиск БД
+            return ShelfService.query().$promise.then(function (results) { //TODO уменьшить загрузку через поиск БД
                 $scope.asyncShelves = results;
                 results.forEach(function (item, i, arr) {
                     if (item.caption.includes(value)) {
@@ -83,9 +88,40 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
         });
     };
 
-    $scope.clearAsync = function () {
-        $scope.asyncSelected = '';
+    $scope.clearAsyncShelf = function () {
+        $scope.asyncShelf = '';
         $scope.asyncShelves = [];
+    };
+
+    $scope.getAsyncMeasures = function (value) {
+        var matched = [];
+        if ($scope.asyncMeasures.length === 0) {
+            return MeasureService.query().$promise.then(function (results) { //TODO уменьшить загрузку через поиск БД
+                $scope.asyncMeasures = results;
+                results.forEach(function (item, i, arr) {
+                    if (item.caption.includes(value)) {
+                        matched.push(item);
+                    }
+                });
+                return matched;
+            });
+        } else {
+            $scope.asyncMeasures.forEach(function (item, i, arr) {
+                if (item.caption.includes(value)) {
+                    matched.push(item);
+                }
+            });
+            return matched;
+        }
+    };
+
+    $scope.selectMeasure = function (measure) {
+        $scope.measure = measure;
+    };
+
+    $scope.clearAsyncMeasure = function () {
+        $scope.asyncMeasure = '';
+        $scope.asyncMeasures = [];
     };
 
     $scope.remove = function () {
@@ -102,6 +138,8 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
             return false;
         }
 
+        $scope.request.measureId = $scope.measure.id;
+        $scope.request.shelfId = $scope.shelf.id;
         $scope.request.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
