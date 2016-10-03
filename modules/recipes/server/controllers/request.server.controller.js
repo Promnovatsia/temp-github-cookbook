@@ -69,7 +69,7 @@ exports.list = function(req, res) {
         {
             where: {
                 userId: req.user.id,
-                isClosed: false
+                isReserved: false
             }
         }
     ).then(function(requests) {
