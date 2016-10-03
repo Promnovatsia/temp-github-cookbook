@@ -38,11 +38,21 @@ function ShelfService($resource, MeasureService) {
     }
 
     function getMeasure(shelf) {
-        return MeasureService.get(
-            {
-                measureId: shelf.measureId
-            }
-        ).$promise;
+        if (!shelf.measureId) {
+            return false;
+        } else {
+            MeasureService.get(
+                {
+                    measureId: shelf.measureId
+                }
+            ).$promise.then(function (measure) {
+                if (!measure) {
+                    return false;
+                }
+                shelf.measure = measure;
+                return true;
+            });
+        }
     }
     
     function onSuccess(shelf) {

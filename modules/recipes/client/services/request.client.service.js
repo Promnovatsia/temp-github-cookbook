@@ -57,19 +57,39 @@ function RequestService($resource, ShelfService, MeasureService) {
     }
 
     function getShelf(request) {
-        return ShelfService.get(
-            {
-                shelfId: request.shelfId
-            }
-        ).$promise;
+        if (!request.measureId) {
+            return false;
+        } else {
+            ShelfService.get(
+                {
+                    shelfId: request.shelfId
+                }
+            ).$promise.then(function (shelf) {
+                if (!shelf) {
+                    return false;
+                }
+                request.shelf = shelf;
+                return true;
+            });
+        }
     }
 
     function getMeasure(request) {
-        return MeasureService.get(
-            {
-                measureId: request.measureId
-            }
-        ).$promise;
+        if (!request.measureId) {
+            return false;
+        } else {
+            MeasureService.get(
+                {
+                    measureId: request.measureId
+                }
+            ).$promise.then(function (measure) {
+                if (!measure) {
+                    return false;
+                }
+                request.measure = measure;
+                return measure;
+            });
+        }
     }
 
     function onSuccess(request) {
