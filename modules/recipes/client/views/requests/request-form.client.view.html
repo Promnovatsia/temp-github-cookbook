@@ -56,6 +56,7 @@
                             </div>
                         </div>
                     </div>
+                    <!--TODO measure select and show carr directive-->
                     <div class="row">
                         <div class="col-md-4">
                             <label>
@@ -120,21 +121,86 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="buy">
-                                Запланировано купить
+                        <div ng-if="request.measure != shelf.measure" class="col-md-4">
+                            <label>
+                                Единица измерения полки
                             </label>
-                            <updowninput id="buy" ng-model="request.buy" measure="measure"><updowninput>
+                            <div ng-show="shelf.measure">
+                                <div class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <h4 class="list-group-item-heading">
+                                                {{shelf.measure.caption}}
+                                            </h4>
+                                        </div>
+                                        <div ng-show="shelf.measure.step>0">
+                                            <div class="col-md-4">
+                                                <div class="list-group-item-text">
+                                                    Мин. = {{shelf.measure.min}}, шаг = {{shelf.measure.step}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div ng-hide="shelf.measure.step>0">
+                                            <div class="col-md-4">
+                                                <div class="list-group-item-text">
+                                                    Неисчисляемая
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" ng-show="shelf.measure.converter">
+                                            Конвертируется
+                                            <div ng-repeat="converter in shelf.measure.converter">
+                                                <small ng-hide=converter.uncountable>
+                                                    {{converter.caption}} = {{converter.rate}} * {{shelf.measure.caption}}
+                                                </small>
+                                                <small ng-show=converter.uncountable>
+                                                    {{converter.caption}} ~ {{shelf.measure.caption}}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" ng-hide="shelf.measure.converter">
+                                            Не конвертируется
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="measure">
+                        <div class="col-md-4">
+                            <label for="requested">
+                                Необходимо
+                            </label>
+                            <updowninput id="requested" ng-model="request.requested" measure="measure"
+                                         validatable="true" validator="checkRequest(id, value, oldValue)">
+                            </updowninput>
+                        </div>
+                        <div class="col-md-4">
+                            <div ng-show="isImmediatelyResolvable">
+                                <label>
+                                    <label class="btn btn-default">
+                                        <i class="glyphicon glyphicon-check"></i>
+                                        Выполнить сразу
+                                    </label>
+                                </label>
+                                <!--TODO input for immediate resolve if shelf is capable to do so-->
+                            </div>
+                            <div ng-hide="isImmediatelyResolvable">
+                                <label for="buy">
+                                    Требуется купить
+                                </label>
+                                <updowninput id="buy" ng-model="request.buy" measure="measure"></updowninput>
+                            </div>
                         </div>
                         <div class="col-md-4">
                             <label for="buyDate">
                                 Купить до
                             </label>
                             <div class="input-group">
-                                <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
                                 <label class="input-group-addon">
                                     <i class="glyphicon glyphicon-calendar"></i>
                                 </label>
+                                <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
                             </div>
                         </div>
                     </div>

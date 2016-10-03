@@ -12,6 +12,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.error = null;
     $scope.asyncShelves = [];
     $scope.asyncMeasures = [];
+    $scope.isImmediatelyResolvable = false;
 
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
 
@@ -28,20 +29,12 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                     requestId: $stateParams.requestId
                 }
             ).$promise.then(function (request) {
-                if (request.measureId) {
-                    request.getMeasure().then(function (measure) {
-                        $scope.measure = measure;
-                    });
-                }
-                if (request.shelfId) {
-                    request.getShelf().then(function (shelf) {
-                        if (shelf.id) {
-                            shelf.getMeasure().then(function (measure) {
-                                $scope.shelf = shelf;
-                                $scope.shelf.measure = measure;
-                            });
-                        }
-                    });
+                if (request.getMeasure()) {
+                    $scope.measure = request.measure;
+                };
+                if (request.getShelf()) {
+                    $scope.shelf = request.shelf;
+                    $scope.shelf.getMeasure();
                 }
                 $scope.request = request;
                 $scope.request.buy = request.buy || 1;
@@ -51,7 +44,6 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
             $scope.request = new RequestService(
                 {
                     createdAt: Date.now(),
-                    buy: 1,
                     buyDate: Date.now()
                 }
             );
@@ -82,10 +74,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
 
     $scope.selectShelf = function (shelf) {
         $scope.shelf = shelf;
-        shelf.getMeasure().then(function (measure) {
-            $scope.shelf = shelf;
-            $scope.shelf.measure = measure;
-        });
+        shelf.getMeasure();
     };
 
     $scope.clearAsyncShelf = function () {
@@ -96,7 +85,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.getAsyncMeasures = function (value) {
         var matched = [];
         if ($scope.asyncMeasures.length === 0) {
-            return MeasureService.query().$promise.then(function (results) { //TODO уменьшить загрузку через поиск БД
+            return MeasureService.query().$promise.then(function (results) {
                 $scope.asyncMeasures = results;
                 results.forEach(function (item, i, arr) {
                     if (item.caption.includes(value)) {
@@ -122,6 +111,21 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.clearAsyncMeasure = function () {
         $scope.asyncMeasure = '';
         $scope.asyncMeasures = [];
+    };
+
+    $scope.checkRequest = function (id, value, oldValue) {
+        if (!$scope.shelf) {
+            return false;
+        }
+        var diff = $scope.shelf.stored - $scope.shelf.deficit - value;
+        if (diff < 0) {
+            $scope.isImmediatelyResolvable = false;
+            $scope.request.buy = -diff;
+        } else {
+            $scope.isImmediatelyResolvable = true;
+            $scope.request.buy = 0;
+        }
+        return true;
     };
 
     $scope.remove = function () {
