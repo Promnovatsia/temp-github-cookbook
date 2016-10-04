@@ -4,9 +4,9 @@ angular
     .module('recipes')
     .controller('RequestController', RequestController);
 
-RequestController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'RequestService', 'ShelfService', 'MeasureService'];
+RequestController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'RequestService', 'ShelfService'];
 
-function RequestController($scope, $stateParams, $location, $window, Authentication, RequestService, ShelfService, MeasureService) {
+function RequestController($scope, $stateParams, $location, $window, Authentication, RequestService, ShelfService) {
 
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -31,7 +31,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
             ).$promise.then(function (request) {
                 if (request.getMeasure()) {
                     $scope.measure = request.measure;
-                };
+                }
                 if (request.getShelf()) {
                     $scope.shelf = request.shelf;
                     $scope.shelf.getMeasure();
@@ -80,37 +80,6 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.clearAsyncShelf = function () {
         $scope.asyncShelf = '';
         $scope.asyncShelves = [];
-    };
-
-    $scope.getAsyncMeasures = function (value) {
-        var matched = [];
-        if ($scope.asyncMeasures.length === 0) {
-            return MeasureService.query().$promise.then(function (results) {
-                $scope.asyncMeasures = results;
-                results.forEach(function (item, i, arr) {
-                    if (item.caption.includes(value)) {
-                        matched.push(item);
-                    }
-                });
-                return matched;
-            });
-        } else {
-            $scope.asyncMeasures.forEach(function (item, i, arr) {
-                if (item.caption.includes(value)) {
-                    matched.push(item);
-                }
-            });
-            return matched;
-        }
-    };
-
-    $scope.selectMeasure = function (measure) {
-        $scope.measure = measure;
-    };
-
-    $scope.clearAsyncMeasure = function () {
-        $scope.asyncMeasure = '';
-        $scope.asyncMeasures = [];
     };
 
     $scope.checkRequest = function (id, value, oldValue) {
