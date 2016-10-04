@@ -7,7 +7,7 @@
     <div class="col-md-12">
         <form name="requestForm" class="form-horizontal" ng-submit="save(requestForm.$valid)" novalidate>
             <fieldset>
-                <div ng-hide="shelf" class="form-group">
+                <div ng-if="!shelf" class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">
                             <i class="glyphicon glyphicon-search"></i>
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                 </div>
-                <div ng-show="shelf" class="form-group">
+                <div ng-if="shelf" class="form-group">
                     <div class="row">
                         <div class="col-md-3">
                             <label>
@@ -57,30 +57,34 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div ng-if="request.measure != shelf.measure" class="col-md-4">
+                            <label>
+                                Единица измерения полки
+                            </label>
+                            <measureselectcard ng-model="shelf.measure"></measureselectcard>
+                            <label class="btn btn-link" ng-click="applyMeasure()">
+                                <i class="glyphicon glyphicon-copy"></i>
+                                Заполнить меру запроса
+                            </label>
+                        </div>
                         <div class="col-md-4">
                             <label>
                                 Единица измерения запроса
                             </label>
                             <measureselectcard ng-model="request.measure" editable="true" cache="asyncMeasures"></measureselectcard>
                         </div>
-                        <div ng-if="request.measure != shelf.measure" class="col-md-4">
-                            <label>
-                                Единица измерения полки
-                            </label>
-                            <measureselectcard ng-model="shelf.measure"></measureselectcard>
-                        </div>
                     </div>
-                    <div class="row" ng-if="measure">
+                    <div class="row" ng-if="request.measure">
                         <div class="col-md-4">
                             <label for="requested">
                                 Необходимо
                             </label>
-                            <updowninput id="requested" ng-model="request.requested" measure="measure"
+                            <updowninput id="requested" ng-model="request.requested" measure="request.measure"
                                          validatable="true" validator="checkRequest(id, value, oldValue)">
                             </updowninput>
                         </div>
                         <div class="col-md-4">
-                            <div ng-show="isImmediatelyResolvable">
+                            <div ng-if="isImmediatelyResolvable">
                                 <label>
                                     <label class="btn btn-default">
                                         <i class="glyphicon glyphicon-check"></i>
@@ -89,14 +93,16 @@
                                 </label>
                                 <!--TODO input for immediate resolve if shelf is capable to do so-->
                             </div>
-                            <div ng-hide="isImmediatelyResolvable">
+                            <div ng-if="!isImmediatelyResolvable">
                                 <label for="buy">
                                     Требуется купить
                                 </label>
-                                <updowninput id="buy" ng-model="request.buy" measure="measure"></updowninput>
+                                <!--TODO default value so buttons can work-->
+                                <updowninput id="buy" ng-model="request.buy" measure="request.measure"></updowninput>
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <!--TODO hide with !immediate-->
                             <label for="buyDate">
                                 Купить до
                             </label>

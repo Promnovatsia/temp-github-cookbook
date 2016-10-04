@@ -29,16 +29,13 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                     requestId: $stateParams.requestId
                 }
             ).$promise.then(function (request) {
-                if (request.getMeasure()) {
-                    $scope.measure = request.measure;
-                }
                 if (request.getShelf()) {
                     $scope.shelf = request.shelf;
                     $scope.shelf.getMeasure();
                 }
                 $scope.request = request;
-                $scope.request.buy = request.buy || 1;
-                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : Date.now();
+                $scope.request.getMeasure();
+                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : Date.now(); //TODO check date construction console error
             });
         } else {
             $scope.request = new RequestService(
@@ -53,7 +50,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.getAsyncShelves = function (value) {
         var matched = [];
         if ($scope.asyncShelves.length === 0) {
-            return ShelfService.query().$promise.then(function (results) { //TODO уменьшить загрузку через поиск БД
+            return ShelfService.query().$promise.then(function (results) {
                 $scope.asyncShelves = results;
                 results.forEach(function (item, i, arr) {
                     if (item.caption.includes(value)) {
@@ -80,6 +77,10 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.clearAsyncShelf = function () {
         $scope.asyncShelf = '';
         $scope.asyncShelves = [];
+    };
+
+    $scope.applyMeasure = function () {
+        $scope.request.measure = $scope.shelf.measure;
     };
 
     $scope.checkRequest = function (id, value, oldValue) {
