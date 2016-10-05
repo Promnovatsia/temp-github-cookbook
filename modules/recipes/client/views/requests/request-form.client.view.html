@@ -30,33 +30,6 @@
                 </div>
                 <div ng-if="shelf" class="form-group">
                     <div class="row">
-                        <div class="col-md-3">
-                            <label>
-                                К полке: {{shelf.caption}}
-                            </label>
-                            <label ng-show="shelf.place">
-                                Место хранения: {{shelf.place}}
-                            </label>
-                        </div>
-                        <div class="col-md-7">
-                            <div class="text-center">
-                                {{shelf.measure.caption}}
-                            </div>
-                            <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
-                            <hr>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="btn-group">
-                                <label class="btn btn-link" ui-sref="shelf.edit({ shelfId: shelf.number })">
-                                    <i class="glyphicon glyphicon-cog"></i>
-                                </label>
-                                <label class="btn btn-link" ui-sref="shelf.query({ shelfId: shelf.number })">
-                                    <i class="glyphicon glyphicon-shopping-cart"></i>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div ng-if="request.measure != shelf.measure" class="col-md-4">
                             <label>
                                 Единица измерения полки
@@ -74,6 +47,22 @@
                             <measureselectcard ng-model="request.measure" editable="true" cache="asyncMeasures"></measureselectcard>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>
+                                К полке: {{shelf.caption}}
+                            </label>
+                            <label ng-show="shelf.place">
+                                Место хранения: {{shelf.place}}
+                            </label>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="text-center">
+                                {{shelf.measure.caption}}
+                            </div>
+                            <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
+                        </div>
+                    </div>
                     <div class="row" ng-if="request.measure">
                         <div class="col-md-4">
                             <label for="requested">
@@ -83,8 +72,8 @@
                                          validatable="true" validator="checkRequest(id, value, oldValue)">
                             </updowninput>
                         </div>
-                        <div class="col-md-4">
-                            <div ng-if="isImmediatelyResolvable">
+                        <div ng-if="isImmediatelyResolvable">
+                            <div class="col-md-4">
                                 <label>
                                     <label class="btn btn-default">
                                         <i class="glyphicon glyphicon-check"></i>
@@ -93,24 +82,31 @@
                                 </label>
                                 <!--TODO input for immediate resolve if shelf is capable to do so-->
                             </div>
-                            <div ng-if="!isImmediatelyResolvable">
+                        </div>
+                        <div ng-if="!isImmediatelyResolvable">
+                            <div class="col-md-4">
                                 <label for="buy">
                                     Требуется купить
                                 </label>
                                 <!--TODO default value so buttons can work-->
                                 <updowninput id="buy" ng-model="request.buy" measure="request.measure"></updowninput>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <!--TODO hide with !immediate-->
-                            <label for="buyDate">
-                                Купить до
-                            </label>
-                            <div class="input-group">
-                                <label class="input-group-addon">
-                                    <i class="glyphicon glyphicon-calendar"></i>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <label class="input-group-addon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                        Купить до
+                                    </label>
+                                    <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label>
+                                    <label class="btn btn-default">
+                                        <i class="glyphicon glyphicon-unchecked"></i>
+                                        Создать запрос
+                                    </label>
                                 </label>
-                                <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
                             </div>
                         </div>
                     </div>

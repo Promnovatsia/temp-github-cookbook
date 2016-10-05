@@ -41,7 +41,8 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
             $scope.request = new RequestService(
                 {
                     createdAt: Date.now(),
-                    buyDate: Date.now()
+                    buyDate: Date.now(),
+                    requested: 1
                 }
             );
         }
@@ -71,7 +72,13 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
 
     $scope.selectShelf = function (shelf) {
         $scope.shelf = shelf;
-        shelf.getMeasure();
+        $scope.shelf.storedOriginaly = $scope.shelf.stored;
+        var a = $scope.shelf.getMeasure();
+        if (a) {
+            a.then(function (measure) {
+                $scope.request.measure = measure;
+            });
+        }
     };
 
     $scope.clearAsyncShelf = function () {
@@ -81,19 +88,30 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
 
     $scope.applyMeasure = function () {
         $scope.request.measure = $scope.shelf.measure;
+        $scope.request.requested = $scope.required.measure.min;
+        $scope.$scope.checkRequest(null, $scope.request.requested);
     };
 
     $scope.checkRequest = function (id, value, oldValue) {
         if (!$scope.shelf) {
             return false;
         }
-        var diff = $scope.shelf.stored - $scope.shelf.deficit - value;
-        if (diff < 0) {
+        if ($scope.request.measure.id === $scope.shelf.measure.id) {
+            $scope.request.measure = $scope.shelf.measure;
+        }
+        if ($scope.request.measure != $scope.shelf.measure) {
             $scope.isImmediatelyResolvable = false;
-            $scope.request.buy = -diff;
-        } else {
+            return true;
+        }
+        var diff = $scope.shelf.storedOriginaly - $scope.shelf.deficit - value;
+        if (diff >= 0) {
             $scope.isImmediatelyResolvable = true;
             $scope.request.buy = 0;
+            $scope.shelf.stored = $scope.shelf.storedOriginaly - value;
+        } else {
+            $scope.isImmediatelyResolvable = false;
+            $scope.request.buy = -diff;
+            $scope.shelf.stored = $scope.shelf.deficit;
         }
         return true;
     };
