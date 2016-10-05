@@ -114,7 +114,7 @@ angular.module('recipes').directive('updowninput', function () {
                             value: newValue
                         };
                     } else {
-                            if( scope.validator(
+                            if( scope.validator( //TODO resort arguments
                             {
                                 id: scope.validationId,
                                 value: newValue,
