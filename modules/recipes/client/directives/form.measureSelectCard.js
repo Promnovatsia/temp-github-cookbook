@@ -5,7 +5,7 @@ angular.module('recipes').directive('measureselectcard', function (MeasureServic
         scope: {
             measure: '=ngModel',
             editable: '=editable',
-            asyncMeasures: '=cache'
+            cache: '=cache'
         },
         require: 'ngModel',
         template:
@@ -76,9 +76,9 @@ angular.module('recipes').directive('measureselectcard', function (MeasureServic
         link: function (scope, iElement, iAttrs, ngModelController) {
             scope.getAsyncMeasures = function (value) {
                 var matched = [];
-                if (scope.asyncMeasures.length === 0) {
+                if (scope.cache.length === 0) {
                     return MeasureService.query().$promise.then(function (results) {
-                        scope.asyncMeasures = results;
+                        scope.cache = results;
                         results.forEach(function (item) {
                             if (item.caption.includes(value)) {
                                 matched.push(item);
@@ -87,7 +87,7 @@ angular.module('recipes').directive('measureselectcard', function (MeasureServic
                         return matched;
                     });
                 } else {
-                    scope.asyncMeasures.forEach(function (item) {
+                    scope.cache.forEach(function (item) {
                         if (item.caption.includes(value)) {
                             matched.push(item);
                         }
@@ -102,7 +102,7 @@ angular.module('recipes').directive('measureselectcard', function (MeasureServic
 
             scope.clearAsyncMeasure = function () {
                 scope.asyncMeasure = '';
-                scope.asyncMeasures = [];
+                scope.cache = [];
             };
         }
     };
