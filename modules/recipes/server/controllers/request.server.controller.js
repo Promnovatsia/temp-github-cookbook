@@ -69,7 +69,7 @@ exports.list = function(req, res) {
         {
             where: {
                 userId: req.user.id,
-                isReserved: false
+                isResolved: false
             }
         }
     ).then(function(requests) {
