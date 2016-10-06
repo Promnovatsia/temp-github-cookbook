@@ -30,15 +30,12 @@
                 </div>
                 <div ng-if="shelf" class="form-group">
                     <div class="row">
-                        <div ng-if="request.measure != shelf.measure" class="col-md-4">
+                        <div ng-if="request.measure.id != shelf.measure.id" class="col-md-4">
                             <label>
                                 Единица измерения полки
+                                <i class="glyphicon glyphicon-copy" ng-click="applyMeasure()"></i>
                             </label>
                             <measureselectcard ng-model="shelf.measure"></measureselectcard>
-                            <label class="btn btn-link" ng-click="applyMeasure()">
-                                <i class="glyphicon glyphicon-copy"></i>
-                                Заполнить меру запроса
-                            </label>
                         </div>
                         <div class="col-md-4">
                             <label>
@@ -72,6 +69,29 @@
                                          validatable="true" validator="checkRequest(id, value, oldValue)">
                             </updowninput>
                         </div>
+                        <div ng-if="!isImmediatelyResolvable">
+                            <div class="col-md-4">
+                                <label for="buy">
+                                    Требуется купить
+                                </label>
+                                <!--TODO default value so buttons can work-->
+                                <updowninput id="buy" ng-model="request.buy" measure="request.measure"
+                                             validatable="true" validator="storeUserBuy(id, value, oldValue)"
+                                ></updowninput>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <label for="buyDate" class="input-group-addon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                        Купить до
+                                    </label>
+                                    <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <hr>
                         <div ng-if="isImmediatelyResolvable">
                             <div class="col-md-4">
                                 <label>
@@ -84,22 +104,6 @@
                             </div>
                         </div>
                         <div ng-if="!isImmediatelyResolvable">
-                            <div class="col-md-4">
-                                <label for="buy">
-                                    Требуется купить
-                                </label>
-                                <!--TODO default value so buttons can work-->
-                                <updowninput id="buy" ng-model="request.buy" measure="request.measure"></updowninput>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="input-group">
-                                    <label class="input-group-addon">
-                                        <i class="glyphicon glyphicon-calendar"></i>
-                                        Купить до
-                                    </label>
-                                    <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
-                                </div>
-                            </div>
                             <div class="col-md-4">
                                 <label>
                                     <label class="btn btn-default">

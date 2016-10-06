@@ -13,6 +13,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.asyncShelves = [];
     $scope.asyncMeasures = [];
     $scope.isImmediatelyResolvable = false;
+    $scope.userStoredBuy = 0;
 
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
 
@@ -29,19 +30,23 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                     requestId: $stateParams.requestId
                 }
             ).$promise.then(function (request) {
-                if (request.getShelf()) {
-                    $scope.shelf = request.shelf;
-                    $scope.shelf.getMeasure();
+                var a = request.getShelf();
+                if (a) {
+                    a.then(function (shelf) {
+                        $scope.shelf = shelf;
+                        $scope.shelf.getMeasure();
+                        $scope.shelf.storedOriginaly = $scope.shelf.stored;
+                    });
                 }
                 $scope.request = request;
                 $scope.request.getMeasure();
-                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : Date.now(); //TODO check date construction console error
+                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : new Date(Date.now()); //TODO check date construction console error
             });
         } else {
             $scope.request = new RequestService(
                 {
-                    createdAt: Date.now(),
-                    buyDate: Date.now(),
+                    createdAt: new Date(Date.now()),
+                    buyDate:new Date(Date.now()),
                     requested: 1
                 }
             );
@@ -88,29 +93,42 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
 
     $scope.applyMeasure = function () {
         $scope.request.measure = $scope.shelf.measure;
-        $scope.request.requested = $scope.required.measure.min;
+        $scope.shelf.stored = $scope.shelf.storedOriginaly;
+        $scope.request.requested = $scope.request.measure.min;
+        $scope.request.buy = 0;
         $scope.$scope.checkRequest(null, $scope.request.requested);
+    };
+
+    $scope.storeUserBuy = function (id, value, oldValue) {
+        if ($scope.request.measure.id !== $scope.shelf.measure.id) {
+            return true;
+        }
+        var diff = $scope.shelf.storedOriginaly - $scope.shelf.deficit - $scope.request.requested;
+        if (value < -diff) {
+            //TODO ability to remove userStoredBuy to null
+            return false;
+        }
+        $scope.userStoredBuy = $scope.userStoredBuy + value - oldValue;
+        return true;
     };
 
     $scope.checkRequest = function (id, value, oldValue) {
         if (!$scope.shelf) {
             return false;
         }
-        if ($scope.request.measure.id === $scope.shelf.measure.id) {
-            $scope.request.measure = $scope.shelf.measure;
-        }
-        if ($scope.request.measure != $scope.shelf.measure) {
+        if ($scope.request.measure.id !== $scope.shelf.measure.id) {
+            $scope.shelf.stored = $scope.shelf.storedOriginaly;
             $scope.isImmediatelyResolvable = false;
             return true;
         }
         var diff = $scope.shelf.storedOriginaly - $scope.shelf.deficit - value;
         if (diff >= 0) {
             $scope.isImmediatelyResolvable = true;
-            $scope.request.buy = 0;
             $scope.shelf.stored = $scope.shelf.storedOriginaly - value;
+            $scope.request.buy = $scope.userStoredBuy;
         } else {
             $scope.isImmediatelyResolvable = false;
-            $scope.request.buy = -diff;
+            $scope.request.buy = -diff + $scope.userStoredBuy;
             $scope.shelf.stored = $scope.shelf.deficit;
         }
         return true;
@@ -130,7 +148,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
             return false;
         }
 
-        $scope.request.measureId = $scope.measure.id;
+        $scope.request.measureId = $scope.request.measure.id;
         $scope.request.shelfId = $scope.shelf.id;
         $scope.request.createOrUpdate()
             .then(successCallback)
