@@ -60,7 +60,7 @@ function RequestService($resource, ShelfService, MeasureService) {
         if (!request.measureId) {
             return false;
         } else {
-            ShelfService.get(
+            return ShelfService.get(
                 {
                     shelfId: request.shelfId
                 }
@@ -69,7 +69,7 @@ function RequestService($resource, ShelfService, MeasureService) {
                     return false;
                 }
                 request.shelf = shelf;
-                return true;
+                return shelf;
             });
         }
     }
