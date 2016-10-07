@@ -62,61 +62,72 @@
                     </div>
                     <div class="row" ng-if="request.measure">
                         <div class="col-md-4">
-                            <label for="requested">
-                                Необходимо
-                            </label>
-                            <updowninput id="requested" ng-model="request.requested" measure="request.measure"
-                                         validatable="true" validator="checkRequest(id, value, oldValue)">
-                            </updowninput>
+                            <toggle-switch class="switch-default" ng-model="request.isOnlyBuy" on-label="Закупка" off-label="Запрос"></toggle-switch>
                         </div>
-                        <div ng-if="!isImmediatelyResolvable">
+                        <div ng-if="request.isOnlyBuy">
                             <div class="col-md-4">
-                                <label for="buy">
-                                    Требуется купить
+                                <label>
+                                    Нужно купить
                                 </label>
-                                <!--TODO default value so buttons can work-->
-                                <updowninput id="buy" ng-model="request.buy" measure="request.measure"
-                                             validatable="true" validator="storeUserBuy(id, value, oldValue)"
-                                ></updowninput>
+                                <updowninput ng-model="request.onlyBuy" measure="request.measure"></updowninput>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-12">
+                                <label>
+                                    Купить до
+                                </label>
                                 <div class="input-group">
-                                    <label for="buyDate" class="input-group-addon">
+                                    <label for="onlyBuyDate" class="input-group-addon">
                                         <i class="glyphicon glyphicon-calendar"></i>
-                                        Купить до
                                     </label>
-                                    <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
+                                    <input id="onlyBuyDate" type="date" ng-model="request.buyDate" class="form-control">
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <hr>
-                        <div ng-if="isImmediatelyResolvable">
+                        <div ng-if="!request.isOnlyBuy">
                             <div class="col-md-4">
                                 <label>
-                                    <label class="btn btn-default">
-                                        <i class="glyphicon glyphicon-check"></i>
-                                        Выполнить сразу
-                                    </label>
+                                    Зарезервировать
                                 </label>
-                                <!--TODO input for immediate resolve if shelf is capable to do so-->
+                                <updowninput ng-model="request.requested" measure="request.measure"
+                                             validatable="true" validator="checkRequest(id, value, oldValue)">
+                                </updowninput>
                             </div>
-                        </div>
-                        <div ng-if="!isImmediatelyResolvable">
-                            <div class="col-md-4">
-                                <label>
-                                    <label class="btn btn-default">
-                                        <i class="glyphicon glyphicon-unchecked"></i>
-                                        Создать запрос
+                            <div ng-if="!isImmediatelyResolvable">
+                                <div class="col-md-4">
+                                    <label>
+                                        Требуется докупить
                                     </label>
-                                </label>
+                                    <updowninput ng-model="request.buy" measure="request.measure"
+                                                 validatable="true" validator="storeUserBuy(id, value, oldValue)"
+                                    ></updowninput>
+                                </div>
+                                <div class="col-md-12">
+                                    <label>
+                                        Купить до
+                                    </label>
+                                    <div class="input-group">
+                                        <label for="buyDate" class="input-group-addon">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </label>
+                                        <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <input type="submit" class="btn btn-default" value="{{request.id ? 'Обновить' : 'Создать'}}">
+                    <div class="input-group">
+                        <label ng-if="isImmediatelyResolvable" class="input-group-addon">
+                            <i class="glyphicon glyphicon-check"></i>
+                            Выполним сразу
+                        </label>
+                        <label ng-if="!isImmediatelyResolvable" class="input-group-addon">
+                            <i class="glyphicon glyphicon-unchecked"></i>
+                            В очереди выполнения
+                        </label>
+                        <input type="submit" class="btn btn-default" value="{{request.id ? 'Обновить запрос' : 'Создать запрос'}}">
+                    </div>
                 </div>
                 <div ng-show="error" class="text-danger">
                     <strong ng-bind="error"></strong>

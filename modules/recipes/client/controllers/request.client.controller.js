@@ -40,14 +40,16 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                 }
                 $scope.request = request;
                 $scope.request.getMeasure();
-                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : new Date(Date.now()); //TODO check date construction console error
+                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : new Date(Date.now());
+                $scope.request.isOnlyBuy = !($scope.request.requested);
             });
         } else {
             $scope.request = new RequestService(
                 {
                     createdAt: new Date(Date.now()),
-                    buyDate:new Date(Date.now()),
-                    requested: 1
+                    buyDate: new Date(Date.now()),
+                    requested: 1,
+                    isOnlyBuy: true
                 }
             );
         }
@@ -96,7 +98,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
         $scope.shelf.stored = $scope.shelf.storedOriginaly;
         $scope.request.requested = $scope.request.measure.min;
         $scope.request.buy = 0;
-        $scope.$scope.checkRequest(null, $scope.request.requested);
+        $scope.checkRequest(null, $scope.request.requested);
     };
 
     $scope.storeUserBuy = function (id, value, oldValue) {
