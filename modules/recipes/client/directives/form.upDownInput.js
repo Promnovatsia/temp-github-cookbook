@@ -15,7 +15,8 @@ angular.module('recipes').directive('updowninput', function () {
             validationId: '='
         },
         require: 'ngModel',
-        template: '<div ng-hide="converter">' +
+        template: //TODO replace ng-show with ng-if
+            '<div ng-hide="converter">' +
                 '<div ng-hide="(measure.step > 0) || !measure">' +
                     '<label class="btn btn-default" ng-click="converter=true">' +
                         '{{measure.caption}}' +
@@ -119,7 +120,7 @@ angular.module('recipes').directive('updowninput', function () {
                                 id: scope.validationId,
                                 value: newValue,
                                 oldValue: scope.value
-                            }
+                            } //TODO allow to return value to replace input
                         )) {
                             ngModelController.$setViewValue(newValue);//TODO look at apply model view tmth
                             scope.form = {
