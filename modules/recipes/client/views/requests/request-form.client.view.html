@@ -61,57 +61,43 @@
                         </div>
                     </div>
                     <div class="row" ng-if="request.measure">
+                        <div ng-if="request.requested" class="col-md-4">
+                            <label>
+                                Запланировано использовать:
+                            </label>
+                            <label>
+                                {{request.requested}}{{shelf.measure.caption}}
+                            </label>
+                        </div>
                         <div class="col-md-4">
-                            <toggle-switch class="switch-default" ng-model="request.isOnlyBuy" on-label="Закупка" off-label="Запрос"></toggle-switch>
+                            <label ng-if="request.requested">
+                                Дополнительно зарезервировать
+                            </label>
+                            <label ng-if="!request.requested">
+                                Зарезервировать
+                            </label>
+                            <updowninput ng-model="request.needed" measure="request.measure"
+                                         validatable="true" validator="checkRequest(id, value, oldValue)">
+                            </updowninput>
                         </div>
-                        <div ng-if="request.isOnlyBuy">
-                            <div class="col-md-4">
-                                <label>
-                                    Нужно купить
-                                </label>
-                                <updowninput ng-model="request.onlyBuy" measure="request.measure"></updowninput>
-                            </div>
-                            <div class="col-md-12">
-                                <label>
-                                    Купить до
-                                </label>
-                                <div class="input-group">
-                                    <label for="onlyBuyDate" class="input-group-addon">
-                                        <i class="glyphicon glyphicon-calendar"></i>
-                                    </label>
-                                    <input id="onlyBuyDate" type="date" ng-model="request.buyDate" class="form-control">
-                                </div>
-                            </div>
+                        <div ng-if="request.buy" class="col-md-4">
+                            <br>
+                            <label>
+                                Требуется докупить:
+                            </label>
+                            <label>
+                                {{request.buy}}{{shelf.measure.caption}}
+                            </label>
                         </div>
-                        <div ng-if="!request.isOnlyBuy">
-                            <div class="col-md-4">
-                                <label>
-                                    Зарезервировать
+                        <div ng-if="request.buy" class="col-md-12">
+                            <label>
+                                Купить до
+                            </label>
+                            <div class="input-group">
+                                <label for="buyDate" class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
                                 </label>
-                                <updowninput ng-model="request.requested" measure="request.measure"
-                                             validatable="true" validator="checkRequest(id, value, oldValue)">
-                                </updowninput>
-                            </div>
-                            <div ng-if="!isImmediatelyResolvable">
-                                <div class="col-md-4">
-                                    <label>
-                                        Требуется докупить
-                                    </label>
-                                    <updowninput ng-model="request.buy" measure="request.measure"
-                                                 validatable="true" validator="storeUserBuy(id, value, oldValue)"
-                                    ></updowninput>
-                                </div>
-                                <div class="col-md-12">
-                                    <label>
-                                        Купить до
-                                    </label>
-                                    <div class="input-group">
-                                        <label for="buyDate" class="input-group-addon">
-                                            <i class="glyphicon glyphicon-calendar"></i>
-                                        </label>
-                                        <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
-                                    </div>
-                                </div>
+                                <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
                             </div>
                         </div>
                     </div>
@@ -120,11 +106,9 @@
                     <div class="input-group">
                         <label ng-if="isImmediatelyResolvable" class="input-group-addon">
                             <i class="glyphicon glyphicon-check"></i>
-                            Выполним сразу
                         </label>
                         <label ng-if="!isImmediatelyResolvable" class="input-group-addon">
                             <i class="glyphicon glyphicon-unchecked"></i>
-                            В очереди выполнения
                         </label>
                         <input type="submit" class="btn btn-default" value="{{request.id ? 'Обновить запрос' : 'Создать запрос'}}">
                     </div>

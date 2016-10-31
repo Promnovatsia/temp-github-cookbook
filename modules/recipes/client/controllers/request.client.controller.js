@@ -11,9 +11,8 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
     $scope.authentication = Authentication;
     $scope.error = null;
     $scope.asyncShelves = [];
-    $scope.asyncMeasures = [];
+    $scope.asyncMeasures = []; //required by measureSelectCard directive
     $scope.isImmediatelyResolvable = false;
-    $scope.userStoredBuy = 0;
 
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
 
@@ -30,26 +29,28 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
                     requestId: $stateParams.requestId
                 }
             ).$promise.then(function (request) {
+                $scope.request = request;
+                $scope.request.needed = (request.buy > 0) ? request.buy - request.requested : 0;
+                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : new Date(Date.now());
+                $scope.request.getMeasure();
                 var a = request.getShelf();
                 if (a) {
                     a.then(function (shelf) {
                         $scope.shelf = shelf;
-                        $scope.shelf.getMeasure();
                         $scope.shelf.storedOriginaly = $scope.shelf.stored;
+                        $scope.shelf.getMeasure().then(function () {
+                            $scope.checkRequest(null, $scope.request.needed, 0);
+                        });
                     });
                 }
-                $scope.request = request;
-                $scope.request.getMeasure();
-                $scope.request.buyDate = request.buyDate ? new Date(request.buyDate) : new Date(Date.now());
-                $scope.request.isOnlyBuy = !($scope.request.requested);
             });
         } else {
+            var newdate = new Date(Date.now());
             $scope.request = new RequestService(
                 {
-                    createdAt: new Date(Date.now()),
-                    buyDate: new Date(Date.now()),
-                    requested: 1,
-                    isOnlyBuy: true
+                    createdAt: newdate,
+                    buyDate: newdate,
+                    requested: 0
                 }
             );
         }
@@ -98,20 +99,7 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
         $scope.shelf.stored = $scope.shelf.storedOriginaly;
         $scope.request.requested = $scope.request.measure.min;
         $scope.request.buy = 0;
-        $scope.checkRequest(null, $scope.request.requested);
-    };
-
-    $scope.storeUserBuy = function (id, value, oldValue) {
-        if ($scope.request.measure.id !== $scope.shelf.measure.id) {
-            return true;
-        }
-        var diff = $scope.shelf.storedOriginaly - $scope.shelf.deficit - $scope.request.requested;
-        if (value < -diff) {
-            //TODO ability to remove userStoredBuy to null
-            return false;
-        }
-        $scope.userStoredBuy = $scope.userStoredBuy + value - oldValue;
-        return true;
+        $scope.checkRequest(null, 0, $scope.request.requested);
     };
 
     $scope.checkRequest = function (id, value, oldValue) {
@@ -119,19 +107,19 @@ function RequestController($scope, $stateParams, $location, $window, Authenticat
             return false;
         }
         if ($scope.request.measure.id !== $scope.shelf.measure.id) {
-            $scope.shelf.stored = $scope.shelf.storedOriginaly;
+            $scope.shelf.stored = $scope.shelf.storedOriginaly - $scope.request.requested;
             $scope.isImmediatelyResolvable = false;
             return true;
         }
-        var diff = $scope.shelf.storedOriginaly - $scope.shelf.deficit - value;
+        var diff = $scope.shelf.storedOriginaly - $scope.shelf.deficit - $scope.request.requested - value;
         if (diff >= 0) {
             $scope.isImmediatelyResolvable = true;
-            $scope.shelf.stored = $scope.shelf.storedOriginaly - value;
-            $scope.request.buy = $scope.userStoredBuy;
+            $scope.shelf.stored = $scope.shelf.storedOriginaly - $scope.request.requested - value;
+            $scope.request.buy = 0;
         } else {
             $scope.isImmediatelyResolvable = false;
-            $scope.request.buy = -diff + $scope.userStoredBuy;
             $scope.shelf.stored = $scope.shelf.deficit;
+            $scope.request.buy = -diff;
         }
         return true;
     };

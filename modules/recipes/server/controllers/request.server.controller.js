@@ -3,7 +3,8 @@
 var path = require('path'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-    Request = db.request;
+    Request = db.request,
+    Shelf = db.shelf;
 
 exports.create = function(req, res) {
 
@@ -38,14 +39,38 @@ exports.update = function(req, res) {
         }
     ).then(function(request) {
         if (request) {
-            request.update(req.body).then(function(request) {
-                return res.json(request);
+            return Shelf.findOne(
+                {
+                    where: {
+                        id: req.body.shelfId
+                    }
+                }
+            ).then(function(shelf) {
+                if (shelf) {
+                    var diff = shelf.stored - shelf.deficit - req.body.requested - req.body.needed;
+                    if (diff >= 0) {
+                        shelf.stored = shelf.deficit + diff;
+                        request.buy = 0;
+                    } else {
+                        shelf.stored = shelf.deficit;
+                        request.buy = -diff;
+                    }
+                    return shelf;
+                }
+            }).save({
+                fields: ['stored']
+            }).then(function(shelf) {
+                if (shelf) {
+                    console.log(shelf);
+                    return request.update(req.body).then(function(request) {
+                        return res.json(request);
+                    });
+                }
             }).catch(function(err) {
                 return res.status(400).send({
-                    message: errorHandler.getErrorMessage(err)
+                    message: 'Unable to find or process the requested shelf'
                 });
             });
-            return null;
         } else {
             return res.status(400).send({
                 message: 'Unable to find the request'
