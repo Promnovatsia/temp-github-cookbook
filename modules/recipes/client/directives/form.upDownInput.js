@@ -36,7 +36,7 @@ angular.module('recipes').directive('updowninput', function () {
                                     '{{value}}' +
                                 '</div>' +
                                 '<div ng-hide="convertable">' +
-                                    '{{value}} {{measure.caption}}' +
+                                    '{{value}} {{measure.caption}}' + //TODO display value and measure via directive with style and hovering tooltip
                                 '</div>' +
                             '</label>' +
                             '<label class="btn btn-default" ng-click="set(1)">' +
