@@ -11,7 +11,8 @@
     <div class="list-group">
         <a ng-repeat="request in requests" ui-sref="request.edit({requestId: request.id})" class="list-group-item">
             <div class="row">
-                {{request.id}}
+                <i class="glyphicon glyphicon-unchecked"></i>
+                Запрос от {{request.createdAt | date}}
             </div>
         </a>
     </div>

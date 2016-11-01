@@ -29,6 +29,7 @@ function RequestService($resource, ShelfService, MeasureService) {
             isArray: true,
             url: '/api/shelf/:shelfId/query'
         }
+        //TODO add methods to tell apart updating and resolving
     });
 
     angular.extend(Request.prototype, {

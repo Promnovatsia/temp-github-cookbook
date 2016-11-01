@@ -2,6 +2,7 @@
     <div class="page-header">
         <h1>
             Запрос от {{request.createdAt | date}}
+            <!--TODO show resolving status-->
         </h1>
     </div>
     <div class="col-md-12">
@@ -98,6 +99,15 @@
                                     <i class="glyphicon glyphicon-calendar"></i>
                                 </label>
                                 <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <!--TODO logic and server actions-->
+                                <label>
+                                    Уже куплено
+                                </label>
+                                <updowninput ng-model="request.bought" measure="request.measure"
+                                             validatable="true" validator="checkRequest(id, value, oldValue)">
+                                </updowninput>
                             </div>
                         </div>
                     </div>

@@ -38,42 +38,64 @@ exports.update = function(req, res) {
             }
         }
     ).then(function(request) {
-        if (request) {
+        if (!request) {
+            return res.status(400).send({
+                message: 'Unable to find the request'
+            });
+        } else {
+            //TODO validate changes and call for shelf update only if needed
+            if (request.shelfId === req.body.shelfId &&
+                request.measureId === req.body.measureId &&
+                request.required === req.body.required &&
+                request.needed === req.body.needed &&
+                request.buy === req.body.buy)
+            {
+                return request.update(req.body).then(function (request) {
+                    return res.json(request);
+                });
+            }
+            //TODO eliminate situation when resolved request changes shelf on update
+            request.needed = req.body.needed || 0;
             return Shelf.findOne(
                 {
                     where: {
                         id: req.body.shelfId
                     }
                 }
-            ).then(function(shelf) {
-                if (shelf) {
+            ).then(function (shelf) {
+                if (!shelf) {
+                    return res.status(400).send({
+                        message: 'Unable to find requested shelf'
+                    });
+                } else {
                     var diff = shelf.stored - shelf.deficit - req.body.requested - req.body.needed;
                     if (diff >= 0) {
                         shelf.stored = shelf.deficit + diff;
-                        request.buy = 0;
+                        req.body.isResolved = true;
                     } else {
-                        shelf.stored = shelf.deficit;
-                        request.buy = -diff;
+                        //TODO restore if resolved request is updated to
+                        if (req.body.buy === -diff) {
+                            shelf.stored = shelf.deficit + 5;//TODO remove adding before commit
+                            req.body.isResolved = false;
+                        }
+                        else {
+                            return res.status(400).send({
+                                message: 'Request has invalid shelf values'
+                            });
+                        }
                     }
-                    return shelf;
-                }
-            }).save({
-                fields: ['stored']
-            }).then(function(shelf) {
-                if (shelf) {
-                    console.log(shelf);
-                    return request.update(req.body).then(function(request) {
-                        return res.json(request);
+                    return shelf.save({fields: ['stored']}).then(function (shelf) {
+                        if (!shelf) {
+                            return res.status(400).send({
+                                message: 'Unable to process requested shelf'
+                            });
+                        } else {
+                            return request.update(req.body).then(function (request) {
+                                return res.json(request);
+                            });
+                        }
                     });
                 }
-            }).catch(function(err) {
-                return res.status(400).send({
-                    message: 'Unable to find or process the requested shelf'
-                });
-            });
-        } else {
-            return res.status(400).send({
-                message: 'Unable to find the request'
             });
         }
     }).catch(function(err) {
