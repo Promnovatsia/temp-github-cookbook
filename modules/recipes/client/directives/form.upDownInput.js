@@ -15,7 +15,8 @@ angular.module('recipes').directive('updowninput', function () {
             validationId: '='
         },
         require: 'ngModel',
-        template: '<div ng-hide="converter">' +
+        template: //TODO replace ng-show with ng-if
+            '<div ng-hide="converter">' +
                 '<div ng-hide="(measure.step > 0) || !measure">' +
                     '<label class="btn btn-default" ng-click="converter=true">' +
                         '{{measure.caption}}' +
@@ -35,7 +36,7 @@ angular.module('recipes').directive('updowninput', function () {
                                     '{{value}}' +
                                 '</div>' +
                                 '<div ng-hide="convertable">' +
-                                    '{{value}} {{measure.caption}}' +
+                                    '{{value}} {{measure.caption}}' + //TODO display value and measure via directive with style and hovering tooltip
                                 '</div>' +
                             '</label>' +
                             '<label class="btn btn-default" ng-click="set(1)">' +
@@ -114,12 +115,12 @@ angular.module('recipes').directive('updowninput', function () {
                             value: newValue
                         };
                     } else {
-                            if( scope.validator(
+                            if( scope.validator( //TODO resort arguments
                             {
                                 id: scope.validationId,
                                 value: newValue,
                                 oldValue: scope.value
-                            }
+                            } //TODO allow to return value to replace input
                         )) {
                             ngModelController.$setViewValue(newValue);//TODO look at apply model view tmth
                             scope.form = {

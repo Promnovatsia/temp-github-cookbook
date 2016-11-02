@@ -5,9 +5,9 @@ angular
     .module('recipes')
     .factory('ShelfService', ShelfService);
 
-ShelfService.$inject = ['$resource'];
+ShelfService.$inject = ['$resource', 'MeasureService'];
 
-function ShelfService($resource) {
+function ShelfService($resource, MeasureService) {
     var Shelf = $resource('api/shelf/:shelfId', {
         shelfId: '@id'
     }, {
@@ -20,6 +20,10 @@ function ShelfService($resource) {
         createOrUpdate: function () {
             var shelf = this;
             return createOrUpdate(shelf);
+        },
+        getMeasure: function () {
+            var shelf = this;
+            return getMeasure(shelf);
         }
     });
     
@@ -30,6 +34,24 @@ function ShelfService($resource) {
             return shelf.$update(onSuccess, onError);
         } else {
             return shelf.$save(onSuccess, onError);
+        }
+    }
+
+    function getMeasure(shelf) {
+        if (!shelf.measureId) {
+            return false;
+        } else {
+            return MeasureService.get(
+                {
+                    measureId: shelf.measureId
+                }
+            ).$promise.then(function (measure) {
+                if (!measure) {
+                    return false;
+                }
+                shelf.measure = measure;
+                return measure;
+            });
         }
     }
     

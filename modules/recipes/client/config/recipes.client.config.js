@@ -49,6 +49,11 @@ angular
             state: 'shelf.list',
             roles: ['user']
         });
+        Menus.addSubMenuItem('topbar', 'shelf', {
+            title: 'Запросы',
+            state: 'request.list',
+            roles: ['user']
+        });
         
         Menus.addMenuItem('topbar', {
             title: 'Меню',

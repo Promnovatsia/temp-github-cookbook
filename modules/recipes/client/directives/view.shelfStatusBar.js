@@ -12,12 +12,12 @@ angular.module('recipes').directive('shelfstatusbar', function () {
     return {
         restrict: 'AE',
         scope: {
-            progressbar: '=handle'
+            progressbar: '=handle' //TODO refactor to fix error with attribute
         },
         require: 'ngModel',
         template:
             '<div>' +
-                '<div ng-show="progressbar">' +
+                '<div ng-show="progressbar">' + //TODO ng-if
                     '<progressbar class="{{progressbar.class}}" value="progressbar.value" type="{{progressbar.type}}" max="100">' +
                         '<span style="color:white; white-space:nowrap;">' + 
                             '{{progressbar.text}}' +
@@ -29,7 +29,7 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                 '</div>' +
             '</div>',
         link: function (scope, iElement, iAttrs, ngModelController) {
-            ngModelController.$render = function () {
+            ngModelController.$render = function () { //TODO check if this is required
                 scope.shelf = ngModelController.$viewValue;
                 scope.progressUpdate();    
             };
@@ -44,7 +44,7 @@ angular.module('recipes').directive('shelfstatusbar', function () {
                     scope.progressbar = 
                         {
                             type: 'danger',
-                            text: scope.shelf.stored + " < " + scope.shelf.deficit, 
+                            text: scope.shelf.stored + " < " + scope.shelf.deficit,
                             value: pbLimitDeficit - pbLengthDeficit + 
                                 ((scope.shelf.stored / scope.shelf.deficit) * pbLengthDeficit)    
                         };

@@ -1,0 +1,132 @@
+<section ng-controller="RequestController" ng-init="findOne()">
+    <div class="page-header">
+        <h1>
+            Запрос от {{request.createdAt | date}}
+            <!--TODO show resolving status-->
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <form name="requestForm" class="form-horizontal" ng-submit="save(requestForm.$valid)" novalidate>
+            <fieldset>
+                <div ng-if="!shelf" class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </div>
+                        <input type="text" ng-model="asyncShelf" placeholder="Выберите полку"
+                               typeahead="shelf as shelf.caption for shelf in getAsyncShelves($viewValue)"
+                               typeahead-loading="loadingShelves" typeahead-no-results="noResultsShelf"
+                               typeahead-on-select="selectShelf($item)" class="form-control">
+                        <i ng-show="loadingShelves" class="glyphicon glyphicon-refresh"></i>
+                        <div ng-show="noResultsShelf" class="input-group-addon">
+                            <i class="glyphicon glyphicon-remove"></i>
+                            Нет результатов
+                        </div>
+                        <div class="input-group-addon">
+                            <div ng-click="clearAsyncShelf()">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="shelf" class="form-group">
+                    <div class="row">
+                        <div ng-if="request.measure.id != shelf.measure.id" class="col-md-4">
+                            <label>
+                                Единица измерения полки
+                                <i class="glyphicon glyphicon-copy" ng-click="applyMeasure()"></i>
+                            </label>
+                            <measureselectcard ng-model="shelf.measure"></measureselectcard>
+                        </div>
+                        <div class="col-md-4">
+                            <label>
+                                Единица измерения запроса
+                            </label>
+                            <measureselectcard ng-model="request.measure" editable="true" cache="asyncMeasures"></measureselectcard>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>
+                                К полке: {{shelf.caption}}
+                            </label>
+                            <label ng-show="shelf.place">
+                                Место хранения: {{shelf.place}}
+                            </label>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="text-center">
+                                {{shelf.measure.caption}}
+                            </div>
+                            <shelfstatusbar ng-model="shelf" handle="handle"></shelfstatusbar>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="request.measure">
+                        <div ng-if="request.requested" class="col-md-4">
+                            <label>
+                                Запланировано использовать:
+                            </label>
+                            <label>
+                                {{request.requested}}{{shelf.measure.caption}}
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <label ng-if="request.requested">
+                                Дополнительно зарезервировать
+                            </label>
+                            <label ng-if="!request.requested">
+                                Зарезервировать
+                            </label>
+                            <updowninput ng-model="request.needed" measure="request.measure"
+                                         validatable="true" validator="checkRequest(id, value, oldValue)">
+                            </updowninput>
+                        </div>
+                        <div ng-if="request.buy" class="col-md-4">
+                            <br>
+                            <label>
+                                Требуется докупить:
+                            </label>
+                            <label>
+                                {{request.buy}}{{shelf.measure.caption}}
+                            </label>
+                        </div>
+                        <div ng-if="request.buy" class="col-md-12">
+                            <label>
+                                Купить до
+                            </label>
+                            <div class="input-group">
+                                <label for="buyDate" class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </label>
+                                <input id="buyDate" type="date" ng-model="request.buyDate" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <!--TODO logic and server actions-->
+                                <label>
+                                    Уже куплено
+                                </label>
+                                <updowninput ng-model="request.bought" measure="request.measure"
+                                             validatable="true" validator="checkRequest(id, value, oldValue)">
+                                </updowninput>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <label ng-if="isImmediatelyResolvable" class="input-group-addon">
+                            <i class="glyphicon glyphicon-check"></i>
+                        </label>
+                        <label ng-if="!isImmediatelyResolvable" class="input-group-addon">
+                            <i class="glyphicon glyphicon-unchecked"></i>
+                        </label>
+                        <input type="submit" class="btn btn-default" value="{{request.id ? 'Обновить запрос' : 'Создать запрос'}}">
+                    </div>
+                </div>
+                <div ng-show="error" class="text-danger">
+                    <strong ng-bind="error"></strong>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</section>
