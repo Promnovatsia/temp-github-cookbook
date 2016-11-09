@@ -9,9 +9,9 @@ ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Au
 function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, IngredientService, MeasureService) {
 
     // progress bar settings
-    const pbLimitDeficit = 20;
-    const pbLimitDesired = 50;
-    const pbLimitMax = 80;
+    var pbLimitDeficit = 20;
+    var pbLimitDesired = 50;
+    var pbLimitMax = 80;
         
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -87,14 +87,14 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     
     $scope.setIngredient = function (ingredient) {
         
-        if (!ingredient) {
+        if (!ingredient.id) {
             $scope.shelf.ingridientId = null;
             $scope.ingredient = null;
             return;
         }
-        
         $scope.ingredient = ingredient;
         $scope.shelf.ingredientId = ingredient.id;
+        console.log(ingredient.measureId);
         ingredient.getMeasure().then(function (measure) {
             $scope.measure = measure;
         });
@@ -183,10 +183,10 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.remove = function () {
-        if ($window.confirm('Are you sure you want to delete?')) {
+        //if ($window.confirm('Are you sure you want to delete?')) {
             $scope.shelf.$remove();
             $location.path('shelf');    
-        }
+        //}
     };
 
     $scope.save = function (isValid) {
@@ -195,15 +195,18 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             $scope.$broadcast('show-errors-check-validity', 'shelfForm');
             return false;
         }
-        
-        $scope.shelf.caption = $scope.ingredient.caption;
-        $scope.shelf.measureCaption = $scope.measure.caption;
+
+        if($scope.ingredient) {
+            $scope.shelf.caption = $scope.ingredient.caption;
+            $scope.shelf.measureCaption = $scope.measure.caption;
+        }
+
         $scope.shelf.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
 
         function successCallback(res) {
-            $location.path('shelf/' + $scope.shelf.number);
+            $location.path('shelf/' + $scope.shelf.id);
         }
 
         function errorCallback(res) {

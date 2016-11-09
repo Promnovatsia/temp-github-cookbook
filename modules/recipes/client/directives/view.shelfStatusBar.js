@@ -1,14 +1,14 @@
 angular.module('recipes').directive('shelfstatusbar', function () {
     'use strict';
     // progress bar settings
-    const pbLimitEmpty = 10;
-    const pbLimitDeficit = 20;
-    const pbLengthDeficit = 20;
-    const pbLimitDesired = 50;
-    const pbLengthDesired = 30;
-    const pbLimitMax = 80;
-    const pbLenghtMax = 30;
-    const pbMultyMax = 5;
+    var pbLimitEmpty = 10;
+    var pbLimitDeficit = 20;
+    var pbLengthDeficit = 20;
+    var pbLimitDesired = 50;
+    var pbLengthDesired = 30;
+    var pbLimitMax = 80;
+    var pbLenghtMax = 30;
+    var pbMultyMax = 5;
     return {
         restrict: 'AE',
         scope: {
