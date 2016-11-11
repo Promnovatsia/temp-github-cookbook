@@ -3,84 +3,105 @@
 module.exports = function (sequelize, DataTypes) {
 
     var Shelf = sequelize.define('shelf', {
-
+        id: {
+            primaryKey: true,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4
+        },
+        fallback: {
+            type: DataTypes.UUID,
+            references: {
+                model: "shelves",
+                key: "id"
+            },
+            comment: 'if set to shelf uuid owned by same user all requests will redirect to fallback shelf instead'
+        },
         isClosed: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: false
+            defaultValue: false,
+            comment: 'if set no request can change stored amount, no fallback'
         },
         isRevision: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: false
+            defaultValue: false,
+            comment: 'if set allows only manual requests, does not notify'
         },
         isStorage: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: false
+            defaultValue: false,
+            comment: 'if set direct checkout will require confirmation, but fallback to this will be resolved'
         },
         isResource: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: false
-        },
-        number: {
-            type: DataTypes.INTEGER    
-        },
-        override: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: "shelves",
-                key: "id"
-            }
-        },
-        fallback: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: "shelves",
-                key: "id"
-            }
+            defaultValue: false,
+            comment: 'if set enables restock by autogenerating requests to reach desired value'
         },
         stored: {
-            type: DataTypes.FLOAT
+            type: DataTypes.FLOAT,
+            allowNull: false,
+            defaultValue: 0,
+            validate: {
+                min: 0
+            },
+            comment: 'value available for reservation and using by resolving requests'
         },
         deficit: {
-            type: DataTypes.FLOAT
+            type: DataTypes.FLOAT,
+            allowNull: false,
+            defaultValue: 0,
+            validate: {
+                min: 0
+            },
+            comment: 'value acting as effective null, no resovle can lower stored value below this'
         },
         desired: {
-            type: DataTypes.FLOAT
+            type: DataTypes.FLOAT,
+            allowNull: false,
+            defaultValue: 0,
+            validate: {
+                min: 0
+            },
+            comment: 'value acting as target for restock'
         },
         max: {
-            type: DataTypes.FLOAT
-        },
-        caption: {
-            type: DataTypes.STRING        
+            type: DataTypes.FLOAT,
+            allowNull: false,
+            defaultValue: 0,
+            validate: {
+                min: 0
+            },
+            comment: 'value acting as visible limit to stored indication'
         },
         place: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: false,
+            comment: 'value used to group similar placed items together'
         },
-        measureCaption: { //TODO remove as premature optimization
-            type: DataTypes.STRING
+        caption: {
+            type: DataTypes.STRING,
+            comment: 'overrides ingredient caption if not null'
         }
     }, {
         scopes: {
-            open: {
+            open: { //regular shelves that acts as normal
                 where: {
-                    isDeleted: false,
                     isClosed: false,
                     isStorage: false,
                     isRevision: false
                 }
             },
-            restock: {
+            restock: { //shelves recommended to restock
                 where: {
-                    isDeleted: false,
                     isClosed: false,
                     isStorage: false,
                     $or: [
                         {
                             stored: {
-                                $lt: sequelize.col('deficit')
+                                $lt: {$col: 'deficit'} /*sequelize.col('deficit')*/
                             }
                         },
                         {
@@ -103,6 +124,5 @@ module.exports = function (sequelize, DataTypes) {
             Shelf.hasMany(models.request);
         }
     });
-    
     return Shelf;
 };
