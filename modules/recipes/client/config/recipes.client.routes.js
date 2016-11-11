@@ -216,10 +216,16 @@ function routeConfig($stateProvider) {
                 roles: ['user', 'admin']
             }
         })
-    
+        .state('shelf.requests', {
+            url: '/:shelfId/requests',
+            templateUrl: 'modules/recipes/client/views/shelf/shelf-requests.client.view.html',
+            data: {
+                roles: ['user', 'admin']
+            }
+        })
         .state('shelf.query', {
             url: '/:shelfId/query',
-            templateUrl: 'modules/recipes/client/views/shelf/shelf-queries.client.view.html',
+            templateUrl: 'modules/recipes/client/views/shelf/shelf-requests.client.view.html',
             data: {
                 roles: ['user', 'admin']
             }

@@ -61,8 +61,11 @@ exports.invokeRolesPolicies = function() {
                 }, {
                     resources: '/api/menu/:menuId',
                     permissions: '*'
-                },{
-                    resources: '/api/menu/:menuId/queries',
+                }, {
+                    resources: '/api/menu/:menuId/requests',
+                    permissions: '*'
+                }, {
+                    resources: '/api/menu/:menuId/queries', //TODO deprecate
                     permissions: '*'
                 },{
                     resources: '/api/shelf',
@@ -71,12 +74,15 @@ exports.invokeRolesPolicies = function() {
                     resources: '/api/shelf/:shelfId',
                     permissions: '*'
                 }, {
-                    resources: '/api/shelf/:shelfId/query',
+                    resources: '/api/shelf/:shelfId/requests',
+                    permissions: '*'
+                }, /*{
+                    resources: '/api/shelf/:shelfId/query', //TODO deprecate
                     permissions: '*'
                 }, {
-                    resources: '/api/shelf/:shelfId/query/:queryId',
+                    resources: '/api/shelf/:shelfId/query/:queryId', //TODO deprecate
                     permissions: '*'
-                }, {
+                },*/ {
                     resources: '/api/request',
                     permissions: '*'
                 }, {

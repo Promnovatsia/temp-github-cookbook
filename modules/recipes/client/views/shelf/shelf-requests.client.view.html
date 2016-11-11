@@ -1,0 +1,76 @@
+<section ng-controller="ShelfController" ng-init="findRequests()">
+    <div class="page-header">
+        <h1>
+            Запросы по полке {{shelf.caption}}
+        </h1>
+    </div>
+    <div class="row">
+        <div ng-repeat="request in requests">
+            <div class="col-md-3 col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div ng-show="request.isResolved">
+                            {{request.id}}:
+                            <i class="glyphicon glyphicon-ok-circle"></i>
+                            Выполнен
+                        </div>
+                        <div ng-hide="request.isResolved">
+                            {{request.id}}:
+                            <i class="glyphicon glyphicon-record"></i>
+                            В процессе
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <a ui-sref="request.edit({ id: request.id })">
+                            <div class="row">
+                                <i class="glyphicon glyphicon-shopping-cart"></i>
+                                {{request.buy}} / {{request.bought}} @ {{buyDate}}
+                            </div>
+                            <div class="row">
+                                <i class="glyphicon glyphicon-cutlery"></i>
+                                {{request.use}} / {{request.used}} @ {{useDate}}
+                            </div>
+                            <div class="row">
+                                <i class="glyphicon glyphicon-trash"></i>
+                                {{request.spoil}} @ {{spoilDate}}
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="list-group">
+        <div ng-repeat="request in requests" class="list-group-item">
+            <div class="row">
+                <div class="col-md-1">
+                    <h4 class="list-group-item-heading" ng-bind="request.id"></h4>
+                </div>
+                <div class="col-md-2">
+                    <div ng-show="request.isResolved">
+                        <i class="glyphicon glyphicon-ok-circle"></i>
+                        Выполнен
+                    </div>
+                    <div ng-hide="request.isResolved">
+                        <i class="glyphicon glyphicon-record"></i>
+                        В процессе
+                    </div>
+                </div>
+                <a ui-sref="request.edit({ id: request.id })">
+                    <div class="col-md-3">
+                        <i class="glyphicon glyphicon-shopping-cart"></i>
+                        {{request.buy}} / {{request.bought}} @ {{buyDate}}
+                    </div>
+                    <div class="col-md-3">
+                        <i class="glyphicon glyphicon-cutlery"></i>
+                        {{request.use}} / {{request.used}} @ {{useDate}}
+                    </div>
+                    <div class="col-md-3">
+                        <i class="glyphicon glyphicon-trash"></i>
+                        {{request.spoil}} @ {{spoilDate}}
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
