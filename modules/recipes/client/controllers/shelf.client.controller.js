@@ -4,9 +4,9 @@ angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
 
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'IngredientService', 'MeasureService'];
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'IngredientService', 'RequestService'];
 
-function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, IngredientService, MeasureService) {
+function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, IngredientService, RequestService) {
 
     // progress bar settings
     var pbLimitDeficit = 20;
@@ -54,6 +54,19 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
                 $scope.setIngredient($stateParams.ingredient);
             }
         } 
+    };
+
+    $scope.findRequests = function() {
+        if ($stateParams.shelfId) {
+            RequestService.requestByShelf(
+                $stateParams.shelfId
+            ).$promise.then(function (requests) {
+                $scope.requests = requests;
+            });
+        }
+        else {
+            $location.path('shelf');
+        }
     };
     
     $scope.getIngredients = function (value) {
