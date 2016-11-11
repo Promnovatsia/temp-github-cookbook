@@ -6,36 +6,40 @@ var path = require('path'),
     async = require('async'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
     db = require(path.resolve('./config/lib/sequelize')).models,
-    Shelf = db.shelf;
+    Shelf = db.shelf,
+    Request = db.request;
 
 exports.create = function (req, res) {
 
     req.body.userId = req.user.id;
-    Shelf.max('number', {
-        where: {
-            userId: req.user.id
-        }
-    }).then(function (number) {
-        if (number) {
-            req.body.number = number + 1;
+
+    Shelf.create(req.body).then(function (shelf) {
+        if (!shelf) {
+            return res.send('users/signup', {
+                errors: 'Could not create the shelf'
+            });
         } else {
-            req.body.number = 1;
-        }
-        Shelf.create(req.body).then(function (shelf) {
-            if (!shelf) {
-                return res.send('users/signup', {
-                    errors: 'Could not create the shelf'
-                });
+            if (shelf.stored <= 0) {
+                return res.json(shelf);
             } else {
+                Request.create(
+                    {
+                        isResolved: true,
+                        bought: shelf.stored,
+                        buyDate: shelf.updatedAt,
+                        comment: 'Autocreated'
+                    }
+                ).then(function (request) {
+                    console.log(request.id,' - Created with shelf ',shelf.id);
+                });
                 return res.json(shelf);
             }
-        });
-        return null;
+        }
     }).catch(function (err) {
         return res.status(400).send({
             message: errorHandler.getErrorMessage(err)
         });
-    });       
+    });
 };
 
 exports.read = function (req, res) {
@@ -52,7 +56,7 @@ exports.update = function (req, res) {
     Shelf.findOne(
         {
             where: { 
-                number: req.body.id,
+                id: req.body.id,
                 userId: req.user.id
             }
         }
@@ -106,21 +110,16 @@ exports.list = function (req, res) {
 
 exports.shelfByID = function (req, res, next, id) {
 
-    if ((id % 1 === 0) === false) { //check if it's integer
-        return res.status(404).send({
-            message: 'Shelf is invalid'
-        });
-    }
     if (!req.user) {
         return res.status(401).send({
             message: 'Unauthorized. This API route returns user-specific data'
         });
     }
-  
+    console.log(id);//TODO find why 'requests' goes here as id
     Shelf.findOne(
         {
             where: { 
-                number: id,
+                id: id,
                 userId: req.user.id
             }
         }
@@ -156,9 +155,9 @@ exports.shelfByIngredient = function (req, res, ingredientId) {
         {
             where: {
                 ingredientId: ingredientId,
-                userId: req.user.id,
-                fallback: null
-            }
+                userId: req.user.id
+            },
+            paranoid: true
         }
     ).then(function(shelf) {
         if (!shelf) {
@@ -171,3 +170,6 @@ exports.shelfByIngredient = function (req, res, ingredientId) {
         return res.jsonp(err);
     });
 };
+
+//TODO setFallbackTo(otherShelf) and setAsOverrideFor(otherShelf)
+//TODO fallback to overriden must rewrite fallback to last in the chain
