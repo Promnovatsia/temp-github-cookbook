@@ -20,7 +20,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     $scope.legend = false;
     $scope.selectedIngridient = "";
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
-    
+
     $scope.find = function () {
         ShelfService.query().$promise.then(function (shelves) {
             $scope.shelves = shelves;
@@ -116,7 +116,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.filterBar = {
-        spoiled: true,
+        spoiled: true,//TODO remove spoiled
         deficit: true,
         lsdesired: true,
         desired: true,
@@ -142,10 +142,10 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         }
     };
     
-    $scope.filterByProgress = function (index) {
+    $scope.filterByProgress = function (index) {//TODO rewrite or move to directive
         var item = $scope.shelves[index];
         if (!item.progressbar) return true;
-        return ($scope.filterBar.spoiled && item.isSpoiled) ||
+        return ($scope.filterBar.spoiled && item.isSpoiled) ||//TODO remove spoiled
             ($scope.filterBar.deficit && item.progressbar.value <= pbLimitDeficit) ||
             ($scope.filterBar.lsdesired && item.progressbar.value > pbLimitDeficit && item.progressbar.value < pbLimitDesired) ||
             ($scope.filterBar.desired && item.progressbar.value >= pbLimitDesired && item.progressbar.value <= pbLimitMax) ||
@@ -209,9 +209,9 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             return false;
         }
 
-        if($scope.ingredient) {
-            $scope.shelf.caption = $scope.ingredient.caption;
-            $scope.shelf.measureCaption = $scope.measure.caption;
+        if($scope.ingredient) { // TODO ingredient must be required
+            $scope.shelf.caption = $scope.ingredient.caption; //TODO caption is an option
+            $scope.shelf.measureId = $scope.measure.id;
         }
 
         $scope.shelf.createOrUpdate()

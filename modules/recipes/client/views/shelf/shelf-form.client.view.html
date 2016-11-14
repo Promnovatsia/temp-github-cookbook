@@ -52,12 +52,7 @@
                                 <br/>
                                 <label class="btn btn-link">
                                     <i class="glyphicon glyphicon-transfer"></i>
-                                    Замена для {{shelf.override}} <!-- //FUTURE override UI-->
-                                </label>
-                                <br/>
-                                <label class="btn btn-link">
-                                    <i class="glyphicon glyphicon-transfer"></i>
-                                    Заменимо на {{shelf.fallback}} <!-- //FUTURE fallback UI-->
+                                    Заменимо на {{shelf.fallback}} <!-- //TODO fallback UI-->
                                 </label>
                             </div>
                         </div>
@@ -107,6 +102,22 @@
                             </div>
                             <div class="col-md-4 col-xs-7">
                                 <updowninput id="stored" ng-model="shelf.stored" measure="measure" validator="validateStored(id,value,oldValue)"><updowninput>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <br>
+                            <div ng-if="shelf.stored" class="col-md-2">
+                                <label>
+                                    Годен до
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-xs-7">
+                                <div class="input-group">
+                                    <label for="spoilDate" class="input-group-addon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </label>
+                                    <input id="spoilDate" type="date" ng-model="shelf.spoilDate" class="form-control">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-7">
@@ -172,26 +183,25 @@
                                 Управление полкой
                             </label>
                             <br>
+                            <toggle-switch id="isClosed" class="switch-danger" ng-model="shelf.isClosed" knob-label="<->" on-label="" off-label=""></toggle-switch>
                             <label for="isClosed">
-                                Общая доступность
+                                Полка {{shelf.isClosed ? 'закрыта' : 'открыта'}}
                             </label>
-                            <toggle-switch id="isClosed" class="switch-danger" ng-model="shelf.isClosed" on-label="Заблокирована" off-label="Включена"></toggle-switch>
                             <br>
+                            <toggle-switch id="isRevision" class="switch-warning" ng-model="shelf.isRevision" knob-label="<->" on-label="" off-label=""></toggle-switch>
                             <label for="isRevision">
-                                Резервирование
+                                На {{shelf.isRevision ? 'особом контроле' : 'общих правах'}}
                             </label>
-                            <toggle-switch id="isRevision" class="switch-warning" ng-model="shelf.isRevision" on-label="Только ручное" off-label="Через планировщик меню"></toggle-switch>
                             <br>
+                            <toggle-switch id="isStorage" class="switch-info" ng-model="shelf.isStorage" knob-label="<->" on-label="" off-label=""></toggle-switch>
                             <label for="isStorage">
-                                Резервирование
-                            </label>
-                            <toggle-switch id="isStorage" class="switch-info" ng-model="shelf.isStorage" on-label="На хранении" off-label="Общедоступна"></toggle-switch>
-                            <br>
-                            <toggle-switch id="isResourse" class="switch-info" ng-model="shelf.isResource" on-label="" off-label=""></toggle-switch>
-                            <label for="isStorage">
-                                Пополнение: {{shelf.isResource ? 'Автоматически до желаемого' : 'По запросу при дефиците'}}
+                                Резервирование {{shelf.isStorage ? 'при подтверждении' : 'автоматическое'}}
                             </label>
                             <br>
+                            <toggle-switch id="isResourse" class="switch-success" ng-model="shelf.isResource" knob-label="<->" on-label="" off-label=""></toggle-switch>
+                            <label for="isResourse">
+                                Пополнение {{shelf.isResource ? 'автоматически' : 'по запросу'}}
+                            </label>
                             <hr>
                         </div>
                     </div>
