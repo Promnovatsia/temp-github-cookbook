@@ -27,7 +27,9 @@ exports.create = function (req, res) {
                         isResolved: true,
                         bought: shelf.stored,
                         buyDate: shelf.updatedAt,
-                        comment: 'Autocreated'
+                        comment: 'Autocreated',
+                        shelfId: shelf.id,
+                        userId: shelf.userId
                     }
                 ).then(function (request) {
                     console.log(request.id,' - Created with shelf ',shelf.id);
@@ -115,7 +117,6 @@ exports.shelfByID = function (req, res, next, id) {
             message: 'Unauthorized. This API route returns user-specific data'
         });
     }
-    console.log(id);//TODO find why 'requests' goes here as id
     Shelf.findOne(
         {
             where: { 

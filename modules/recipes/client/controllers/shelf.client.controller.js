@@ -58,9 +58,9 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
 
     $scope.findRequests = function() {
         if ($stateParams.shelfId) {
-            RequestService.requestByShelf(
-                $stateParams.shelfId
-            ).$promise.then(function (requests) {
+            RequestService.requestByShelf({
+                shelfId: $stateParams.shelfId
+            }).$promise.then(function (requests) {
                 $scope.requests = requests;
             });
         }
