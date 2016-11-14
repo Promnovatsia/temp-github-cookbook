@@ -24,15 +24,17 @@ exports.create = function (req, res) {
             } else {
                 Request.create(
                     {
+                        userId: shelf.userId,
+                        shelfId: shelf.id,
+                        measureId: shelf.measureId,
                         isResolved: true,
                         bought: shelf.stored,
                         buyDate: shelf.updatedAt,
-                        comment: 'Autocreated',
-                        shelfId: shelf.id,
-                        userId: shelf.userId
+                        spoilDate: shelf.spoilDate,
+                        comment: 'Autocreated'
                     }
                 ).then(function (request) {
-                    console.log(request.id,' - Created with shelf ',shelf.id);
+                    console.log('Request', request.id,'- Autocreated with shelf',shelf.id);
                 });
                 return res.json(shelf);
             }
