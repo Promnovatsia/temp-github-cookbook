@@ -5,9 +5,9 @@ angular
     .module('recipes')
     .factory('MenuService', MenuService);
 
-MenuService.$inject = ['$resource', 'ShelfQueryService'];
+MenuService.$inject = ['$resource', 'RequestService'];
 
-function MenuService($resource, ShelfQueryService) {
+function MenuService($resource, RequestService) {
     var Menu = $resource('api/menu/:menuId', {
         menuId: '@number'
     }, {
@@ -21,9 +21,9 @@ function MenuService($resource, ShelfQueryService) {
             var menu = this;
             return createOrUpdate(menu);
         },
-        getQueries: function () {
+        getRequests: function () {
             var menu = this;
-            return getQueries(menu);
+            return getRequests(menu);
         }
     });
     
@@ -37,8 +37,8 @@ function MenuService($resource, ShelfQueryService) {
         }
     }
 
-    function getQueries(menu) {
-        return ShelfQueryService.queryByMenu(
+    function getRequests(menu) {
+        return RequestService.requestByMenu(
             {
                 menuId: menu.id
             }
