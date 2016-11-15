@@ -183,14 +183,14 @@
                                 Управление полкой
                             </label>
                             <br>
-                            <toggle-switch id="isClosed" class="switch-danger" ng-model="shelf.isClosed" knob-label="<->" on-label="" off-label=""></toggle-switch>
-                            <label for="isClosed">
-                                Полка {{shelf.isClosed ? 'закрыта' : 'открыта'}}
+                            <toggle-switch id="isRestricted" class="switch-danger" ng-model="shelf.isRestricted" knob-label="<->" on-label="" off-label=""></toggle-switch>
+                            <label for="isRestricted">
+                                На {{shelf.isRestricted ? 'особом контроле' : 'общих правах'}}
                             </label>
                             <br>
-                            <toggle-switch id="isRevision" class="switch-warning" ng-model="shelf.isRevision" knob-label="<->" on-label="" off-label=""></toggle-switch>
-                            <label for="isRevision">
-                                На {{shelf.isRevision ? 'особом контроле' : 'общих правах'}}
+                            <toggle-switch id="isClosed" class="switch-warning" ng-model="shelf.isClosed" knob-label="<->" on-label="" off-label=""></toggle-switch>
+                            <label for="isClosed">
+                                {{shelf.isClosed ? 'Закрыта' : 'Открыта'}} для планирования
                             </label>
                             <br>
                             <toggle-switch id="isStorage" class="switch-info" ng-model="shelf.isStorage" knob-label="<->" on-label="" off-label=""></toggle-switch>

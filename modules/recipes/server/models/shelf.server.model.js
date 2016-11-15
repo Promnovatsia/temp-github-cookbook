@@ -16,13 +16,13 @@ module.exports = function (sequelize, DataTypes) {
             },
             comment: 'if set to shelf uuid owned by same user all requests will redirect to fallback shelf instead'
         },
-        isClosed: {
+        isRestricted: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
             comment: 'if set no request can change stored amount, no fallback'
         },
-        isRevision: {
+        isClosed: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
@@ -89,14 +89,14 @@ module.exports = function (sequelize, DataTypes) {
         scopes: {
             open: { //regular shelves that acts as normal
                 where: {
+                    isRestricted: false,
                     isClosed: false,
                     isStorage: false,
-                    isRevision: false
                 }
             },
             restock: { //shelves recommended to restock
                 where: {
-                    isClosed: false,
+                    isRestricted: false,
                     isStorage: false,
                     $or: [
                         {
