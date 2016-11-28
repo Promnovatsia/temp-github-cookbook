@@ -4,14 +4,14 @@ angular
     .module('recipes')
     .controller('ShelfController', ShelfController);
 
-ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'ShelfQueryService', 'IngredientService', 'MeasureService'];
+ShelfController.$inject = ['$scope', '$stateParams', '$location', '$window', 'Authentication', 'ShelfService', 'IngredientService', 'RequestService'];
 
-function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, ShelfQueryService, IngredientService, MeasureService) {
+function ShelfController($scope, $stateParams, $location, $window, Authentication, ShelfService, IngredientService, RequestService) {
 
     // progress bar settings
-    const pbLimitDeficit = 20;
-    const pbLimitDesired = 50;
-    const pbLimitMax = 80;
+    var pbLimitDeficit = 20;
+    var pbLimitDesired = 50;
+    var pbLimitMax = 80;
         
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -20,7 +20,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     $scope.legend = false;
     $scope.selectedIngridient = "";
     $scope.imageurl = 'http://res.cloudinary.com/thomascookbook/image/upload/v1466671927/';
-    
+
     $scope.find = function () {
         ShelfService.query().$promise.then(function (shelves) {
             $scope.shelves = shelves;
@@ -55,6 +55,19 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             }
         } 
     };
+
+    $scope.findRequests = function() {
+        if ($stateParams.shelfId) {
+            RequestService.requestByShelf({
+                shelfId: $stateParams.shelfId
+            }).$promise.then(function (requests) {
+                $scope.requests = requests;
+            });
+        }
+        else {
+            $location.path('shelf');
+        }
+    };
     
     $scope.getIngredients = function (value) {
         var matched = [];
@@ -87,14 +100,14 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     
     $scope.setIngredient = function (ingredient) {
         
-        if (!ingredient) {
+        if (!ingredient.id) {
             $scope.shelf.ingridientId = null;
             $scope.ingredient = null;
             return;
         }
-        
         $scope.ingredient = ingredient;
         $scope.shelf.ingredientId = ingredient.id;
+        console.log(ingredient.measureId);
         ingredient.getMeasure().then(function (measure) {
             $scope.measure = measure;
         });
@@ -103,7 +116,7 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.filterBar = {
-        spoiled: true,
+        spoiled: true,//TODO remove spoiled
         deficit: true,
         lsdesired: true,
         desired: true,
@@ -129,10 +142,10 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
         }
     };
     
-    $scope.filterByProgress = function (index) {
+    $scope.filterByProgress = function (index) {//TODO rewrite or move to directive
         var item = $scope.shelves[index];
         if (!item.progressbar) return true;
-        return ($scope.filterBar.spoiled && item.isSpoiled) ||
+        return ($scope.filterBar.spoiled && item.isSpoiled) ||//TODO remove spoiled
             ($scope.filterBar.deficit && item.progressbar.value <= pbLimitDeficit) ||
             ($scope.filterBar.lsdesired && item.progressbar.value > pbLimitDeficit && item.progressbar.value < pbLimitDesired) ||
             ($scope.filterBar.desired && item.progressbar.value >= pbLimitDesired && item.progressbar.value <= pbLimitMax) ||
@@ -183,10 +196,10 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
     };
     
     $scope.remove = function () {
-        if ($window.confirm('Are you sure you want to delete?')) {
+        //if ($window.confirm('Are you sure you want to delete?')) {
             $scope.shelf.$remove();
             $location.path('shelf');    
-        }
+        //}
     };
 
     $scope.save = function (isValid) {
@@ -195,15 +208,18 @@ function ShelfController($scope, $stateParams, $location, $window, Authenticatio
             $scope.$broadcast('show-errors-check-validity', 'shelfForm');
             return false;
         }
-        
-        $scope.shelf.caption = $scope.ingredient.caption;
-        $scope.shelf.measureCaption = $scope.measure.caption;
+
+        if($scope.ingredient) { // TODO ingredient must be required
+            $scope.shelf.caption = $scope.ingredient.caption; //TODO caption is an option
+            $scope.shelf.measureId = $scope.measure.id;
+        }
+
         $scope.shelf.createOrUpdate()
             .then(successCallback)
             .catch(errorCallback);
 
         function successCallback(res) {
-            $location.path('shelf/' + $scope.shelf.number);
+            $location.path('shelf/' + $scope.shelf.id);
         }
 
         function errorCallback(res) {

@@ -10,8 +10,8 @@ var recipesPolicy = require('../policies/recipes.server.policy'),
     products = require('../controllers/products.server.controller'),
     menus = require('../controllers/menus.server.controller'),
     shelf = require('../controllers/shelf.server.controller'),
-    request = require('../controllers/request.server.controller.js'),
-    shelfQuery = require('../controllers/shelfQuery.server.controller');
+    request = require('../controllers/request.server.controller');
+    //shelfQuery = require('../controllers/shelfQuery.server.controller');
 
 module.exports = function(app) {
 
@@ -77,9 +77,14 @@ module.exports = function(app) {
         .get(menus.read)
         .put(menus.update)
     ;
-    app.route('/api/menu/:menuId/queries')
+    /*app.route('/api/menu/:menuId/queries') //TODO deprecate
         .all(recipesPolicy.isAllowed)
         .get(shelfQuery.queryByMenu)
+    ;
+    */
+    app.route('/api/menu/:menuId/requests')
+        .all(recipesPolicy.isAllowed)
+        .get(request.requestByMenu)
     ;
     
     app.route('/api/shelf')
@@ -92,16 +97,21 @@ module.exports = function(app) {
         .get(shelf.read)
         .put(shelf.update)
     ;
-    app.route('/api/shelf/:shelfId/query')
+    app.route('/api/shelf/:shelfId/requests')
+        .all(recipesPolicy.isAllowed)
+        .get(request.requestByShelf)
+        //.post(request.create) //TODO create request for shelf
+    ;
+    /*app.route('/api/shelf/:shelfId/query') //TODO deprecate
         .all(recipesPolicy.isAllowed)
         .get(shelfQuery.list)
         .post(shelfQuery.create)
     ;
-    app.route('/api/shelf/:shelfId/query/:queryId')
+    app.route('/api/shelf/:shelfId/query/:queryId') //TODO deprecate
         .all(recipesPolicy.isAllowed)
         .get(shelfQuery.read)
         .put(shelfQuery.update)
-    ;
+    ;*/
 
     app.route('/api/request')
         .all(recipesPolicy.isAllowed)
@@ -122,6 +132,6 @@ module.exports = function(app) {
     app.param('productId', products.productByID);
     app.param('menuId', menus.menuByID);
     app.param('shelfId', shelf.shelfByID);
-    app.param('queryId', shelfQuery.queryByID);
+    //app.param('queryId', shelfQuery.queryByID); //TODO deprecate
     app.param('requestId', request.requestByID);
 };

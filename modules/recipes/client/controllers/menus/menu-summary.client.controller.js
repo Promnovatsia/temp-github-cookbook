@@ -4,9 +4,9 @@
 angular
     .module('recipes')
     .controller('MenuSummaryController', MenuSummaryController);
-MenuSummaryController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'MenuService','IngredientService', 'MealService'];
+MenuSummaryController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'MenuService','IngredientService', 'MealService', 'RequestService'];
 
-function MenuSummaryController($scope, $stateParams, $location, Authentication, MenuService, IngredientService, MealService) {
+function MenuSummaryController($scope, $stateParams, $location, Authentication, MenuService, IngredientService, MealService, RequestService) {
     
     $scope.authentication = Authentication;
     $scope.error = null;
@@ -57,9 +57,9 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
                 });
             });
         });
-        if (!$scope.menu.shelfQueries) {
-            $scope.menu.getQueries().then(function (queries) {
-                $scope.menu.shelfQueries = queries;
+        if (!$scope.menu.requests) {
+            $scope.menu.getRequests().then(function (requests) {
+                $scope.menu.requests = requests;
             });
         }
     };
@@ -112,23 +112,38 @@ function MenuSummaryController($scope, $stateParams, $location, Authentication, 
 
     $scope.checkout = function () {
         $scope.summary.forEach(function (ingredient, i, arr) {
-            if (ingredient.shelf) {
-                ingredient.measures.forEach(function(measure, j, arr) {
-                    var found = false;
-                    if ($scope.menu.shelfQueries.some(
-                        function (query, k, arr) {
-                            if (query.shelfId===ingredient.shelf.id && query.measureId === measure.id) {
-                                found = k;
+            if (!ingredient.shelf) {
+                //TODO if shelf is never existed
+            } else {
+                if (ingredient.shelf.isRestricted) {
+                    //TODO restricted error
+                    return;
+                }
+                if (ingredient.shelf.isClosed) {
+                    //TODO manual checkout required
+                }
+                ingredient.measures.forEach(function (measure, j, arr) {
+                    var found = new RequestService();
+                    if ($scope.menu.requests.some(
+                        function (request, k, arr) {
+                            if (request.shelfId === ingredient.shelf.id && request.measureId === measure.id) {
+                                found = new RequestService(request);
                                 return true;
                             } else return false;
                         })
                     ) {
-                        $scope.menu.shelfQueries[found].use = measure.amount;
-                        $scope.menu.shelfQueries[found].useDate = $scope.menu.startDate;
+                        if (found.requested > measure.amount) {
+                            found.requested = measure.amount;
+                        } else {
+                            var diff = ingredient.shelf.stored - ingredient.shelf.deficit + found.requested - measure.amount;
+                            found.buy = (diff >= 0) ? 0 : -diff;
+                        }
+                        found.useDate = $scope.menu.startDate;
+                        //TODO checkout save callback
                     } else {
-                        $scope.menu.shelfQueries.push(
+                        $scope.menu.requests.push(
                             {
-                                use: measure.amount,
+                                requested: measure.amount,
                                 useDate: $scope.menu.startDate,
                                 shelfId: ingredient.shelf.id,
                                 measureId: measure.id

@@ -75,7 +75,7 @@ exports.update = function(req, res) {
                     } else {
                         //TODO restore if resolved request is updated to
                         if (req.body.buy === -diff) {
-                            shelf.stored = shelf.deficit + 5;//TODO remove adding before commit
+                            shelf.stored = shelf.deficit;
                             req.body.isResolved = false;
                         }
                         else {

@@ -19,7 +19,7 @@ function RequestService($resource, ShelfService, MeasureService) {
                 menuId: '@menuId'
             },
             isArray: true,
-            url: 'api/menu/:menuId/queries'
+            url: 'api/menu/:menuId/requests'
         },
         requestByShelf: {
             method: 'GET',
@@ -27,7 +27,7 @@ function RequestService($resource, ShelfService, MeasureService) {
                 shelfId: '@shelfId'
             },
             isArray: true,
-            url: '/api/shelf/:shelfId/query'
+            url: '/api/shelf/:shelfId/requests'
         }
         //TODO add methods to tell apart updating and resolving
     });

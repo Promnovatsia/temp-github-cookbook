@@ -55,7 +55,7 @@
                 </div>
             </form>
         </div>
-        <a ng-repeat="shelf in shelves | filter: filterByName | orderBy: 'progressbar.value'" class="list-group-item" ui-sref="shelf.view({shelfId:shelf.number})" ng-show="filterByProgress($index)">
+        <a ng-repeat="shelf in shelves | filter: filterByName | orderBy: 'progressbar.value'" class="list-group-item" ui-sref="shelf.view({shelfId:shelf.id})" ng-show="filterByProgress($index)">
             <div class="row">
                 <div class="col-md-3">
                     <h4 class="list-group-item-heading" ng-bind="shelf.caption"></h4>
