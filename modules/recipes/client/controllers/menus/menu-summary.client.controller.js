@@ -4,9 +4,9 @@
 angular
     .module('recipes')
     .controller('MenuSummaryController', MenuSummaryController);
-MenuSummaryController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'MenuService','IngredientService', 'MealService'];
+MenuSummaryController.$inject = ['$scope', '$stateParams', '$location', 'Authentication', 'MenuService','IngredientService', 'MealService', 'RequestService'];
 
-function MenuSummaryController($scope, $stateParams, $location, Authentication, MenuService, IngredientService, MealService) {
+function MenuSummaryController($scope, $stateParams, $location, Authentication, MenuService, IngredientService, MealService, RequestService) {
     
     $scope.authentication = Authentication;
     $scope.error = null;

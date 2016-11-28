@@ -10,8 +10,8 @@ var recipesPolicy = require('../policies/recipes.server.policy'),
     products = require('../controllers/products.server.controller'),
     menus = require('../controllers/menus.server.controller'),
     shelf = require('../controllers/shelf.server.controller'),
-    request = require('../controllers/request.server.controller.js'),
-    shelfQuery = require('../controllers/shelfQuery.server.controller');
+    request = require('../controllers/request.server.controller');
+    //shelfQuery = require('../controllers/shelfQuery.server.controller');
 
 module.exports = function(app) {
 
